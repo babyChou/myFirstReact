@@ -1,0 +1,160 @@
+$btn-common-h:21px;
+$btn-mt: -2px;
+$btn-common-color: $white;
+$btn-imgs-con: (
+    'btn_menu_logout' : '%btn_logout',
+    'btn_menu_language' : '%btn_language',
+    'btn_common' : '%btn_btn',
+    'btn_broadcastlist' : '%btn_menu_broadcastlist',
+    'btn_configuration' : '%btn_menu_configuration',
+    'btn_encoding' : '%btn_menu_encoding',
+    'btn_log' : '%btn_menu_log',
+    'btn_administration' : '%btn_menu_administration'
+);
+
+$btn-imgs-h21: (
+    'btn_add' : '%btn_add',
+    'btn_broadcast_list_delete' : '%btn_broadcast_list_delete',
+    'btn_broadcast_list_start' : '%btn_broadcast_list_start',
+    'btn_broadcast_list_stop' : '%btn_broadcast_list_stop',
+    'btn_delete' : '%btn_delete',
+    'btn_done' : '%btn_done',
+    'btn_edit' : '%btn_edit',
+    'btn_expand' : '%btn_expand',
+    'btn_folding' : '%btn_folding',
+    'btn_refresh' : '%btn_refresh',
+    'btn_rename_edit' : '%btn_rename_edit',
+    'btn_start' : '%btn_start',
+    'btn_stop' : '%btn_stop',
+    'btn_tuner_volume_max' : '%btn_tuner_volume_max',
+    'btn_tuner_volume_minimal' : '%btn_tuner_volume_minimal',
+    'btn_tuner_volume_mute' : '%btn_tuner_volume_mute'
+);
+
+$btn-imgs-h30: (
+    'btn_volume' : '%btn_volume'
+);
+
+@mixin genBtns($btn-h, $btn-imgs) {
+
+    @each $key, $val in $btn-imgs {
+        .#{$key}{
+            height: $btn-h;
+            border: 0;
+            background-color: rgba(255, 255, 255, 0);
+            display: block;
+            cursor: pointer;
+            &:hover{
+                background-position-y: -$btn-h;
+                background-position-x: right;
+            }
+            &:active, &.active{
+                background-position-y: -($btn-h*2);
+                background-position-x: right;
+            }
+            &:disabled, &.disabled{
+                cursor: not-allowed;
+                background-position-y: -($btn-h*3);
+                background-position-x: right;
+            }
+            &:focus{
+                outline-style: none;
+            }
+        }
+    }
+}
+
+@each $key, $val in $btn-imgs-con {
+
+    @if $key != 'btn_common' and $key != 'btn_menu_logout' and $key != 'btn_menu_language' {
+        $btn-common-h:23px;
+        $btn-mt: 0;
+    }
+
+    .#{$key}{
+        position: relative;
+        border: 1px solid transparent;
+        height: $btn-common-h;
+        background-color: rgba(255, 255, 255, 0);
+        color:$white;
+        font-weight: 600;
+        width: 100px;
+        outline: 0;
+        cursor: pointer;
+        &::before{
+            @extend #{$val};
+            content: '';
+            background-position: 0 0;
+            position: absolute;
+            width: 50%;
+            height: $btn-common-h;
+            top: 0;
+            left: 0;
+        }
+        &::after{
+            @extend #{$val};
+            content: '';
+            background-position: right 0;
+            position: absolute;
+            width: 50%;
+            height: $btn-common-h;
+            top: 0;
+            right: 0;
+        }
+        &:hover{
+            &::after{
+                background-position-y: -$btn-common-h;
+                background-position-x: right;
+            }
+            &::before{
+                background-position-y: -$btn-common-h;
+                background-position-x: 0;
+            }
+        }
+        &:active, &.active{
+            &::after{
+                background-position-y: -($btn-common-h*2);
+                background-position-x: right;
+            }
+            &::before{
+                background-position-y: -($btn-common-h*2);
+                background-position-x: 0;
+            }
+        }
+        &:disabled, &.disabled{
+            cursor: not-allowed;
+            &::after{
+                background-position-y: -($btn-common-h*3);
+                background-position-x: right;
+            }
+            &::before{
+                background-position-y: -($btn-common-h*3);
+                background-position-x: 0;
+            }
+        }
+        &:focus{
+            outline-style: none;
+        }
+    
+        >*{
+            position: relative;
+            text-align: center;
+            z-index: 2;
+            color: $btn-common-color;
+            display: block;
+            margin-top: $btn-mt;
+            margin-bottom: 0;
+            &:hover{color: $btn-common-color; text-decoration:none}
+            &:active{color: $btn-common-color; text-decoration:none}
+        }
+    }
+}
+
+@include genBtns(30px, $btn-imgs-h30);
+@include genBtns(21px, $btn-imgs-h21);
+@include genBtns(66px, ('btn_source_hdmi' : '%panel_hdmi_simple'));
+@include genBtns(46px, ('btn_source_sdi' : '%panel_sdi_simple'));
+
+.btn_common_sm{width: 70px;}
+.btn_common_md{width: 100px;}
+.btn_common_lg{width: 120px;}

@@ -1,0 +1,32 @@
+.volume_control{
+    * {
+        display: inline-block;
+    }
+    .btn_tuner_volume_minimal{
+        // margin-right: 10px;
+    }
+    .btn_tuner_volume_max{
+        // margin-left: 10px;
+    }
+
+    .volume_control_tube{
+        position: relative;
+        min-width: 100px;
+        height: 8px;
+        background-color: #000;
+        .volume_bar_control{
+            position: absolute;
+            top: -5px;
+            left: 0;
+        }
+        .volume_bar_status{
+            position: absolute;
+            top:0;
+            left: 0;
+        }
+    }
+
+    .volume_control_value{
+        width: 60px;
+    }
+}

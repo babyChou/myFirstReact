@@ -1,0 +1,88 @@
+
+.modal-header{
+    min-height: 27px;
+    background: linear-gradient(to bottom, #006ABC 0%, #002757 100%);
+    .close{
+        padding: 0;
+        margin-top: -5px;
+    }
+}
+
+.modal-body{
+    background-color: $white;
+    color: $black;
+}
+
+.modal-footer{
+    background-color: $white;
+    border-radius: 0 0 $border-radius-lg $border-radius-lg; 
+}
+
+.close{
+    opacity: 1;
+    &:hover {
+        opacity: 1;
+        color: $yellow;
+    }
+    &:active {
+        opacity: 1;
+        color: $orange;
+        padding-top: 1px;
+        margin-right: -1px;
+    }
+}
+
+
+.common-dp-menu > span{
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+//table
+$thead-blue-bg: #617392;
+$table-odd-bg: #BFC7D3;
+$table-even-bg: #D1D7E1;
+
+.table, .table-configuration{
+    .thead-blue {
+        th {
+            border-bottom: 0;
+            padding: 8px;
+            color: $table-dark-color;
+            background-color: $thead-blue-bg;
+            border-color: $table-border-color;
+        }
+    }
+    th, td{
+        padding: 0.4rem;
+        vertical-align: top;
+    }
+
+}
+.table-striped-common {
+    tbody tr:nth-of-type(odd) {
+        background-color: $table-odd-bg;
+    }
+
+    tbody tr:nth-of-type(even) {
+        background-color: $table-even-bg;
+    }
+}
+
+.table-common-odd{
+    td, th{
+        background-color: $table-odd-bg;
+    }
+}
+
+.table-common-even{
+    td, th{
+        background-color: $table-even-bg;
+    }
+}
+
+
+
+// @include my-form-validation-state("aaa-valid", $form-feedback-invalid-color);
+
+@include my-form-validation-state("invalid", $form-feedback-invalid-color);

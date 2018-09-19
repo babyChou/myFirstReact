@@ -1,0 +1,96 @@
+%bg_login{width:387px;height:308px;background-image:url("./img/bg_login.png");}
+%bg_se5820_panel{width:466px;height:130px;background-image:url("./img/bg_se5820_panel.png");}
+%btn_add{width:21px;height:84px;background-image:url("./img/btn_add.png");}
+%btn_broadcast_list_delete{width:30px;height:84px;background-image:url("./img/btn_broadcast_list_delete.png");}
+%btn_broadcast_list_start{width:30px;height:84px;background-image:url("./img/btn_broadcast_list_start.png");}
+%btn_broadcast_list_stop{width:30px;height:84px;background-image:url("./img/btn_broadcast_list_stop.png");}
+%btn_btn{width:200px;height:84px;background-image:url("./img/btn_btn.png");}
+%btn_delete{width:21px;height:84px;background-image:url("./img/btn_delete.png");}
+%btn_done{width:21px;height:84px;background-image:url("./img/btn_done.png");}
+%btn_edit{width:21px;height:84px;background-image:url("./img/btn_edit.png");}
+%btn_expand{width:21px;height:84px;background-image:url("./img/btn_expand.png");}
+%btn_folding{width:21px;height:84px;background-image:url("./img/btn_folding.png");}
+%btn_language{width:200px;height:84px;background-image:url("./img/btn_language.png");}
+%btn_login_faceook{width:288px;height:62px;background-image:url("./img/btn_login_faceook.png");}
+%btn_logout{width:200px;height:84px;background-image:url("./img/btn_logout.png");}
+%btn_menu_administration{width:200px;height:92px;background-image:url("./img/btn_menu_administration.png");}
+%btn_menu_broadcastlist{width:200px;height:92px;background-image:url("./img/btn_menu_broadcastlist.png");}
+%btn_menu_browser{width:200px;height:92px;background-image:url("./img/btn_menu_browser.png");}
+%btn_menu_configuration{width:200px;height:92px;background-image:url("./img/btn_menu_configuration.png");}
+%btn_menu_encoding{width:200px;height:92px;background-image:url("./img/btn_menu_encoding.png");}
+%btn_menu_log{width:200px;height:92px;background-image:url("./img/btn_menu_log.png");}
+%btn_menu_overview{width:200px;height:92px;background-image:url("./img/btn_menu_overview.png");}
+%btn_menu_pip{width:200px;height:92px;background-image:url("./img/btn_menu_pip.png");}
+%btn_menu_redundancy{width:200px;height:92px;background-image:url("./img/btn_menu_redundancy.png");}
+%btn_menu_remote_controller{width:200px;height:92px;background-image:url("./img/btn_menu_remote_controller.png");}
+%btn_menu_satellite{width:200px;height:92px;background-image:url("./img/btn_menu_satellite.png");}
+%btn_menu_watermark{width:200px;height:92px;background-image:url("./img/btn_menu_watermark.png");}
+%btn_preview{width:21px;height:84px;background-image:url("./img/btn_preview.png");}
+%btn_refresh{width:21px;height:84px;background-image:url("./img/btn_refresh.png");}
+%btn_rename_edit{width:30px;height:84px;background-image:url("./img/btn_rename_edit.png");}
+%btn_start{width:21px;height:84px;background-image:url("./img/btn_start.png");}
+%btn_stop{width:21px;height:84px;background-image:url("./img/btn_stop.png");}
+%btn_tuner_volume_max{width:21px;height:84px;background-image:url("./img/btn_tuner_volume_max.png");}
+%btn_tuner_volume_minimal{width:21px;height:84px;background-image:url("./img/btn_tuner_volume_minimal.png");}
+%btn_tuner_volume_mute{width:21px;height:84px;background-image:url("./img/btn_tuner_volume_mute.png");}
+%btn_volume{width:30px;height:120px;background-image:url("./img/btn_volume.png");}
+%head_1{width:396px;height:117px;background-image:url("./img/head_1.png");}
+%head_2{width:6px;height:117px;background-image:url("./img/head_2.png");}
+%icon_dialogboxe{width:62px;height:62px;background-image:url("./img/icon_dialogboxe.png");}
+%icon_dialogboxe_2{width:62px;height:62px;background-image:url("./img/icon_dialogboxe_2.png");}
+%icon_dialogboxe_3{width:62px;height:62px;background-image:url("./img/icon_dialogboxe_3.png");}
+%icon_dialogboxe_4{width:62px;height:62px;background-image:url("./img/icon_dialogboxe_4.png");}
+%logo{width:136px;height:45px;background-image:url("./img/logo.png");}
+%panel_hdmi_simple{width:32px;height:264px;background-image:url("./img/panel_hdmi_simple.png");}
+%panel_sdi_simple{width:46px;height:184px;background-image:url("./img/panel_sdi_simple.png");}
+%scan_progress_bar{width:1px;height:20px;background-image:url("./img/scan_progress_bar.png");}
+%volume_bar_control{width:12px;height:18px;background-image:url("./img/volume_bar_control.png");}
+%volume_bar_status{width:1px;height:8px;background-image:url("./img/volume_bar_status.png");}
+.bg_login{@extend %bg_login;}
+.bg_se5820_panel{@extend %bg_se5820_panel;}
+.btn_add{@extend %btn_add;}
+.btn_broadcast_list_delete{@extend %btn_broadcast_list_delete;}
+.btn_broadcast_list_start{@extend %btn_broadcast_list_start;}
+.btn_broadcast_list_stop{@extend %btn_broadcast_list_stop;}
+.btn_btn{@extend %btn_btn;}
+.btn_delete{@extend %btn_delete;}
+.btn_done{@extend %btn_done;}
+.btn_edit{@extend %btn_edit;}
+.btn_expand{@extend %btn_expand;}
+.btn_folding{@extend %btn_folding;}
+.btn_language{@extend %btn_language;}
+.btn_login_faceook{@extend %btn_login_faceook;}
+.btn_logout{@extend %btn_logout;}
+.btn_menu_administration{@extend %btn_menu_administration;}
+.btn_menu_broadcastlist{@extend %btn_menu_broadcastlist;}
+.btn_menu_browser{@extend %btn_menu_browser;}
+.btn_menu_configuration{@extend %btn_menu_configuration;}
+.btn_menu_encoding{@extend %btn_menu_encoding;}
+.btn_menu_log{@extend %btn_menu_log;}
+.btn_menu_overview{@extend %btn_menu_overview;}
+.btn_menu_pip{@extend %btn_menu_pip;}
+.btn_menu_redundancy{@extend %btn_menu_redundancy;}
+.btn_menu_remote_controller{@extend %btn_menu_remote_controller;}
+.btn_menu_satellite{@extend %btn_menu_satellite;}
+.btn_menu_watermark{@extend %btn_menu_watermark;}
+.btn_preview{@extend %btn_preview;}
+.btn_refresh{@extend %btn_refresh;}
+.btn_rename_edit{@extend %btn_rename_edit;}
+.btn_start{@extend %btn_start;}
+.btn_stop{@extend %btn_stop;}
+.btn_tuner_volume_max{@extend %btn_tuner_volume_max;}
+.btn_tuner_volume_minimal{@extend %btn_tuner_volume_minimal;}
+.btn_tuner_volume_mute{@extend %btn_tuner_volume_mute;}
+.btn_volume{@extend %btn_volume;}
+.head_1{@extend %head_1;}
+.head_2{@extend %head_2;}
+.icon_dialogboxe{@extend %icon_dialogboxe;}
+.icon_dialogboxe_2{@extend %icon_dialogboxe_2;}
+.icon_dialogboxe_3{@extend %icon_dialogboxe_3;}
+.icon_dialogboxe_4{@extend %icon_dialogboxe_4;}
+.logo{@extend %logo;}
+.panel_hdmi_simple{@extend %panel_hdmi_simple;}
+.panel_sdi_simple{@extend %panel_sdi_simple;}
+.scan_progress_bar{@extend %scan_progress_bar;}
+.volume_bar_control{@extend %volume_bar_control;}
+.volume_bar_status{@extend %volume_bar_status;}

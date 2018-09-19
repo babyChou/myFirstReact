@@ -1,0 +1,73 @@
+#header_top{
+    background-repeat: repeat-x;
+    width:100%;
+    position: relative;
+    
+    .logo{
+        position: absolute;
+        top:0;
+        right: 17px;
+    }
+}
+
+#main_tab{
+    position: absolute;
+    padding-left: 18px;
+    top: 78px;
+    a {
+        display: inline-block;
+        width: auto;
+        padding-right: 25px;
+        text-decoration: none;
+        >* {
+            padding-left: 40px; 
+        }
+    }
+
+}
+
+ul#menu_config{
+    position: absolute;
+    top: 45px;
+    right:44px;
+    li {
+        vertical-align: middle;
+        margin-right: 10px;
+        display: inline-block;
+        width: auto;
+        padding-left: 27px;
+        padding-right: 10px;
+    }
+}
+
+
+#source_panel{
+    width: auto;
+    min-height: 138px;
+    border: 2px solid #4F698D;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, rgb(41, 65, 104) 0%, rgb(24, 40, 64) 100%);
+    margin: 1rem;
+    padding: .5rem;
+}
+
+.input_panel{
+    display: inline-block;
+    width: 550px;
+    height: 130px;
+    background-color: $black;
+    .border_text_sdi{
+        text-align: center;
+        border: 0.1rem solid $white;
+        width: 50px;
+        font-size: 0.75rem;
+        border-radius: 0.5rem;
+    }
+    .border_text_hdmi{
+        text-align: center;
+        border: 0.1rem solid $white;
+        width: 80px;
+        font-size: 0.75rem;
+        border-radius: 0.5rem;
+    }
+}

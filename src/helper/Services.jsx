@@ -1,0 +1,364 @@
+import { arrayBufferToBase64, isObject, serializeParams } from './helper';
+import { profileActions } from '../action/Profile.Actions';
+import { configActions } from '../action/Config.Actions';
+import { rootActions } from '../action/Root.Actions';
+import store from '../store/Store';
+
+let hostname = './';
+if (process.env.NODE_ENV !== 'production') {
+    hostname = 'http://localhost:9998/se5820/';
+}
+
+let SESSION = '';
+
+function updateSession(session) {
+    SESSION = session;
+}
+
+/* function parseJSON(response) {
+  return new Promise((resolve) => response.json()
+    .then((json) => resolve({
+      status: response.status,
+      ok: response.ok,
+      json,
+    })));
+} */
+
+function fetchData(params, method, isStore) {
+    const _method = method || this.method || 'POST';
+    const headers = new Headers({'Content-Type' : 'application/json', 'Accept': 'application/json', 'Accept-Charset' : 'utf-8'});
+    const storeFun = this.store;
+    const storeType = this.storeType;
+    let url = hostname + this.url;
+    let reqParams = {
+        mode: 'cors', //for test
+        // credentials: 'include',
+        cache: 'no-cache',
+        method : _method,
+        headers : headers
+    };
+
+
+    if(!this.url.match('login') && (!this.url.match('configuration') && _method === 'GET')) {
+        if(!SESSION) {
+            alert('SESSION empty. URL: ' + this.url);
+        }
+        // reqParams.credentials = 'include';//????
+        headers.append('Authorization', 'Bearer ' + SESSION);
+    }
+
+    if(isObject(params)) {
+        if(_method === 'GET') {
+            // url = new URL(url);
+            //TODO: Edge not work
+            //npm install url-search-params-polyfill --save
+            // url.search = new URLSearchParams(params);
+
+            url += ('?' + serializeParams(params));
+        }else{
+            reqParams.body = JSON.stringify(params);
+        }
+    }
+
+    // for (var p of headers) {
+    //     console.log(p)
+    // }
+
+    /* return new Promise((resolve, reject) => {
+        fetch(url, reqParams)
+        .then(parseJSON)
+        .then((response) => {
+            if (response.ok) {
+
+                if(isStore !== false && storeFun) {
+                    if(storeType === 'LOAD') {
+                        storeFun(response.json);    
+                    }
+                }
+
+                return resolve(response.json);
+            }
+          return reject(response.json.meta.error);
+        })
+        .catch((error) => reject({
+            networkError: error.message,
+        }));
+    }); */
+
+
+    return fetch(url, reqParams).then(response=>{
+        if(!response.ok) {
+            return Promise.reject(response);
+        }else{
+            return response.json();
+        }
+       
+        // if (!response.ok) throw new Error(response.statusText);
+        // return response.json();
+
+    })
+    .then(data => {
+        if(isStore !== false && storeFun) {
+            if(storeType === 'LOAD') {
+                storeFun(data);    
+            }
+        }
+        return data;
+    })
+    .catch(errResp=>{
+        // alert(err);
+        console.log(errResp);
+        const currHost = 'http://' + window.location.hostname;
+        // console.trace(err);
+        //Handle lose connection//error
+        /* if(this.url.match(/[(login)||(configuration)]$/)) {
+            alert(`${err} ${currHost}${this.url}`);
+        }else{
+            window.location.replace('/error'+ this.url.slice(4));
+        } */
+        return Promise.reject(errResp);
+    });
+}
+
+function fetchFile(params) {
+    // const url = new URL(hostname + this.url);
+    let url = hostname + this.url;
+    const method = this.method || 'GET';
+    const headers = new Headers({'Authorization' : SESSION, 'Content-Type' : 'image/jpeg', 'Accept-Charset' : 'utf-8'});
+
+    // url.search = new URLSearchParams(params);
+    params.t = Date.now();
+    url += ('?' + serializeParams(params));
+
+    return fetch(url, {
+        method : method,
+        headers : headers
+    }).then(response=>{
+        if (!response.ok) throw new Error(response.statusText);
+        return response.arrayBuffer().then((buffer) => {
+            const base64Flag = 'data:image/jpeg;base64,';
+            const imageStr = arrayBufferToBase64(buffer);
+
+            return base64Flag + imageStr;//src
+    
+        });
+
+    })
+    .catch(err=>{
+        console.log(err);
+        //Handle lose connection
+    });
+}
+
+
+
+const LOGIN = {
+    url: '/api/login',
+    fetchData,
+    updateSession
+};
+
+const GET_CONFIG = {
+    url: '/api/configuration',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(configActions.loadConfig(data.config));
+        }
+    }
+};
+
+const SET_CONFIG = {
+    url: '/api/configuration',
+    fetchData
+};
+
+const GET_DEVICE_CONFIG = {
+    url: '/api/deviceConfig',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(rootActions.loadSourceType(data.device.videoInput, data.device.id));
+            store.dispatch(configActions.loadDeviceConfig(data.device));
+        }
+    }
+};
+
+const SET_DEVICE_CONFIG = {
+    url: '/api/deviceConfig',
+    method : 'PATCH',
+    fetchData
+};
+
+const SOURCE_THUMBNAIL = {
+    url: '/api/sourceThumbnail',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchFile
+};
+
+const GET_DEVICE_FACILITIES = {
+    url: '/api/deviceFacilities',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(configActions.loadFacilites(data.devices));
+        }
+    }
+}
+
+const GET_DEVICE_TASK = {
+    url: '/api/deviceTask',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(configActions.loadDevicesTasks(data.devices));
+        }
+    }
+};
+
+const SET_DEVICE_TASK = {
+    url: '/api/deviceTask',
+    fetchData
+};
+
+const START_DEVICE_TASK = {
+    url: '/api/startTask',
+    fetchData
+};
+
+const STOP_DEVICE_TASK = {
+    url: '/api/stopTask',
+    fetchData
+};
+
+
+const DELETE_DEVICE_TASK = {
+    url: '/api/deleteTask',
+    method: 'DELETE',
+    fetchData
+};
+
+const GET_TASKS_STATUS = {
+    url: '/api/taskStatus',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(configActions.loadTasksStatus(data.tasks));
+        }
+        
+    }
+};
+
+const GET_ENCODE_PROFILE_LIST = {
+    url: '/api/encodeProfileList',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(profileActions.loadEncodingProfileList(data.profiles));
+        }
+    }
+};
+
+const GET_ENCODE_PROFILE = {//store.getState().year
+    url: '/api/encodeProfile',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(profileActions.loadEncodingProfile());
+        }
+    }
+};
+
+const SET_ENCODE_PROFILE = {
+    url: '/api/encodeProfile',
+    fetchData
+};
+
+const GET_STREAM_PROFILE = {
+    url: '/api/streamProfile',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(profileActions.loadStreamProfile(data.streamProfile));
+        }
+        
+    }
+};
+
+const SET_STREAM_PROFILE = {
+    url: '/api/streamProfile',
+    fetchData
+};
+
+const GET_NETWORK_STATUS = {
+    url: '/api/networkStatus',
+    method: 'GET',
+    fetchData
+};
+
+const GET_NETWORK_CONFIG = {
+    url: '/api/networkConfig',
+    storeType: 'LOAD',
+    method: 'GET',
+    fetchData,
+    store: (data) => {
+        if(data.result === 0) {
+            store.dispatch(configActions.loadNetworkConfig(data.nic));
+        }
+        
+    }
+};
+
+const SET_NETWORK_CONFIG = {
+    url: '/api/networkConfig',
+    fetchData
+};
+
+const GET_PIP_PREVIEW_IMG = {
+    url: '/api/inputSourceThumbnail',
+    method: 'GET',
+    fetchFile
+};
+
+
+
+export {
+    LOGIN,
+    GET_CONFIG,
+    SET_CONFIG,
+    SOURCE_THUMBNAIL,
+    GET_DEVICE_FACILITIES,
+    GET_DEVICE_TASK,
+    SET_DEVICE_TASK,
+    START_DEVICE_TASK,
+    STOP_DEVICE_TASK,
+    GET_ENCODE_PROFILE_LIST,
+    GET_ENCODE_PROFILE, 
+    SET_ENCODE_PROFILE, 
+    GET_STREAM_PROFILE, 
+    SET_STREAM_PROFILE,
+    GET_TASKS_STATUS,
+    GET_NETWORK_STATUS,
+    GET_NETWORK_CONFIG,
+    SET_NETWORK_CONFIG,
+    GET_DEVICE_CONFIG,
+    SET_DEVICE_CONFIG,
+    GET_PIP_PREVIEW_IMG
+};

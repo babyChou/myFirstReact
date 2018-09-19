@@ -1,0 +1,25 @@
+@import 'custom_variables';
+@import 'open-iconic/font/css/open-iconic-bootstrap.scss';
+@import 'ionicons/dist/scss/ionicons.scss';
+@import 'bootstrap/scss/bootstrap';
+@import 'mixins';
+@import 'custom_bootstrap';
+
+@import 'img';
+@import 'btn';
+@import 'volume';
+@import 'login';
+@import 'header';
+
+body{
+    background-color: #373C46;
+    color: $white;
+}
+
+
+#flexContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
