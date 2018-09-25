@@ -69,7 +69,7 @@ switch ($method) {
 					['upsert' => true]
 				);
 
-				$t->dievceID = $deviceID;
+				$t->deviceID = $deviceID;
 				$t->taskID = $newTaskID;
 
 				array_push($tasks, $t);
@@ -132,7 +132,7 @@ switch ($method) {
 					]
 				);
 
-				$t->dievceID = $deviceID;
+				$t->deviceID = $deviceID;
 				$t->taskID = $task['id'];
 
 				array_push($tasks, $t);

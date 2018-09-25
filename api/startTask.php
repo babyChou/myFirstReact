@@ -21,9 +21,9 @@ $tasks = $req['tasks'];
 // }
 
 
-foreach ($tasks as $task) {
-	$deviceID = $tasks['dievceID'];
-	$taskID = $tasks['taskID'];
+foreach ($tasks as $k => $task) {
+	$deviceID = $task['deviceID'];
+	$taskID = $task['taskID'];
 	
 	$document = $taskColl->findOneAndUpdate(
 			['DEVICE_ID' => $deviceID, 'TASK_ID' => $taskID],
