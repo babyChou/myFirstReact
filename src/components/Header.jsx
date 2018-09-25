@@ -114,7 +114,7 @@ class Header extends React.Component {
 						<li className="btn_menu_logout"><span>{t('msg_logout')}</span></li>
 					</ul>
 					<nav id="main_tab">
-						{/* <NavLink exact to="/" className="btn_broadcastlist" activeClassName="active"><span>{t('msg_broadcast_list')}</span></NavLink> */}
+						<NavLink exact to="/" className="btn_broadcastlist" activeClassName="active"><span>{t('msg_broadcast_list')}</span></NavLink>
 						<NavLink to="/configuration" className="btn_configuration" activeClassName="active"><span>{t('msg_configuration')}</span></NavLink>
 						{/* <NavLink to="/encoding" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink> */}
 						{/* <NavLink to="/log" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink> */}

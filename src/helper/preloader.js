@@ -95,9 +95,10 @@ function checkStreamProfiles(id, renew) {
 
 
 function checkDeviceConfig(id, renew) {
-    let deviceConfig = JSON.parse(JSON.stringify(store.getState().configReducer.devicesConfig));
+    let devicesConfig = JSON.parse(JSON.stringify(store.getState().configReducer.devicesConfig));
+    let deviceConfig;
 
-    if (helper.isEmptyObj(deviceConfig)) {
+    if (devicesConfig.length === 0 || renew) {
         return Services.GET_DEVICE_CONFIG.fetchData({
             id: id
         }).then(data => {
@@ -106,7 +107,19 @@ function checkDeviceConfig(id, renew) {
             }
         });
     } else {
-        return Promise.resolve(deviceConfig);
+        deviceConfig = devicesConfig.find(config => config.id === id);
+        if(helper.isEmptyObj(deviceConfig)) {
+            return Services.GET_DEVICE_CONFIG.fetchData({
+                id: id
+            }).then(data => {
+                if (data.result === 0) {
+                    return data.device;
+                }
+            });
+
+        }else{
+            return Promise.resolve(deviceConfig);
+        }
     }
 }
 

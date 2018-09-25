@@ -1,5 +1,5 @@
 <?php
-
+//http://php.net/manual/en/set.mongodb.php
 require 'vendor/autoload.php';
 
 $dbhost = 'localhost';
@@ -12,6 +12,8 @@ $dbport = '27017';
 
 $client = new MongoDB\Client("mongodb://$dbhost:$dbport");
 $collection = $client->se5820;
+
+$manager = new MongoDB\Driver\Manager("mongodb://$dbhost:$dbport");
 
 
 

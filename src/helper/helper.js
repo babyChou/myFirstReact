@@ -6,7 +6,6 @@ export {
     isFunction,
     isObject,
     isEmptyObj,
-    outputAddr,
     retrieveFromProp,
     randomID,
     genCheckFormats,
@@ -23,7 +22,7 @@ function randomID() {
 }
 
 function checkDomainName(value) {
-    return value.match(/^[a-zA-Z0-9\.\-]*$/);
+    return value.match(/^[a-zA-Z0-9.-]*$/);
 }
 
 function checkIPv6Address(value) {
@@ -31,7 +30,7 @@ function checkIPv6Address(value) {
 }
 
 function checkUri(value) {
-    return value.match(/^[a-zA-Z0-9\,\.\;\?\'\+\\&amp;%\$#\=~_:\-\/]*$/);
+    return value.match(/^[a-zA-Z0-9,.;?'+\\&amp;%$#=~_:\-/]*$/);
 }
 
 function checkPortNumber(value) {
@@ -158,65 +157,6 @@ function serializeParams(params, prefix) {
     return str.join("&");
 }
 
-function outputAddr(streamType, streamProfile, netWorkStatus) {
-    let urls = [];
-    const tempUrl = '{protocol}://{@}{ip}:{port}{uri}';
-    const protocols = ['', 'tcp', 'udp', 'udp', 'rtp', 'rtp', '', '', 'rtsp'];
-
-    if (streamType < 11) {
-        netWorkStatus.filter(data => (data.ip !== '0.0.0.0'))
-            .forEach(data => {
-                if (streamType === 8) {
-                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{protocol}', protocols[streamType]));
-                } else {
-                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{uri}', '').replace('{protocol}', protocols[streamType]));
-                }
-            });
-    }
-
-    // console.log(netWorkStatus);
-    switch (streamType) {
-        case 1: //tcp://ip:port
-            urls = urls.map(url => {
-                return url.replace('{@}', '').replace('{port}', streamProfile.tcp.port);
-            });
-
-            break;
-        case 2: // udp://@ip:port
-        case 3:
-            urls = urls.map(url => {
-                return url.replace('{@}', '@').replace('{port}', streamProfile.udp.port);
-            });
-            break;
-        case 4: // rtp://@ip:port
-        case 5:
-            urls = urls.map(url => {
-                return url.replace('{@}', '@').replace('{port}', streamProfile.rtp.port);
-            });
-            break;
-        case 6: //FMS URL : streamInfo.rtmpUrl, Stream
-            break;
-        case 7: // http://xxxxx/xxxxx.m3u8
-            break;
-        case 8: //rtsp://ip:port/uri
-            urls = urls.map(url => {
-                return url.replace('{@}', '').replace('{port}', streamProfile.rtsp.port).replace('{uri}', 'rtspUrl');
-            });
-            break;
-        case 11: //https://www.ustream.tv/broadcaster/'+streamInfo.cdnUrl
-        case 12: //https://www.twitch.tv/'+streamInfo.cdnUser
-        case 13: //https://www.youtube.com/watch?v='+streamInfo.cdnUrl
-
-
-            break;
-        default:
-            break;
-    }
-
-    return urls;
-
-}
-
 
 function concatTasksStatus(_devicesTasks, _tasksStatu) {
     let devicesTasks = JSON.parse(JSON.stringify(_devicesTasks));
@@ -226,11 +166,11 @@ function concatTasksStatus(_devicesTasks, _tasksStatu) {
     return devicesTasks.map(device => {
 
         mainTask = device.tasks.map(task => {
-            subTask = _tasksStatu.filter(taskStatus => device.id === taskStatus.dievceID && task.id === taskStatus.taskID)
+            subTask = _tasksStatu.filter(taskStatus => device.id === taskStatus.deviceID && task.id === taskStatus.taskID)
                 .map(taskStatus => {
                     let newObj = {};
                     for (let k in taskStatus) {
-                        if (k !== 'dievceID' && k !== 'taskID') {
+                        if (k !== 'deviceID' && k !== 'taskID') {
                             newObj[k] = taskStatus[k];
                         }
 

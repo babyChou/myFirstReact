@@ -19,17 +19,25 @@
     "react-router-redux": "^5.0.0-alpha.9",
     "react-scripts": "1.1.4",
     "reactstrap": "^6.3.0",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "source-map-explorer": "^1.6.0"
   },
   "scripts": {
+    "analyze": "source-map-explorer build/static/js/main.*",
     "start-js": "react-scripts start",
     "start": "npm-run-all -p watch-css start-js",
     "build-js": "react-scripts build",
     "build": "npm-run-all build-css build-js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --source-map-root ./src --source-map true --source-map-embed",
+    "build-css": "node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --source-map-root ./src --source-map true --source-map-embed --output-style compressed",
     "watch-css": "npm run build-css && node-sass-chokidar --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive"
+  },
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:9998/se5820",
+      "secure": false
+    }
   },
   "devDependencies": {}
 }

@@ -27,19 +27,60 @@ switch ($method) {
 
         $req = json_decode(file_get_contents('php://input'), true);
         $profile = $req['streamProfile'];
-        // var_dump($profile);
-        // $sqlResult = $collection->insertOne($profile);
+        $id = 1;
+
+        $qProfiles = $collection->find();
+
+        foreach ($qProfiles as $item) {
+            if($item['id'] >= $id) {
+                $id += 1;
+            }
+        }
+
+        $profile['id'] = $id;
+
+        $insertOneResult = $collection->insertOne($profile);
 
         
         echo json_encode(array(
             'result' => 0,
-            // 'id' => $profile['id']
-            'id' => 1
+            'id' => $profile['id']
         ));
 
 
         break;
     case 'PATCH':
+        $req = json_decode(file_get_contents('php://input'), true);
+        $profile = $req['streamProfile'];
+        $resp = new stdClass();
+        if(!isset($profile['id'])) {
+            $resp->result = 102;
+            echo json_encode($resp);
+            exit();
+        }
+
+        foreach ($device as $k => $val) {
+            if(is_object($val) || is_array($val)) {
+                // $setArr[$k] = $val;
+                 foreach ($val as $k2 => $val2) {
+                    $setArr[$k.'.'.$k2] = $val2;
+                 }
+            }else{
+                $setArr[$k] = $val;
+            }
+
+        }
+
+        $document = $collection->findOneAndUpdate(
+            ['id' => $profile['id']],
+            ['$set' => $setArr],
+            ['upsert' => true]
+        );
+
+        echo json_encode(array(
+            'result' => 0
+        ));
+
         break;
     case 'PUT':
         $req = json_decode(file_get_contents('php://input'), true);
@@ -51,11 +92,14 @@ switch ($method) {
             exit();
         }
 
-        $streamID = $profile['id'];
+        $document = $collection->findOneAndUpdate(
+            ['id' => $profile['id']],
+            ['$set' => $profile],
+            ['upsert' => true]
+        );
 
         echo json_encode(array(
-            'result' => 0,
-            'id' => $streamID
+            'result' => 0
         ));
 
         break;
@@ -69,36 +113,51 @@ switch ($method) {
 
         $streamID = (int)$_GET['id'];
 
-        // $sqlResult = $collection->find( [ '_id' => $streamID] );
+        $sqlResult = $collection->find( [ 'id' => $streamID] );
 
-        // echo json_encode(array(
-        //     'result' => 0,
-        //     'streamProfile' => $sqlResult
-        // ));
+        $streamProfile = [];
 
-        $a = '{
-              "result": 0,
-              "streamProfile": {
-                "id": '.$streamID.',
-                "name": "aaaa",
-                "setPid": true,
-                "streamType": 6,
-                "nic" : 1,
-                "rtmp": {
-                    "rtmpUrl": "",
-                    "playBackUrl": "",
-                    "rtmpBackupUrl": "",
-                    "rtmpStreamName":"%s ",
-                    "enableAuthorize": true ,
-                    "rtmpUser":"%s",
-                    "rtmpPasswd":"%s"
+
+        foreach ($sqlResult as $result) {
+            // echo $result['id'];
+            foreach ($result as $k => $val) {
+                // echo $k;
+                if($k !== '_id') {
+                    $streamProfile[$k] = $val;
                 }
-              }
-        }';
+            }
 
-        $a = trim(preg_replace('/\s+/', ' ', $a));
-        $a = json_decode($a);
-        echo json_encode($a);
+        }
+
+        echo json_encode(array(
+            'result' => 0,
+            'streamProfile' => $streamProfile
+        ));
+
+        // $a = '{
+        //       "result": 0,
+        //       "streamProfile": {
+        //         "id": '.$streamID.',
+        //         "name": "aaaa",
+        //         "setPid": true,
+        //         "streamType": 6,
+        //         "nic" : 1,
+        //         "rtmp": {
+        //             "rtmpUrl": "",
+        //             "playBackUrl": "",
+        //             "rtmpBackupUrl": "",
+        //             "rtmpStreamName":"%s ",
+        //             "enableAuthorize": true ,
+        //             "rtmpUser":"%s",
+        //             "rtmpPasswd":"%s"
+        //         }
+        //       }
+        // }';
+
+        // // echo $a;
+        // $a = trim(preg_replace('/\s+/', ' ', $a));
+        // $a = json_decode($a);
+        // echo json_encode($a);
         break;
 }
 ?>

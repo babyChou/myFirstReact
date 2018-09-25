@@ -23,6 +23,7 @@ class HeaderPanel extends React.Component {
 				2 : ''
 			}
 		};
+		
 
 		this.interval = {};
 
@@ -32,22 +33,21 @@ class HeaderPanel extends React.Component {
 	}
 
 	componentDidMount() {
-		/* const { devices, selectedSource } = this.props;
+		const { devices, selectedSource } = this.props;
 
 		devices.forEach(device => {
 			if(selectedSource[device.id].length > 0) {	
 				this.renewPreview(device.id);
 			}
 
-		}); */
+		});
 	}
 	componentDidUpdate(prevProps, prevState) {
-		/* const { devices, selectedSource } = this.props;
+		const { devices, selectedSource } = this.props;
 
 
 		devices.forEach(device => {
 			let isPropsChange = false;
-			let isStateChange = false;
 
 			if(selectedSource[device.id].length !== prevProps.selectedSource[device.id].length) {
 				isPropsChange = true;
@@ -73,7 +73,7 @@ class HeaderPanel extends React.Component {
 
 			}
 
-		}); */
+		});
 
 	}
 	componentWillUnmount () {

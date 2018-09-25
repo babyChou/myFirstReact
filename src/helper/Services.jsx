@@ -4,15 +4,22 @@ import { configActions } from '../action/Config.Actions';
 import { rootActions } from '../action/Root.Actions';
 import store from '../store/Store';
 
-let hostname = './';
-if (process.env.NODE_ENV !== 'production') {
-    hostname = 'http://localhost:9998/se5820/';
-}
+const rootDOM = document.getElementById('root');
+const errorDOM = document.getElementById('error');
 
+let hostname = './';
 let SESSION = '';
+
+// if (process.env.NODE_ENV !== 'production') {
+//     // hostname = 'http://localhost:9998/se5820/';
+// }
 
 function updateSession(session) {
     SESSION = session;
+}
+
+function checkSession() {
+    return SESSION;
 }
 
 /* function parseJSON(response) {
@@ -32,14 +39,14 @@ function fetchData(params, method, isStore) {
     let url = hostname + this.url;
     let reqParams = {
         mode: 'cors', //for test
-        // credentials: 'include',
+        credentials: 'include',
         cache: 'no-cache',
         method : _method,
         headers : headers
     };
 
 
-    if(!this.url.match('login') && (!this.url.match('configuration') && _method === 'GET')) {
+    if(!this.url.match('login') && (!this.url.match('configuration') && _method !== 'GET')) {
         if(!SESSION) {
             alert('SESSION empty. URL: ' + this.url);
         }
@@ -59,6 +66,7 @@ function fetchData(params, method, isStore) {
             reqParams.body = JSON.stringify(params);
         }
     }
+
 
     // for (var p of headers) {
     //     console.log(p)
@@ -86,38 +94,56 @@ function fetchData(params, method, isStore) {
     }); */
 
 
-    return fetch(url, reqParams).then(response=>{
-        if(!response.ok) {
-            return Promise.reject(response);
+    return fetch(url, reqParams).then(response => {//add time
+        if (!response.ok){
+            // return Promise.reject({ url: this.url, body: response.statusText, type: 'responseNotOk', status: response.status });
+            throw new { url: this.url, body: response.statusText, type: 'responseNotOk', status: response.status };
         }else{
-            return response.json();
+            return response.text();
         }
-       
-        // if (!response.ok) throw new Error(response.statusText);
-        // return response.json();
-
+    }).then(responseBodyAsText => {
+        try {
+            const bodyAsJson = JSON.parse(responseBodyAsText);
+            return bodyAsJson;
+        } catch (e) {
+            throw new { url: this.url, body: responseBodyAsText, type: 'unparsable' };
+        }
     })
-    .then(data => {
+    .then(json => {
         if(isStore !== false && storeFun) {
             if(storeType === 'LOAD') {
-                storeFun(data);    
+                storeFun(json);    
             }
         }
-        return data;
+
+        if(json.hasOwnProperty('result')) {
+            if(json.result !== 0) {
+                console.warn(this.url, json);
+            }
+        }
+        return json;
     })
-    .catch(errResp=>{
-        // alert(err);
-        console.log(errResp);
-        const currHost = 'http://' + window.location.hostname;
-        // console.trace(err);
-        //Handle lose connection//error
-        /* if(this.url.match(/[(login)||(configuration)]$/)) {
-            alert(`${err} ${currHost}${this.url}`);
+    .catch(err => {
+
+        console.log(err, err.body);
+        
+        if(err.body) {
+            // alert(`${err.url}. ${err}. ${err.body}`);
+            store.dispatch(rootActions.stackError(err));
         }else{
-            window.location.replace('/error'+ this.url.slice(4));
-        } */
-        return Promise.reject(errResp);
+            store.dispatch(rootActions.stackError({
+                url: this.url, body: err.stack, type: 'unknow' 
+            }));
+            
+            // alert(err);
+        }
+
+        rootDOM.removeChild(rootDOM.firstChild);
+        errorDOM.classList.remove('d-none');
+
+        return err;
     });
+
 }
 
 function fetchFile(params) {
@@ -155,7 +181,8 @@ function fetchFile(params) {
 const LOGIN = {
     url: '/api/login',
     fetchData,
-    updateSession
+    updateSession,
+    checkSession
 };
 
 const GET_CONFIG = {
@@ -337,6 +364,12 @@ const GET_PIP_PREVIEW_IMG = {
     fetchFile
 };
 
+const GET_INPUT_SIGNAL_STATUS = {
+    url: '/api/inputSignalStatus',
+    method: 'GET',
+    fetchData
+};
+
 
 
 export {
@@ -349,6 +382,7 @@ export {
     SET_DEVICE_TASK,
     START_DEVICE_TASK,
     STOP_DEVICE_TASK,
+    DELETE_DEVICE_TASK,
     GET_ENCODE_PROFILE_LIST,
     GET_ENCODE_PROFILE, 
     SET_ENCODE_PROFILE, 
@@ -360,5 +394,6 @@ export {
     SET_NETWORK_CONFIG,
     GET_DEVICE_CONFIG,
     SET_DEVICE_CONFIG,
-    GET_PIP_PREVIEW_IMG
+    GET_PIP_PREVIEW_IMG,
+    GET_INPUT_SIGNAL_STATUS
 };

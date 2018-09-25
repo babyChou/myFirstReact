@@ -1,7 +1,10 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { translate } from "react-i18next";
 import { isFunction } from "../helper/helper";
 import Btn from './Btn';
+//https://zhuanlan.zhihu.com/p/29880992
+//https://reactjs.org/docs/portals.html
 
 /*
 type: <String> 'alert','custom','confirm'
@@ -21,6 +24,10 @@ class Dialog extends React.Component {
 
 		this.reminderDOM = this.reminderDOM.bind(this);
 		this.btnAction = this.btnAction.bind(this);
+
+		const doc = window.document;
+		this.node = doc.createElement('div');
+		doc.body.appendChild(this.node);
 	}
 	componentDidMount() {
 		//body append class modal-open
@@ -65,7 +72,7 @@ class Dialog extends React.Component {
 			return null;
 		}
 
-		return (
+		return createPortal(
 			<React.Fragment>
 				<div className="modal fade show d-block" >
 					<div className="modal-dialog modal-dialog-centered">

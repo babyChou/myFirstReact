@@ -11,6 +11,7 @@ if(!isset($_GET['id'])) {
 
 $id = $_GET['id'];
 
+
 $imgArr = ['', realpath('H:\TEST_FILE\img\techi.jpg'), realpath('H:\TEST_FILE\img\yurina.jpg')];
 
 

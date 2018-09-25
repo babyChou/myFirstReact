@@ -6,14 +6,18 @@ import {
 	ADD_VIDEO_SOURCE,
 	DELETE_VIDEO_SOURCE,
 	REPLACE_LAST_VIDEO_SOURCE,
-	LOAD_VIDEO_SOURCES
+	LOAD_VIDEO_SOURCES,
+	STACK_ERROR,
+	DISPLAY_ERROR
 } from '../constant/Root.Consts';
 
 export const rootActions = {
 	addSourceType,
 	deleteSourceType,
 	replaceLastSourceType,
-	loadSourceType
+	loadSourceType,
+	stackError,
+	displayError
 };
 
 function loadSourceType(videoTypes, deviceID) {
@@ -40,11 +44,25 @@ function deleteSourceType(videoType, deviceID) {
 	};
 }
 
+
 function replaceLastSourceType(videoType, deviceID) {
 	return {
 		type: REPLACE_LAST_VIDEO_SOURCE,
 		videoType,
 		id: deviceID
+	};
+}
+
+function stackError(error) {
+	return {
+		type: STACK_ERROR,
+		error: error
+	};
+}
+
+function displayError() {
+	return {
+		type: STACK_ERROR
 	};
 }
 

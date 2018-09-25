@@ -4,18 +4,23 @@ import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from 'redux';
 import { INPUT_SOURCES, STREAM_STATUS } from '../constant/Common.Consts';
-import { checkFacilities, checkDevicesTasks, checkTasksStatus, checkEncodeProfiles, checkStreamProfiles } from '../helper/preloader';
-import { outputAddr, concatTasksStatus } from '../helper/helper';
-import { SET_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, GET_NETWORK_STATUS } from '../helper/Services';
+import { checkFacilities, checkDeviceConfig, checkDevicesTasks, checkTasksStatus, checkEncodeProfiles, checkStreamProfiles } from '../helper/preloader';
+import { concatTasksStatus } from '../helper/helper';
+import { DELETE_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, GET_NETWORK_STATUS, GET_PIP_PREVIEW_IMG, GET_INPUT_SIGNAL_STATUS } from '../helper/Services';
+import { NavLink } from 'react-router-dom';
+import BroadcastListPanel from "./BroadcastListPanel";
+import Dialog from "./Dialog";
 
 
 const mapStateToProps = store => (
 	{ 
-		devices: store.configReducer.devices
+		devices: store.configReducer.devices,
+		selectedSource: store.rootReducer.selectedSource
 	}
 );
 
-const updateSec = 15000;
+const updateSec = 10000;
+// const updateSec = 1000;
 
 class BroadcastList extends React.Component {
 	constructor(props) {
@@ -24,37 +29,88 @@ class BroadcastList extends React.Component {
 			devicesTasks : [],
 			btnsStatus: [],
 			tasksIsChecked: [],
-			netWorkStatus: []
+			netWorkStatus: [],
+			backdropShow : false,
+			dialogObj : {
+				title : '',
+				type : 'alert',
+				icon : 'warning',
+				mainMsg : '',
+				msg : '',
+			},
+			isDialogShow : false,
+			preview: {
+				1 : '',
+				2 : ''
+			},
+			signals: []
 		};
 
 		this.renewList = this.renewList.bind(this);
 		this.taskOnCheck = this.taskOnCheck.bind(this);
 		this.btnAction = this.btnAction.bind(this);
 		this.isAnyChecked = this.isAnyChecked.bind(this);
+		this.outputAddr = this.outputAddr.bind(this);
 	}
 
 	componentDidMount(){// Handle after fetch data
-		// let reqPromise = [checkDevicesTasks(true), checkEncodeProfiles()];
-		checkFacilities().then(() => {
-			this.renewList();
+		let reqPromise = [];
+		let preview = {};
+
+		checkFacilities().then(facilitys => {
+
+			return Promise.all(facilitys.map(facility => checkDeviceConfig(facility.id)))
+							.then((devicesConfig)=> {
+								
+								devicesConfig.forEach(config => {
+									if(config.videoInput.length > 0) {
+										reqPromise.push(GET_PIP_PREVIEW_IMG.fetchFile({ id : config.id }).then(url => {
+											preview[config.id] = url;
+											return true;
+										}));
+			
+									}
+								});
+
+								Promise.all(reqPromise).then(data => {
+
+									this.setState((state) => ({
+										preview : {
+											...state.preview,
+											...preview
+										}
+									}));
+
+									return this.renewList();
+									
+								});
+								
+								
+							});
 		});
+
+
 	}
 	componentWillUnmount () {
 		clearInterval(this.interval);
 	}
+	componentDidCatch(error, info) {
+	}
 	renewList() {
-		let reqPromise = [checkDevicesTasks(true), checkEncodeProfiles(), GET_NETWORK_STATUS.fetchData(), checkTasksStatus(true)];
+		let reqPromise = [checkDevicesTasks(true), checkEncodeProfiles(), GET_NETWORK_STATUS.fetchData(), checkTasksStatus(true), GET_INPUT_SIGNAL_STATUS.fetchData()];
 		let reqPromise2 = [];
 		let btnsStatus = [];
 		let tasksIsChecked = [];
+
+		// console.log(this.state);
 
 		Promise.all(reqPromise).then(data => {
 			let devicesTasks = concatTasksStatus(data[0], data[3]);
 			let encodingProfiles = data[1];
 
-
 			this.setState({
-				netWorkStatus : data[2]['nic']
+				netWorkStatus : data[2]['nic'],
+				signals: data[4]['signalStatuses']
 			});
 
 			devicesTasks.forEach(device => {
@@ -63,12 +119,13 @@ class BroadcastList extends React.Component {
 					disabled: true
 				});
 
+				//Select All
 				tasksIsChecked.push({
 					deviceID: device.id,
 					taskID: 0,
 					checked: false
 				});
-				
+
 				device.tasks.forEach(task => {
 					
 					tasksIsChecked.push({
@@ -76,6 +133,7 @@ class BroadcastList extends React.Component {
 						taskID: task.id,
 						checked: false
 					});
+
 					encodingProfiles.forEach(profile => {
 						if(task.profileID === profile.id) {
 							task.profileName = profile.name;
@@ -87,20 +145,19 @@ class BroadcastList extends React.Component {
 
 			});
 
-			return Promise.all(reqPromise2).then(streamProfiles => {
-
-				devicesTasks.forEach(device => {
-					device.tasks.forEach(task => {
-						streamProfiles.forEach(streamProfile => {
-
-							if(task.profileID === streamProfile.id) {
-								task.streamProfile = streamProfile;
-							}
-						});
-					});
-				});
-
-				return devicesTasks;
+			return Promise.all(reqPromise2).then(data => {
+				let streamProfiles = data[data.length - 1];
+				
+				return 	devicesTasks
+							.map(device => ({
+								...device,
+								tasks: device
+										.tasks
+										.map(task => ({
+											...task,
+											streamProfile : streamProfiles.find(streamProfile => task.streamID === streamProfile.id)
+										}))
+							}));
 
 			});
 			
@@ -118,10 +175,12 @@ class BroadcastList extends React.Component {
 		}
 
 		this.interval = setInterval(() => {
-			
-			checkTasksStatus(true).then(tasksStatus => {
-				let devicesTasks = this.state.devicesTasks.map(device => {
-					let tasks = tasksStatus.filter(taskStatus => (device.id === taskStatus.dievceID))
+			const { devices, selectedSource } = this.props;
+			let queryP = [];
+
+			queryP.push(checkTasksStatus(true).then(tasksStatus => {
+				return this.state.devicesTasks.map(device => {
+					let tasks = tasksStatus.filter(taskStatus => (device.id === taskStatus.deviceID))
 										.map(taskStatus => {
 											let task = device.tasks.filter(task => (task.id === taskStatus.taskID))[0];
 											return {
@@ -137,9 +196,48 @@ class BroadcastList extends React.Component {
 
 				});
 
-				this.setState({
-					devicesTasks : devicesTasks
+			}));
+
+			queryP.push(GET_INPUT_SIGNAL_STATUS.fetchData());
+
+			devices.forEach(device => {
+				let deviceID = device.id;
+				if(selectedSource[deviceID].length > 0) {
+					queryP.push(GET_PIP_PREVIEW_IMG.fetchFile({
+						id : deviceID
+					}).then(url => {
+						return {
+							id : deviceID,
+							url:url
+						};
+					}));
+					
+				}
+			});
+
+
+			Promise.all(queryP).then(data => {
+				let updateData = {};
+				
+				data.forEach((uData, i) => {
+					switch(i) {
+						case 0:
+							updateData.devicesTasks = uData;
+							break;
+						case 1:
+							updateData.signals = uData.signalStatuses;
+							break;
+						default: 
+							updateData.preview = {
+								...this.state.preview,
+								[uData.id] : uData.url
+							};
+							break;
+					}
 				});
+
+				this.setState(updateData);
+				
 			});
 
 		}, updateSec);
@@ -219,28 +317,42 @@ class BroadcastList extends React.Component {
 
 	}
 	btnAction(deviceID, action) {
+		const { t, selectedSource } = this.props;
+		const isSourceOk = (selectedSource[deviceID].length > 0);
 		let resp;
 		let params = {
-			device : {
-				id : deviceID,
-				tasks: []
-			}
+			tasks : []
 		};
 
-		params.device.tasks = this.state.tasksIsChecked.filter(obj => {
+
+		params.tasks = this.state.tasksIsChecked.filter(obj => {
 			return (obj.taskID !== 0 && obj.deviceID === deviceID && obj.checked);
 		}).map(obj => {
 			return {
+				deviceID,
 				taskID : obj.taskID
 			};
 		});
 
 		switch (action) {
 			case 0:
-				resp = SET_DEVICE_TASK.fetchData(params, 'DELETE');
+				resp = DELETE_DEVICE_TASK.fetchData(params, 'DELETE');
 				break
 			case 1:
-				resp = START_DEVICE_TASK.fetchData(params);
+				if(isSourceOk) {
+					resp = START_DEVICE_TASK.fetchData(params);
+				}else{
+					this.setState({
+						isDialogShow : true,
+						dialogObj : {
+							...this.state.dialogObj,
+							title : t('msg_input_source_not_set'),
+							msg : t('msg_please_configure_input_source'),//a003670
+						}
+					});
+					return false;
+				}
+
 				break
 			case 2:
 				resp = STOP_DEVICE_TASK.fetchData(params);
@@ -255,12 +367,73 @@ class BroadcastList extends React.Component {
 			}
 		});
 	}
+	outputAddr(streamType, streamProfile, netWorkStatus) {
+		let urls = [];
+	    const { t } = this.props;
+	    const tempUrl = '{protocol}://{@}{ip}:{port}{uri}';
+	    const protocols = ['', 'tcp', 'udp', 'udp', 'rtp', 'rtp', '', '', 'rtsp'];
+
+	    if (streamType < 11) {
+	        netWorkStatus.filter(data => (data.ip !== '0.0.0.0'))
+	            .forEach(data => {
+	                if (streamType === 8) {
+	                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{protocol}', protocols[streamType]));
+	                } else {
+	                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{uri}', '').replace('{protocol}', protocols[streamType]));
+	                }
+	            });
+	    }
+
+	    // console.log(netWorkStatus);
+	    switch (streamType) {
+	        case 1: //tcp://ip:port
+	            urls = urls.map(url => {
+	                return url.replace('{@}', '').replace('{port}', streamProfile.tcp.port);
+	            });
+
+	            break;
+	        case 2: // udp://@ip:port
+	        case 3:
+	            urls = urls.map(url => {
+	                return url.replace('{@}', '@').replace('{port}', streamProfile.udp.port);
+	            });
+	            break;
+	        case 4: // rtp://@ip:port
+	        case 5:
+	            urls = urls.map(url => {
+	                return url.replace('{@}', '@').replace('{port}', streamProfile.rtp.port);
+	            });
+	            break;
+	        case 6: //FMS URL : streamInfo.rtmpUrl, Stream
+	            urls = [t('msg_fms_addr') + ' ' + streamProfile.rtmp.rtmpUrl ,t('msg_fms_stream_name') + ' ' + streamProfile.rtmp.rtmpStreamName ];
+	            break;
+	        case 7: // http://xxxxx/xxxxx.m3u8
+	            break;
+	        case 8: //rtsp://ip:port/uri
+	            urls = urls.map(url => {
+	                return url.replace('{@}', '').replace('{port}', streamProfile.rtsp.port).replace('{uri}', 'rtspUrl');
+	            });
+	            break;
+	        case 11: //https://www.ustream.tv/broadcaster/'+streamInfo.cdnUrl
+	        case 12: //https://www.twitch.tv/'+streamInfo.cdnUser
+	        case 13: //https://www.youtube.com/watch?v='+streamInfo.cdnUrl
+
+
+	            break;
+	        default:
+	            break;
+	    }
+
+	    return urls;
+	}
 	render() {
 		const state = this.state;
-		const { t, devices } = this.props;
-		const { devicesTasks, btnsStatus, tasksIsChecked, netWorkStatus } = state;
+		const { t, devices, selectedSource } = this.props;
+		const { devicesTasks, btnsStatus, tasksIsChecked, netWorkStatus, preview, signals } = state;
 		const taskOnCheck = this.taskOnCheck;
 		const btnAction = this.btnAction;
+		const outputAddr = this.outputAddr;
+
 		
 		function modal(device, tasks, i) {
 			let btnsDisabled = true;
@@ -331,18 +504,20 @@ class BroadcastList extends React.Component {
 			let streamStatus = 0;
 			let streamStatusInfo = [];
 			const addrs = outputAddr(task.streamProfile.streamType, task.streamProfile, netWorkStatus).map((url, i) => (<span className="d-block" key={i}>{url}</span>));
-		
+	
 			tasksIsChecked.forEach(obj => {
 				if(obj.deviceID === deviceID && obj.taskID === task.id) {
 					isChecked = obj.checked;
 					return false;
 				}
 			});
-	
-			//TODO: get device config
-			/* task.streamProfile.sourceType.forEach(type => {
-				channelName.push(INPUT_SOURCES[type]);
-			}); */
+
+
+			channelName = selectedSource[deviceID]
+							.map(input => {
+								return (<div key={input + deviceID}>{INPUT_SOURCES[input]}</div>);
+							});
+
 
 			if(task.isStart === 1) {
 				streamStatus = task.status;
@@ -354,12 +529,17 @@ class BroadcastList extends React.Component {
 				streamStatus = 0;
 			}
 
-
 		
 			return	<tr key={i}>
 						<td className="align-middle text-center"><input type="checkbox" name={ 'd_' + deviceID +'_t[]'} value={deviceID*1000 + task.id} checked={isChecked} onChange={taskOnCheck}/></td>
 						<td className="align-middle">{i}</td>
-						<td className="align-middle">{channelName.join(' , ')}</td>
+						<td className="align-middle">
+						{ 
+							channelName.length === 0 ?
+							(<div className="media"><i className="icon_dialogboxe d-block mr-2" style={{width:'20px', height:'20px', backgroundSize:'100%'}}></i><div className="media-body"><NavLink to="/configuration"><span>{t('msg_input_source_not_set')}</span></NavLink></div></div>) :
+							channelName
+						}
+						</td>
 						<td className="align-middle">{addrs}</td>
 						<td className="align-middle">{task.profileName}</td>
 						<td className="align-middle">{t(STREAM_STATUS[streamStatus])}</td>
@@ -369,15 +549,26 @@ class BroadcastList extends React.Component {
 
 		return (
 			<div className="">
-				<Header></Header>
+				{ this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null }
+				{<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>}
+				<Header>
+					<BroadcastListPanel devices={devices} preview={preview} signals={signals}></BroadcastListPanel>
+
+				</Header>
 				<section id="config_panel" className="mx-3">
 				{
 					devices.map((device, i) => {
-						return devicesTasks.filter(deviceTasks => {
+						let deviceTaskDOM = devicesTasks.filter(deviceTasks => {
 							return device.id === deviceTasks.id;
 						}).map(currDevice => {
 							return modal(currDevice , currDevice.tasks, i+1);
-						})
+						});
+
+						if(deviceTaskDOM.length === 0) {
+							return modal({id:device.id} , [], i+1);
+						}else{
+							return deviceTaskDOM;
+						}
 					})
 				}
 				</section>

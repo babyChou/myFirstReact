@@ -141,6 +141,8 @@ class ConfigurationRtmp extends React.Component {
 
 					return true;
 				}
+
+				return false;
 				
 			});
 			

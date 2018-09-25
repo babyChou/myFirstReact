@@ -209,7 +209,6 @@ class ConfigurationTasks extends React.Component {
 			streamType
 		};
 
-		// console.log(77777,streamID, streamProfileMethod, data);
 
 		let task = {};
 		
@@ -278,6 +277,7 @@ class ConfigurationTasks extends React.Component {
 				}).then(data => {
 					if(data.result === 0) {
 						return Promise.all([checkDevicesTasks(true), checkTasksStatus(true)]).then(() => {
+							this.props.renewDevicesTasksDetail();
 							this.props.handleBackdrop(false);
 						});
 					}else{
@@ -302,6 +302,7 @@ class ConfigurationTasks extends React.Component {
 		//stopStream
 		//STOP_DEVICE_TASK
 		const { deviceID, taskID } = this.props.streamInfo;
+		this.props.handleBackdrop(true);
 
 		STOP_DEVICE_TASK.fetchData({
 			tasks : [{
@@ -310,7 +311,10 @@ class ConfigurationTasks extends React.Component {
 			}]
 		}).then(data => {
 			if(data.result === 0) {
-				checkTasksStatus(true);
+				checkTasksStatus(true).then(()=>{				
+					this.props.renewDevicesTasksDetail();
+					this.props.handleBackdrop(false);
+				});
 			}else{
 				//dialog error
 			}

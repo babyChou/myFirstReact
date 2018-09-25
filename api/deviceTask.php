@@ -19,21 +19,21 @@ $method = $_SERVER['REQUEST_METHOD'];//Access-Control-Request-Method
 switch ($method) {
 	case 'POST':
 		//>>> MOCK TEST
-		$req = json_decode(file_get_contents('php://input'), true);
-		$devices = $req['devices'];
+		// $req = json_decode(file_get_contents('php://input'), true);
+		// $devices = $req['devices'];
 
-		$deviceID = $devices[0]['id'];
-		$taskID = 1;
+		// $deviceID = $devices[0]['id'];
+		// $taskID = 1;
 
 	
-		echo json_encode(array(
-			'result' => 0,
-			'tasks' => [[
-				'deviceID' => $deviceID,
-				'taskID' => $taskID
-			]]
-		));
-		exit();
+		// echo json_encode(array(
+		// 	'result' => 0,
+		// 	'tasks' => [[
+		// 		'deviceID' => $deviceID,
+		// 		'taskID' => $taskID
+		// 	]]
+		// ));
+		// exit();
 		//<<< MOCK TEST
 	
 		$req = json_decode(file_get_contents('php://input'), true);
@@ -61,7 +61,9 @@ switch ($method) {
 					['$set' => [
 						'TASK_ID' => $newTaskID,
 						'STREAM_ID' => $task['streamID'],
-						'PROFILE_ID' => $task['profileID']
+						'PROFILE_ID' => $task['profileID'],
+						'isStart' => 0,
+						'status' => 0
 						]
 					],
 					['upsert' => true]
@@ -87,23 +89,29 @@ switch ($method) {
 
 		break;
 	case 'PATCH':
+		$resp = new stdClass();
+		if(!isset($_GET['deviceID']) || !isset($_GET['taskID'])) {
+			$resp->result = 102;
+			echo json_encode($resp);
+			exit();
+		}
 		//>>> MOCK TEST
-		$req = json_decode(file_get_contents('php://input'), true);
-		$devices = $req['devices'];
+		// $req = json_decode(file_get_contents('php://input'), true);
+		// $devices = $req['devices'];
 
 
-		$deviceID = $devices[0]['id'];
-		$taskID = $devices[0]['tasks'][0]['id'];
+		// $deviceID = $devices[0]['id'];
+		// $taskID = $devices[0]['tasks'][0]['id'];
 
 	
-		echo json_encode(array(
-			'result' => 0,
-			'tasks' => [[
-				'deviceID' => $deviceID,
-				'taskID' => $taskID
-			]]
-		));
-		exit();
+		// echo json_encode(array(
+		// 	'result' => 0,
+		// 	'tasks' => [[
+		// 		'deviceID' => $deviceID,
+		// 		'taskID' => $taskID
+		// 	]]
+		// ));
+		// exit();
 		//<<< MOCK TEST
 		$req = json_decode(file_get_contents('php://input'), true);
 
@@ -181,8 +189,7 @@ switch ($method) {
 			'result' => 0,
 			'devices' => $devices
 		));
-		
-	
+
 		break;
 	
 	// default:
