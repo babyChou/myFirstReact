@@ -11,7 +11,7 @@ const ConfigurationModal = (props) => {
 				</h6>
 			</div>
 			<div className="modal-body">
-				{/* { props.children[0] } */}
+				{ props.children[0] }
 				<div className="table-responsive">
 					<table className="table-configuration">
 						<thead className="thead-blue">

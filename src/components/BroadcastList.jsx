@@ -141,12 +141,15 @@ class BroadcastList extends React.Component {
 					});
 
 					reqPromise2.push(checkStreamProfiles(task.streamID, true));
+
 				});
 
 			});
 
 			return Promise.all(reqPromise2).then(data => {
+				// console.log(data);
 				let streamProfiles = data[data.length - 1];
+				// console.log(streamProfiles);
 				
 				return 	devicesTasks
 							.map(device => ({
@@ -162,7 +165,8 @@ class BroadcastList extends React.Component {
 			});
 			
 
-		}).then(data => {
+		})
+		.then(data => {
 			this.setState({
 				devicesTasks : data,
 				btnsStatus,
@@ -503,6 +507,7 @@ class BroadcastList extends React.Component {
 			let channelName = [];
 			let streamStatus = 0;
 			let streamStatusInfo = [];
+			console.log(task, task.streamProfile);
 			const addrs = outputAddr(task.streamProfile.streamType, task.streamProfile, netWorkStatus).map((url, i) => (<span className="d-block" key={i}>{url}</span>));
 	
 			tasksIsChecked.forEach(obj => {

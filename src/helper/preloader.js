@@ -89,7 +89,7 @@ function checkStreamProfiles(id, renew) {
             }
         });
     } else {
-        return Promise.resolve(streamProfiles);
+        return JSON.parse(JSON.stringify(store.getState().profiles.streamProfiles));
     }
 }
 

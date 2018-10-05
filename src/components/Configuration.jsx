@@ -100,7 +100,7 @@ class Configuration extends React.Component {
 						isDeviceConfigSet: true
 					});
 
-					return Promise.all(reqPromise2);
+					return Promise.all(reqPromise2).then(data => data);
 				});
 			})
 			.then(data => {
@@ -122,6 +122,7 @@ class Configuration extends React.Component {
 						device => device.id === facility.id
 					);
 
+
 					devicesTasksStatus
 						.filter(device => device.id === facility.id)
 						.forEach(device => {
@@ -129,6 +130,7 @@ class Configuration extends React.Component {
 								let streamProfile = streamProfiles.find(
 									stream => stream.id === task.streamID
 								);
+
 								return {
 									deviceID: device.id,
 									taskID: task.id,
@@ -141,8 +143,9 @@ class Configuration extends React.Component {
 						});
 
 					if (tasks.length === 0) {
-						streamInfo.deviceID = facility.id;
-						tasks.push(streamInfo);
+						tasks.push(Object.assign({}, streamInfo, {
+							deviceID : facility.id
+						}));
 					}
 
 					return {
@@ -206,52 +209,51 @@ class Configuration extends React.Component {
 		
 	}
 
-	renewDevicesTasksDetail() {
-		const { devices, devicesConfig, devicesTasks, tasksStatus, streamProfiles, encodeProfiles } = this.props;
-		const devicesTasksStatus = concatTasksStatus(devicesTasks, tasksStatus);
+	renewDevicesTasksDetail(taskInfo) {
+		const { deviceID, taskID, rowNo, profileID, streamID } = taskInfo;
+		const { devicesConfig, tasksStatus, streamProfiles } = this.props;
 
+		let devicesTasksDetail = this.state.devicesTasksDetail.map(device => {
+			let deviceConfig = devicesConfig.find(facility => deviceID === facility.id);
 
-		let streamInfo = {
-			deviceID: -1,
-			taskID: -1,
-			profileID: encodeProfiles[0]['id'],
-			isStart: 0,
-			streamStatus: 0,
-			id: -1,
-			streamType: defaultStreamType,
-			nic: 1
-		};
+			if(device.id === deviceID) {
 
-		let devicesTasksDetail = devices.map(facility => {
-			let tasks = [];
-			let config = devicesConfig.find(device => device.id === facility.id);
+				let tasks = device.tasks.map((task, i) => {
+								let _rowNo = i+1;
 
-			devicesTasksStatus
-			.filter(device => device.id === facility.id)
-			.forEach(device => {
-				tasks = device.tasks.map((task, i) => {
-					let streamProfile = streamProfiles.find(stream => stream.id === task.streamID);
-					return {
-						deviceID: device.id,
-						taskID: task.id,
-						profileID: task.profileID,
-						isStart: task.isStart,
-						streamStatus: task.status,
-						...streamProfile
-					};
-				});
-			});
+								let taskStatus = tasksStatus.find(taskStatus => taskStatus.deviceID === deviceID && taskStatus.taskID === taskID);
+								let streamProfile = streamProfiles.find(stream => stream.id === streamID);
 
-			if (tasks.length === 0) {
-				streamInfo.deviceID = facility.id;
-				tasks.push(streamInfo);
+								if(rowNo === _rowNo) {
+									return {
+										...task,
+										taskID: taskID,
+										profileID: profileID, 
+										isStart: taskStatus.isStart,
+										streamStatus: taskStatus.status,
+										id: taskID,
+										...streamProfile
+									};
+
+								}else{
+									return task;
+								}
+
+							});
+
+				return {
+					...device,
+					tasks,
+					deviceConfig
+				};
+			}else{
+
+				return {
+					...device,
+					deviceConfig
+				};
 			}
 
-			return {
-				...facility,
-				tasks: tasks,
-				deviceConfig: config
-			};
 		});
 
 		this.setState({
@@ -356,6 +358,7 @@ class Configuration extends React.Component {
 				<section id="config_panel" className="mx-3">
 					{devicesTasksDetail.map(device => {
 						let totalTaskCount = device.tasks.length;
+
 						return (
 							<ConfigurationModal
 								key={device.id}

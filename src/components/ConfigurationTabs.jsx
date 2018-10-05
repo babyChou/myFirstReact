@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { SET_DEVICE_CONFIG } from '../helper/Services';
+import { SET_DEVICE_CONFIG, GET_PIP_CONFIG_LIST } from '../helper/Services';
 import { INPUT_SOURCES } from '../constant/Common.Consts';
 import Volume from './Volume';
+import PipCanvas from './PipCanvas';
 
 const audioParam = ['micMix','mixInput','soundControl','micPercentage','audioPercentage'];
 const videoParma = ['brightness','contrast','hue','saturation'];
@@ -12,12 +13,23 @@ export default class ConfigurationTabs extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			tabActive : ['active','','']
+			tabActive : ['active','',''],
+			pipList: []
 		};
 
 		this.cgTab = this.cgTab.bind(this);
 		this.volumeChange = this.volumeChange.bind(this);
 		this.valChange = this.valChange.bind(this);
+	}
+	componentDidMount() {
+		GET_PIP_CONFIG_LIST.fetchData().then(data => {
+			if(data.result === 0) {
+				this.setState({
+					pipList : data.config
+				});
+
+			}
+		});
 	}
 	cgTab(indx) {
 		let tabActive = ['','',''];
@@ -115,6 +127,7 @@ export default class ConfigurationTabs extends React.Component {
 
 		return (
 			<div>
+				
 				<ul className="nav nav-tabs">
 					<li className="nav-item">
 						<a className={'btn nav-link ' + tabActive[0] } onClick={() => cgTab(0) }>{t('msg_audio')}</a>
@@ -248,30 +261,16 @@ export default class ConfigurationTabs extends React.Component {
 										<div className="form-check mb-1">
 											<input className="form-check-input" type="checkbox" id="source_reverse" value="option1" />
 											<label className="form-check-label" htmlFor="source_reverse">{t('msg_yes')}</label>
-										</div>	
-										<div className="bg-primary" style={{width:'100px', height:'100px'}}></div>
+										</div>
+										{/* <Stage width={160} height={90}> */}
+											{/* <Layer> */}
+												<PipCanvas className="bg-secondary" width={160} height={90}></PipCanvas>
+											{/* </Layer> */}
+										{/* </Stage> */}
+										
 									</li>
-									<li className="list-inline-item">
-										<div className="form-check mb-1">
-											<input className="form-check-input" type="checkbox" id="source_reverse" value="option1" />
-											<label className="form-check-label" htmlFor="source_reverse">{t('msg_yes')}</label>
-										</div>	
-										<div className="bg-primary" style={{width:'100px', height:'100px'}}></div>
-									</li>
-									<li className="list-inline-item">
-										<div className="form-check mb-1">
-											<input className="form-check-input" type="checkbox" id="source_reverse" value="option1" />
-											<label className="form-check-label" htmlFor="source_reverse">{t('msg_yes')}</label>
-										</div>	
-										<div className="bg-primary" style={{width:'100px', height:'100px'}}></div>
-									</li>
-									<li className="list-inline-item">
-										<div className="form-check mb-1">
-											<input className="form-check-input" type="checkbox" id="source_reverse" value="option1" />
-											<label className="form-check-label" htmlFor="source_reverse">{t('msg_yes')}</label>
-										</div>	
-										<div className="bg-primary" style={{width:'100px', height:'100px'}}></div>
-									</li>
+									
+									
 									
 								</ul>
 

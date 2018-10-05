@@ -57,7 +57,7 @@ switch ($method) {
 			foreach($device['tasks'] as $task) {
 				$t = new stdClass();
 				$document = $taskColl->findOneAndUpdate(
-					['DEVICE_ID' => $deviceID],
+					['DEVICE_ID' => $deviceID, 'TASK_ID' => $newTaskID],
 					['$set' => [
 						'TASK_ID' => $newTaskID,
 						'STREAM_ID' => $task['streamID'],
@@ -90,11 +90,11 @@ switch ($method) {
 		break;
 	case 'PATCH':
 		$resp = new stdClass();
-		if(!isset($_GET['deviceID']) || !isset($_GET['taskID'])) {
-			$resp->result = 102;
-			echo json_encode($resp);
-			exit();
-		}
+		// if(!isset($_GET['deviceID']) || !isset($_GET['taskID'])) {
+		// 	$resp->result = 102;
+		// 	echo json_encode($resp);
+		// 	exit();
+		// }
 		//>>> MOCK TEST
 		// $req = json_decode(file_get_contents('php://input'), true);
 		// $devices = $req['devices'];
@@ -167,10 +167,21 @@ switch ($method) {
 
 		
 		foreach ($result as $entry) {
-			$device = new stdClass();
-			$device->id = $entry['DEVICE_ID'];
-			$device->tasks = [];
-			array_push($devices, $device);
+			$isAdded = false;
+			foreach ($devices as $device) {
+				if($device->id === $entry['DEVICE_ID']) {
+					$isAdded = true;;
+				}
+
+			}
+
+			if(!$isAdded) {
+				$device = new stdClass();
+				$device->id = $entry['DEVICE_ID'];
+				$device->tasks = [];
+				array_push($devices, $device);
+			}
+
 
 			$task = new stdClass();
 			$task->id = $entry['TASK_ID'];

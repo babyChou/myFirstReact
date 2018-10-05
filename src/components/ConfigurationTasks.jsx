@@ -197,6 +197,7 @@ class ConfigurationTasks extends React.Component {
 		this.setState({
 			isStreamingCheck : false
 		});
+		const rowNo = this.props.rowNo;
 		const { deviceID, taskID, id } = this.props.streamInfo;
 		const streamID = id;
 		const streamProfileMethod = ( streamID !== -1 ? 'PUT' : 'POST');
@@ -271,13 +272,19 @@ class ConfigurationTasks extends React.Component {
 			if(data.result !== 0) {
 				//dialog error
 			}else{
+
+				task.rowNo = rowNo;
+				task = {
+					...task,
+					...data.tasks.find(task => task.deviceID === deviceID)
+				};
 			
 				return START_DEVICE_TASK.fetchData({
 					tasks : [...data.tasks]
 				}).then(data => {
 					if(data.result === 0) {
 						return Promise.all([checkDevicesTasks(true), checkTasksStatus(true)]).then(() => {
-							this.props.renewDevicesTasksDetail();
+							this.props.renewDevicesTasksDetail(task);
 							this.props.handleBackdrop(false);
 						});
 					}else{
@@ -299,9 +306,17 @@ class ConfigurationTasks extends React.Component {
 
 	}
 	btnStop(e) {
-		//stopStream
-		//STOP_DEVICE_TASK
-		const { deviceID, taskID } = this.props.streamInfo;
+
+		const rowNo = this.props.rowNo;
+		const { deviceID, taskID, id } = this.props.streamInfo;
+		const taskInfo = {
+			deviceID,
+			taskID,
+			rowNo,
+			streamID : id,
+			profileID : Number(this.state.encodingProfile.value)
+		};
+		
 		this.props.handleBackdrop(true);
 
 		STOP_DEVICE_TASK.fetchData({
@@ -312,26 +327,54 @@ class ConfigurationTasks extends React.Component {
 		}).then(data => {
 			if(data.result === 0) {
 				checkTasksStatus(true).then(()=>{				
-					this.props.renewDevicesTasksDetail();
+					this.props.renewDevicesTasksDetail(taskInfo);
 					this.props.handleBackdrop(false);
 				});
 			}else{
 				//dialog error
 			}
-		})
+		});
 
-		console.log(this, e);
 	}
 	btnAdd(e) {
 		this.props.addSubTask(this.props.streamInfo.deviceID);
 	}
 	btnDelete(e) {
 		const rowNo = this.props.rowNo;
-		const { deviceID, taskID } = this.props.streamInfo;
-		//DELETE_DEVICE_TASK
-		console.log();
+		const { deviceID, taskID, id } = this.props.streamInfo;
+		const taskInfo = {
+			deviceID,
+			taskID,
+			rowNo,
+			streamID : id,
+			profileID : Number(this.state.encodingProfile.value)
+		};
 
-		this.props.deleteSubTask(deviceID, taskID, rowNo);
+		this.props.handleBackdrop(true);
+
+		if(taskID !== -1) {
+			DELETE_DEVICE_TASK.fetchData({
+				tasks : [{
+					deviceID,
+					taskID
+				}]
+			}).then(data => {
+				if(data.result === 0) {
+					checkTasksStatus(true).then(()=>{				
+						this.props.deleteSubTask(deviceID, taskID, rowNo);
+						this.props.handleBackdrop(false);
+					});
+				}else{
+					//dialog error
+				}
+			});
+			
+		}else{
+			this.props.deleteSubTask(deviceID, taskID, rowNo);
+			this.props.handleBackdrop(false);
+		}
+
+		
 	}
 	onChangeVal(e, key) {
 		let updateObj = {
@@ -461,7 +504,7 @@ class ConfigurationTasks extends React.Component {
 					<td className="" style={{width:'21px', paddingTop:'10px'}}>
 						{
 							isAddRow ? <button className="btn_delete" onClick={ this.btnDelete.bind(this) } disabled={(streamInfo.isStart )}></button> :
-										<button className="btn_add" onClick={ this.btnAdd.bind(this) } disabled={(streamInfo.isStart || totalTaskCount >= 2 )}></button>
+										<button className="btn_add" onClick={ this.btnAdd.bind(this) } disabled={ totalTaskCount >= 2 }></button>
 						}
 						
 					</td>

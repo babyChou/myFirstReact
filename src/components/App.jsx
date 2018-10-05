@@ -26,25 +26,23 @@ class App extends React.Component {
 
 	}
 
-	componentDidMount() {
-		const loggedIn = this.props.authentication.loggedIn;
-
-		if(loggedIn) {
-			LOGIN.updateSession(this.props.authentication.session);
-		}
-
-	}
+	componentDidMount() {}
 
     render() {
     	const { authentication } = this.props;
+    	const loggedIn = this.props.authentication.loggedIn;
+
+    	if(loggedIn || !LOGIN.checkSession()) {
+			LOGIN.updateSession(this.props.authentication.session);
+		}
 
 	//<Router history={history}>
         return (<Router>
 					<Switch>
 						<Route path="/login" component={Login} />
 						<PrivateRoute exact={true} path="/" component={BroadcastList} authentication={authentication}/>
-						<PrivateRoute path="/Configuration" component={Configuration} authentication={authentication}/>
-						<Redirect from="*" to={"/Configuration"} />
+						<PrivateRoute path="/configuration" component={Configuration} authentication={authentication}/>
+						<Redirect from="*" to={"/configuration"} />
 					</Switch>
 				</Router>) ;
     }

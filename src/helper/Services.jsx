@@ -10,9 +10,9 @@ const errorDOM = document.getElementById('error');
 let hostname = './';
 let SESSION = '';
 
-// if (process.env.NODE_ENV !== 'production') {
-//     // hostname = 'http://localhost:9998/se5820/';
-// }
+/* if (process.env.NODE_ENV !== 'production') {
+    hostname = 'http://localhost:9998/se5820/';
+} */
 
 function updateSession(session) {
     SESSION = session;
@@ -39,7 +39,7 @@ function fetchData(params, method, isStore) {
     let url = hostname + this.url;
     let reqParams = {
         mode: 'cors', //for test
-        credentials: 'include',
+        // credentials: 'include',
         cache: 'no-cache',
         method : _method,
         headers : headers
@@ -370,6 +370,25 @@ const GET_INPUT_SIGNAL_STATUS = {
     fetchData
 };
 
+const GET_PIP_CONFIG_LIST = {
+    url: '/api/PIPConfigList',
+    method: 'GET',
+    fetchData
+};
+
+const SET_PIP_CONFIG = {
+    url: '/api/PIPConfig',
+    method: 'POST',
+    fetchData
+};
+
+
+const DELETE_PIP_CONFIG = {
+    url: '/api/deletePIPConfig',
+    method: 'DELETE',
+    fetchData
+};
+
 
 
 export {
@@ -395,5 +414,8 @@ export {
     GET_DEVICE_CONFIG,
     SET_DEVICE_CONFIG,
     GET_PIP_PREVIEW_IMG,
-    GET_INPUT_SIGNAL_STATUS
+    GET_INPUT_SIGNAL_STATUS,
+    GET_PIP_CONFIG_LIST,
+    SET_PIP_CONFIG,
+    DELETE_PIP_CONFIG
 };
