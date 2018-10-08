@@ -4,7 +4,7 @@ import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from "redux";
 import { configActions } from "../action/Config.Actions";
-import { GET_NETWORK_STATUS } from "../helper/Services";
+import { GET_NETWORK_STATUS, GET_PIP_CONFIG_LIST } from "../helper/Services";
 import { concatTasksStatus } from "../helper/helper";
 import {
 	checkFacilities,
@@ -46,6 +46,7 @@ class Configuration extends React.Component {
 
 		this.state = {
 			netWorkStatus: [],
+			pipList: [],
 			devicesTasksDetail: [],
 			isDeviceConfigSet: false,
 			backdropShow: false
@@ -61,9 +62,11 @@ class Configuration extends React.Component {
 			checkDevicesTasks(true),
 			checkTasksStatus(true),
 			checkEncodeProfiles(),
-			GET_NETWORK_STATUS.fetchData()
+			GET_NETWORK_STATUS.fetchData(),
+			GET_PIP_CONFIG_LIST.fetchData()
 		];
 		let reqPromise2 = [];
+		let pipList = [];
 		let netWorkStatus = [];
 		let devicesConfig = [];
 		let devices, devicesTasksStatus, encodeProfiles;
@@ -84,6 +87,7 @@ class Configuration extends React.Component {
 					);
 					encodeProfiles = data[2];
 					netWorkStatus = data[3]["nic"];
+					pipList = data[4]["config"];
 
 					devicesConfig[1] = data.pop();
 					devicesConfig[0] = data.pop();
@@ -156,6 +160,7 @@ class Configuration extends React.Component {
 				});
 
 				this.setState({
+					pipList,
 					netWorkStatus,
 					devicesTasksDetail
 				});
@@ -371,6 +376,7 @@ class Configuration extends React.Component {
 										t={t}
 										id={device.id}
 										deviceConfig={device.deviceConfig}
+										pipList={this.state.pipList}
 										updateDeviceConfig={this.props.setDeviceConfig}
 										renewDevicesTasksDetail={this.renewDevicesTasksDetail}
 									/>
@@ -384,6 +390,8 @@ class Configuration extends React.Component {
 											nics={netWorkStatus}
 											videoInputs={device.videoInput}
 											selectedSource={selectedSource}
+											updateDeviceConfig={this.props.setDeviceConfig}
+											reverseInputSource={device.deviceConfig.reverseInputSource}
 											streamInfo={task}
 											encodeProfiles={encodeProfiles}
 											addSubTask={this.addSubTask}

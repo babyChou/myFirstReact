@@ -408,10 +408,23 @@ class ConfigurationTasks extends React.Component {
 
 
 	}
+	changeSourceReversed(e, state) {
+		
+		let passDevice = {
+			id: this.props.streamInfo.deviceID,
+			reverseInputSource: state
+		};
+
+		this.props.updateDeviceConfig(passDevice);
+
+		SET_DEVICE_CONFIG.fetchData({
+			device : passDevice
+		},'PATCH');
+	}
 
 	render() {
 
-		const { rowNo, totalTaskCount, videoInputs, nics, streamInfo, encodeProfiles, selectedSource, t } = this.props;
+		const { rowNo, totalTaskCount, videoInputs, nics, streamInfo, encodeProfiles, selectedSource, reverseInputSource, t } = this.props;
 		const { streamType, encodingProfile, ipAddr, port, nic } = this.state;
 		const videoSelected = this.state.videoSelected;
 		const deviceID = streamInfo.deviceID;
@@ -447,10 +460,12 @@ class ConfigurationTasks extends React.Component {
 								<select className="form-control" onChange={this.cgVideoSource} data-source-row="0" value={ selected || ''} disabled={streamInfo.isStart} required={isCheck}>{ videoInputDOM(disabledType) }</select>
 								<div className="invalid-feedback">{t('msg_not_setup_yet')}</div>
 							</td>);
+					dom.push(<td key="3" style={{width:'21px', paddingTop:'10px'}} className="align-top text-center"><button className={"btn_reversed " + (reverseInputSource ? 'active' : '')} onClick={e => this.changeSourceReversed(e, !reverseInputSource)} ></button></td>);//reverseInputSource
 				}else{
 					
-					dom.push(<td key="3" className="align-middle text-center" rowSpan="2">{rowNo}</td>);
-					dom.push(<td key="4" rowSpan="2"></td>);
+					dom.push(<td key="4" className="align-middle text-center" rowSpan="2">{rowNo}</td>);
+					dom.push(<td key="5" rowSpan="2"></td>);
+					dom.push(<td key="6" rowSpan="2"></td>);
 				}
 			}else{
 				if(!isAddRow) {
@@ -459,7 +474,7 @@ class ConfigurationTasks extends React.Component {
 								<div className="invalid-feedback">{t('msg_not_setup_yet')}</div>
 							</td>);
 				}else{
-					// dom.push(<td key="6"></td>);
+					// 
 				}
 			}
 
@@ -511,6 +526,7 @@ class ConfigurationTasks extends React.Component {
 				</tr>
 				<tr ref={this.trRow2} className={'table-common-odd table-bordered ' + (this.state.wasValidated ? 'my-was-validated' : '')}>
 					{ rowDOM(2) }
+					<td></td>
 					<td className="px-3 py-4" colSpan="7">
 						{ subDOM(streamType.value) }
 					</td>

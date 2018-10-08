@@ -18,6 +18,7 @@ const ConfigurationModal = (props) => {
 							<tr className="table-bordered">
 								<th scope="col" className="w-5">{t('msg_no')}</th>
 								<th scope="col" className="w-10">{t('msg_channel_name')}</th>
+								<th scope="col" className=""></th>
 								<th scope="col" className="w-15">{t('msg_stream_type')}</th>
 								<th scope="col" className="w-25">{t('msg_encoding_profile')}</th>
 								<th scope="col" className="w-15">{t('msg_ip_addr')}</th>

@@ -1298,12 +1298,10 @@ PATCH (Update attribute)
                 "x":%d,
                 "y":%d
             },
-            "windowSize":{
-                "x":%d,
-                "y":%d
-            },
-            keepRatio:%b,
-            sourceReverse:%b
+            "windowSize": %d,
+            "keepRatio":%b,
+            "duplicable":%b,
+            "isPBP":%b,
         }
     ]
 }
@@ -1325,12 +1323,10 @@ POST (New Config)
             "x":%d,
             "y":%d
         },
-        "windowSize":{
-            "x":%d,
-            "y":%d
-        },
-        keepRatio:%b,
-        sourceReverse:%b
+        "windowSize": %d,
+        "keepRatio":%b,
+        "duplicable":%b,
+        "isPBP":%b,
     }
     
 }
@@ -1346,12 +1342,10 @@ PATCH (Modify)
             "x":%d,
             "y":%d
         },
-        "windowSize":{
-            "x":%d,
-            "y":%d
-        },
-        keepRatio:%b,
-        sourceReverse:%b
+        "windowSize": %d,
+        "keepRatio":%b,
+        "duplicable":%b,
+        "isPBP":%b,
     }
 }
 ```

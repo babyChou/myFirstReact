@@ -1,11 +1,14 @@
 import * as React from 'react';
-import { SET_DEVICE_CONFIG, GET_PIP_CONFIG_LIST } from '../helper/Services';
+import { findDOMNode } from "react-dom";
+import { SET_DEVICE_CONFIG } from '../helper/Services';
 import { INPUT_SOURCES } from '../constant/Common.Consts';
 import Volume from './Volume';
 import PipCanvas from './PipCanvas';
 
 const audioParam = ['micMix','mixInput','soundControl','micPercentage','audioPercentage'];
 const videoParma = ['brightness','contrast','hue','saturation'];
+const boolValParma = ['micMix'];
+const numberValParma = ['currentPIPId'];
 
 
 
@@ -14,22 +17,15 @@ export default class ConfigurationTabs extends React.Component {
 		super(props);
 		this.state = {
 			tabActive : ['active','',''],
-			pipList: []
+			pipList: props.pipList
 		};
 
 		this.cgTab = this.cgTab.bind(this);
 		this.volumeChange = this.volumeChange.bind(this);
 		this.valChange = this.valChange.bind(this);
+		this.changePip = this.changePip.bind(this);
 	}
 	componentDidMount() {
-		GET_PIP_CONFIG_LIST.fetchData().then(data => {
-			if(data.result === 0) {
-				this.setState({
-					pipList : data.config
-				});
-
-			}
-		});
 	}
 	cgTab(indx) {
 		let tabActive = ['','',''];
@@ -40,7 +36,7 @@ export default class ConfigurationTabs extends React.Component {
 		});
 	}
 	volumeChange(val, name) {
-		const attr = (name).replace(/[0-9]$/,'');
+		const attr = (name).replace(/([0-9]*)$/,'');
 		let passDevice = {
 			id: this.props.id
 		};
@@ -78,18 +74,18 @@ export default class ConfigurationTabs extends React.Component {
 
 	}
 	valChange(e) {
-		const attr = (e.target.name).replace(/[0-9]$/,'');
+		const attr = (e.target.name).replace(/([0-9]*)$/,'');
+		const val = boolValParma.includes(attr) ? !!Number(e.target.value) : (numberValParma.includes(attr) ? Number(e.target.value) : e.target.value);
 		let passDevice = {
 			id: this.props.id
 		};
 
-		console.log(attr, e.target.value);
 
 		if(audioParam.includes(attr)) {
 			passDevice = {
 				...passDevice,
 				audioParam : {
-					[attr] : (attr === 'micMix' ? !!Number(e.target.value) : e.target.value) 
+					[attr] : val
 				}
 			}
 		}
@@ -98,7 +94,7 @@ export default class ConfigurationTabs extends React.Component {
 			passDevice = {
 				...passDevice,
 				videoParma : {
-					[attr] : e.target.value
+					[attr] : val
 				}
 			}
 		}
@@ -106,7 +102,7 @@ export default class ConfigurationTabs extends React.Component {
 		if(!passDevice.hasOwnProperty('audioParam') && !passDevice.hasOwnProperty('videoParma')) {
 			passDevice = {
 				...passDevice,
-				[attr] : e.target.value
+				[attr] : val
 			}
 		}
 
@@ -118,12 +114,24 @@ export default class ConfigurationTabs extends React.Component {
 		},'PATCH');
 
 	}
+	changePip(e) {
+		const inputNodeDOM = findDOMNode(e.currentTarget).querySelector('input[type="radio"]');
+		let passDevice = {
+			id: this.props.id,
+			currentPIPId: Number(inputNodeDOM.value)
+		};
+		this.props.updateDeviceConfig(passDevice);
+
+		SET_DEVICE_CONFIG.fetchData({
+			device : passDevice
+		},'PATCH');
+	}
 	render() {
 		const cgTab = this.cgTab;
 		const volumeChange = this.volumeChange;
 		const tabActive = this.state.tabActive;
+		const pipList = this.state.pipList;
 		const { t, facility, deviceConfig, id } = this.props;
-
 
 		return (
 			<div>
@@ -254,37 +262,28 @@ export default class ConfigurationTabs extends React.Component {
 					</section>
 					<section className={'tab-pane ' + tabActive[2]}>
 						<div className="form-row form-group align-items-center">
-							<div className="col-lg-2">{t('msg_layout')}</div>
+							<div className="col-lg-1">{t('msg_layout')}</div>
 							<div className="col-lg">
 								<ul className="list-inline">
-									<li className="list-inline-item">
-										<div className="form-check mb-1">
-											<input className="form-check-input" type="checkbox" id="source_reverse" value="option1" />
-											<label className="form-check-label" htmlFor="source_reverse">{t('msg_yes')}</label>
-										</div>
-										{/* <Stage width={160} height={90}> */}
-											{/* <Layer> */}
-												<PipCanvas className="bg-secondary" width={160} height={90}></PipCanvas>
-											{/* </Layer> */}
-										{/* </Stage> */}
-										
-									</li>
+									{
+										pipList.map(pipConfig => {
+											return (<li key={pipConfig.id} className="list-inline-item gradient-blue-bg p-2 rounded" onClick={this.changePip}>
+														<div className="form-check mb-1" onClick={e => e.stopPropagation()}>
+															<input className="form-check-input" type="radio" name={'currentPIPId' + id+(pipConfig.id*100)} id={'pip_' + pipConfig.id} value={pipConfig.id} checked={deviceConfig.currentPIPId === pipConfig.id} onChange={this.valChange}/>
+															<label className={"form-check-label text-white " + (deviceConfig.currentPIPId === pipConfig.id ? 'text-warning' : '')} htmlFor={'pip_' + pipConfig.id}>{pipConfig.name}</label>
+														</div>
+														<PipCanvas width={160} height={90} pipConfig={pipConfig}></PipCanvas>
+													</li>);
+										})
 									
+									}
 									
 									
 								</ul>
 
 							</div>
 						</div>
-						<div className="form-row form-group align-items-center">
-							<div className="col-lg-2">{t('msg_video_source_reverse')}</div>
-							<div className="col-lg">
-								<div className="form-check">
-									<input className="form-check-input" type="checkbox" id="source_reverse" value="option1" />
-									<label className="form-check-label" htmlFor="source_reverse">{t('msg_yes')}</label>
-								</div>
-							</div>
-						</div>
+
 					</section>
 				</div>
 			</div>
