@@ -6566,7 +6566,7 @@ a.text-dark:hover, a.text-dark:focus {
   height: 92px;
   background-image: url("./img/btn_menu_broadcastlist.png"); }
 
-.btn_menu_browser {
+.btn_menu_browser, .btn_browser::before, .btn_browser::after {
   width: 200px;
   height: 92px;
   background-image: url("./img/btn_menu_browser.png"); }
@@ -6591,7 +6591,7 @@ a.text-dark:hover, a.text-dark:focus {
   height: 92px;
   background-image: url("./img/btn_menu_overview.png"); }
 
-.btn_menu_pip {
+.btn_menu_pip, .btn_pip::before, .btn_pip::after {
   width: 200px;
   height: 92px;
   background-image: url("./img/btn_menu_pip.png"); }
@@ -6601,7 +6601,7 @@ a.text-dark:hover, a.text-dark:focus {
   height: 92px;
   background-image: url("./img/btn_menu_redundancy.png"); }
 
-.btn_menu_remote_controller {
+.btn_menu_remote_controller, .btn_remote_controller::before, .btn_remote_controller::after {
   width: 200px;
   height: 92px;
   background-image: url("./img/btn_menu_remote_controller.png"); }
@@ -7227,6 +7227,195 @@ a.text-dark:hover, a.text-dark:focus {
       color: #fff;
       text-decoration: none; }
     .btn_administration > *:active {
+      color: #fff;
+      text-decoration: none; }
+
+.btn_pip {
+  position: relative;
+  border: 1px solid transparent;
+  height: 23px;
+  background-color: rgba(255, 255, 255, 0);
+  color: #fff;
+  font-weight: 600;
+  width: 100px;
+  outline: 0;
+  cursor: pointer; }
+  .btn_pip::before {
+    content: '';
+    background-position: 0 0;
+    position: absolute;
+    width: 50%;
+    height: 23px;
+    top: 0;
+    left: 0; }
+  .btn_pip::after {
+    content: '';
+    background-position: right 0;
+    position: absolute;
+    width: 50%;
+    height: 23px;
+    top: 0;
+    right: 0; }
+  .btn_pip:hover::after {
+    background-position-y: -23px;
+    background-position-x: right; }
+  .btn_pip:hover::before {
+    background-position-y: -23px;
+    background-position-x: 0; }
+  .btn_pip:active::after, .btn_pip.active::after {
+    background-position-y: -46px;
+    background-position-x: right; }
+  .btn_pip:active::before, .btn_pip.active::before {
+    background-position-y: -46px;
+    background-position-x: 0; }
+  .btn_pip:disabled, .btn_pip.disabled {
+    cursor: not-allowed; }
+    .btn_pip:disabled::after, .btn_pip.disabled::after {
+      background-position-y: -69px;
+      background-position-x: right; }
+    .btn_pip:disabled::before, .btn_pip.disabled::before {
+      background-position-y: -69px;
+      background-position-x: 0; }
+  .btn_pip:focus {
+    outline-style: none; }
+  .btn_pip > * {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    color: #fff;
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0; }
+    .btn_pip > *:hover {
+      color: #fff;
+      text-decoration: none; }
+    .btn_pip > *:active {
+      color: #fff;
+      text-decoration: none; }
+
+.btn_remote_controller {
+  position: relative;
+  border: 1px solid transparent;
+  height: 23px;
+  background-color: rgba(255, 255, 255, 0);
+  color: #fff;
+  font-weight: 600;
+  width: 100px;
+  outline: 0;
+  cursor: pointer; }
+  .btn_remote_controller::before {
+    content: '';
+    background-position: 0 0;
+    position: absolute;
+    width: 50%;
+    height: 23px;
+    top: 0;
+    left: 0; }
+  .btn_remote_controller::after {
+    content: '';
+    background-position: right 0;
+    position: absolute;
+    width: 50%;
+    height: 23px;
+    top: 0;
+    right: 0; }
+  .btn_remote_controller:hover::after {
+    background-position-y: -23px;
+    background-position-x: right; }
+  .btn_remote_controller:hover::before {
+    background-position-y: -23px;
+    background-position-x: 0; }
+  .btn_remote_controller:active::after, .btn_remote_controller.active::after {
+    background-position-y: -46px;
+    background-position-x: right; }
+  .btn_remote_controller:active::before, .btn_remote_controller.active::before {
+    background-position-y: -46px;
+    background-position-x: 0; }
+  .btn_remote_controller:disabled, .btn_remote_controller.disabled {
+    cursor: not-allowed; }
+    .btn_remote_controller:disabled::after, .btn_remote_controller.disabled::after {
+      background-position-y: -69px;
+      background-position-x: right; }
+    .btn_remote_controller:disabled::before, .btn_remote_controller.disabled::before {
+      background-position-y: -69px;
+      background-position-x: 0; }
+  .btn_remote_controller:focus {
+    outline-style: none; }
+  .btn_remote_controller > * {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    color: #fff;
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0; }
+    .btn_remote_controller > *:hover {
+      color: #fff;
+      text-decoration: none; }
+    .btn_remote_controller > *:active {
+      color: #fff;
+      text-decoration: none; }
+
+.btn_browser {
+  position: relative;
+  border: 1px solid transparent;
+  height: 23px;
+  background-color: rgba(255, 255, 255, 0);
+  color: #fff;
+  font-weight: 600;
+  width: 100px;
+  outline: 0;
+  cursor: pointer; }
+  .btn_browser::before {
+    content: '';
+    background-position: 0 0;
+    position: absolute;
+    width: 50%;
+    height: 23px;
+    top: 0;
+    left: 0; }
+  .btn_browser::after {
+    content: '';
+    background-position: right 0;
+    position: absolute;
+    width: 50%;
+    height: 23px;
+    top: 0;
+    right: 0; }
+  .btn_browser:hover::after {
+    background-position-y: -23px;
+    background-position-x: right; }
+  .btn_browser:hover::before {
+    background-position-y: -23px;
+    background-position-x: 0; }
+  .btn_browser:active::after, .btn_browser.active::after {
+    background-position-y: -46px;
+    background-position-x: right; }
+  .btn_browser:active::before, .btn_browser.active::before {
+    background-position-y: -46px;
+    background-position-x: 0; }
+  .btn_browser:disabled, .btn_browser.disabled {
+    cursor: not-allowed; }
+    .btn_browser:disabled::after, .btn_browser.disabled::after {
+      background-position-y: -69px;
+      background-position-x: right; }
+    .btn_browser:disabled::before, .btn_browser.disabled::before {
+      background-position-y: -69px;
+      background-position-x: 0; }
+  .btn_browser:focus {
+    outline-style: none; }
+  .btn_browser > * {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    color: #fff;
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0; }
+    .btn_browser > *:hover {
+      color: #fff;
+      text-decoration: none; }
+    .btn_browser > *:active {
       color: #fff;
       text-decoration: none; }
 

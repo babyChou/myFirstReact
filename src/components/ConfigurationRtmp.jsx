@@ -183,7 +183,7 @@ class ConfigurationRtmp extends React.Component {
 
 	}
 	render() {
-		const { t, isStreamingCheck, streamInfo } = this.props;
+		const { t, streamInfo } = this.props;
 		const { addr, streamName, username, password, cmPassword, enableAuthorize } = this.state;
 		const rtmpCertID = 'enable_rtmp_cert' + randomID();
 		

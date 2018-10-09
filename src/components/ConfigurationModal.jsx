@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 const ConfigurationModal = (props) => {
 	const { t, id } = props;

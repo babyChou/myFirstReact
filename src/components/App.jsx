@@ -9,6 +9,7 @@ import { LOGIN } from '../helper/Services';
 import PrivateRoute from './PrivateRoute';
 import BroadcastList from './BroadcastList';
 import Configuration from './Configuration';
+import Pip from './Pip';
 import Login from './Login';
 
 // const history = createBrowserHistory();
@@ -21,10 +22,6 @@ const mapStateToProps = store => (
 );
 
 class App extends React.Component {
-	constructor(props) {
-		super(props);
-
-	}
 
 	componentDidMount() {}
 
@@ -42,6 +39,7 @@ class App extends React.Component {
 						<Route path="/login" component={Login} />
 						<PrivateRoute exact={true} path="/" component={BroadcastList} authentication={authentication}/>
 						<PrivateRoute path="/configuration" component={Configuration} authentication={authentication}/>
+						<PrivateRoute path="/pip" component={Pip} authentication={authentication}/>
 						<Redirect from="*" to={"/configuration"} />
 					</Switch>
 				</Router>) ;

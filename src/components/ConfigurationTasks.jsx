@@ -341,14 +341,7 @@ class ConfigurationTasks extends React.Component {
 	}
 	btnDelete(e) {
 		const rowNo = this.props.rowNo;
-		const { deviceID, taskID, id } = this.props.streamInfo;
-		const taskInfo = {
-			deviceID,
-			taskID,
-			rowNo,
-			streamID : id,
-			profileID : Number(this.state.encodingProfile.value)
-		};
+		const { deviceID, taskID } = this.props.streamInfo;
 
 		this.props.handleBackdrop(true);
 

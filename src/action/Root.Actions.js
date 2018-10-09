@@ -7,8 +7,7 @@ import {
 	DELETE_VIDEO_SOURCE,
 	REPLACE_LAST_VIDEO_SOURCE,
 	LOAD_VIDEO_SOURCES,
-	STACK_ERROR,
-	DISPLAY_ERROR
+	STACK_ERROR
 } from '../constant/Root.Consts';
 
 export const rootActions = {

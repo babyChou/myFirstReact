@@ -334,10 +334,7 @@ class Configuration extends React.Component {
 		const {
 			t,
 			devices,
-			devicesTasks,
-			tasksStatus,
 			encodeProfiles,
-			streamProfiles,
 			devicesConfig,
 			selectedSource
 		} = this.props;

@@ -464,38 +464,30 @@ class BroadcastList extends React.Component {
 							</h6>
 						</div>
 						<div className="modal-body">
-							<ul className="nav nav-tabs">
-								<li className="nav-item">
-									<a className="nav-link active" >{t('msg_streaming_task')}</a>
-								</li>
+							<ul className="list-inline">
+								<li className="list-inline-item"><button type="button" className="btn_broadcast_list_delete" disabled={btnsDisabled} onClick={() => btnAction(device.id, 0)}></button></li>
+								<li className="list-inline-item"><button type="button" className="btn_broadcast_list_start" disabled={btnsDisabled} onClick={() => btnAction(device.id, 1)}></button></li>
+								<li className="list-inline-item"><button type="button" className="btn_broadcast_list_stop" disabled={btnsDisabled} onClick={() => btnAction(device.id, 2)}></button></li>
 							</ul>
-							<div className="border border-top-0 p-3">
-								<ul className="list-inline">
-									<li className="list-inline-item"><button type="button" className="btn_broadcast_list_delete" disabled={btnsDisabled} onClick={() => btnAction(device.id, 0)}></button></li>
-									<li className="list-inline-item"><button type="button" className="btn_broadcast_list_start" disabled={btnsDisabled} onClick={() => btnAction(device.id, 1)}></button></li>
-									<li className="list-inline-item"><button type="button" className="btn_broadcast_list_stop" disabled={btnsDisabled} onClick={() => btnAction(device.id, 2)}></button></li>
-								</ul>
-								<div className="table-responsive">
-									<table className="table table-bordered table-striped-common ">
-										<thead className="thead-blue">
-											<tr>
-												<th scope="col" className="text-center"><input type="checkbox" id={'ckboxAll_' + device.id} value={device.id*1000} checked={isChecked} onChange={taskOnCheck} /></th>
-												<th scope="col">{t('msg_no')}</th>
-												<th scope="col">{t('msg_channel_name')}</th>
-												<th scope="col" className="w-25">{t('msg_output_addr')}</th>
-												<th scope="col" className="w-25">{t('msg_encoding_profile')}</th>
-												<th scope="col">{t('msg_status')}</th>
-												<th scope="col">{t('msg_streaming_status')}</th>
-											</tr>
-										</thead>
-										<tbody>
-											{
-												tasks.map((task, i) => taskList(device.id, task, i+1))
-											}
-										</tbody>
-									</table>
-								</div>
-								
+							<div className="table-responsive">
+								<table className="table table-bordered table-striped-common ">
+									<thead className="thead-blue">
+										<tr>
+											<th scope="col" className="text-center"><input type="checkbox" id={'ckboxAll_' + device.id} value={device.id*1000} checked={isChecked} onChange={taskOnCheck} /></th>
+											<th scope="col">{t('msg_no')}</th>
+											<th scope="col">{t('msg_channel_name')}</th>
+											<th scope="col" className="w-25">{t('msg_output_addr')}</th>
+											<th scope="col" className="w-25">{t('msg_encoding_profile')}</th>
+											<th scope="col">{t('msg_status')}</th>
+											<th scope="col">{t('msg_streaming_status')}</th>
+										</tr>
+									</thead>
+									<tbody>
+										{
+											tasks.map((task, i) => taskList(device.id, task, i+1))
+										}
+									</tbody>
+								</table>
 							</div>
 						</div>
 						<div className="modal-footer"></div>

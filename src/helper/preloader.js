@@ -72,11 +72,10 @@ function checkEncodeProfiles(renew) {
 function checkStreamProfiles(id, renew) {
     let streamProfiles = JSON.parse(JSON.stringify(store.getState().profiles.streamProfiles));
     let isLoaded = false;
-    let respProfile = {};
+    
     streamProfiles.forEach(profile => {
         if (profile.id === id) {
             isLoaded = true;
-            respProfile = profile;
         }
     });
 

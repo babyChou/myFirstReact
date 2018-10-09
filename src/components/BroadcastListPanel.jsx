@@ -4,9 +4,6 @@ import { INPUT_DEVICE_NAME, INPUT_SOURCES } from '../constant/Common.Consts';
 
 
 class BroadcastListPanel extends React.Component {
-	constructor(props) {
-		super(props);
-	}
 
 	componentDidMount() {}
 	componentDidUpdate(prevProps, prevState) {}

@@ -28,6 +28,8 @@ export default class Volume extends React.Component {
 		this.maxVolume = this.maxVolume.bind(this);
 		this.minVolume = this.minVolume.bind(this);
 		this.ckRange = this.ckRange.bind(this);
+		this.getRangeVal = this.getRangeVal.bind(this);
+		this.checkMinMax = this.checkMinMax.bind(this);
 		
 	}
 // 
@@ -77,24 +79,31 @@ export default class Volume extends React.Component {
 		const { rangeLeft, rangeWidth } = this.state;
 		return (e.pageX >= rangeLeft) && (e.pageX <= (rangeLeft + rangeWidth));
 	}
-	getRange(pageX) {
+	getRangeVal(pageX) {
 		const { rangeLeft, rangeWidth, rangeValue } = this.state;
+		const { min } = this.props;
 		const currRange = pageX - rangeLeft;
-		const unitX = rangeValue/rangeWidth;
-		let result = Math.ceil(unitX*currRange);
-		
-		if(currRange < unitX) {
-			result = this.props.min;
-		}
+		const percent = currRange/rangeWidth;
 
-		return result;
+		return min + Math.round(rangeValue*percent);
+
 	}
 	onDrag(e) {
-		const { isDrag } = this.state;
+		const { isDrag, draggerWidth } = this.state;
+		const { limitMin, limitMax } = this.props;
 		let { textVal } = this.state;
 
 		if(isDrag && this.ckRange(e)) {
-			textVal = this.getRange(e.pageX);
+			textVal = this.getRangeVal(e.pageX);
+
+			if(textVal > limitMax) {
+					textVal = limitMax;
+				}
+
+				if(textVal < limitMin) {
+					textVal = limitMin;
+				}
+
 			this.updateUIval(textVal);
 
 			this.setState({
@@ -110,11 +119,21 @@ export default class Volume extends React.Component {
 		e.preventDefault();
 	}
 	startDragger(e) {
+		const { draggerWidth } = this.state;
+		const { limitMin, limitMax } = this.props;
 		let textVal = this.state.valueText;
-		
+
 		if(!this.props.disabled) {
 			if(this.ckRange(e)) {
-				textVal = this.getRange(e.pageX);
+				textVal = this.getRangeVal(e.pageX);
+				if(textVal > limitMax) {
+					textVal = limitMax;
+				}
+
+				if(textVal < limitMin) {
+					textVal = limitMin;
+				}
+
 				this.updateUIval(textVal);
 			}
 
@@ -141,19 +160,18 @@ export default class Volume extends React.Component {
 	}
 	changeVal(e) {
 		const val = Number(e.target.value);
-		this.updateUIval(val);
 
+		
 		this.setState({
 			valueText : val
 		});
 
-		if(isFunction(this.props.onChange)) {
-			this.props.onChange(val, this.props.name);
-		}
+		
 	}
 	updateUIval(val) {
+		const { min } = this.props;
 		const { draggerWidth, rangeWidth, rangeValue } = this.state;
-		let statusWidth = (val*rangeWidth)/rangeValue;
+		let statusWidth = (Math.abs(min - val)*rangeWidth)/rangeValue;
 		if(statusWidth > rangeWidth) {
 			statusWidth = rangeWidth;
 		}
@@ -162,6 +180,34 @@ export default class Volume extends React.Component {
 			draggerStyle : { left:statusWidth - (draggerWidth/2) },
 			barStyle: { width: statusWidth }
 		});
+
+	}
+	checkMinMax(e) {
+		let val = Number(e.target.value);
+		const { min, max, limitMin, limitMax } = this.props;
+		if(val > max) {
+			val = max;
+		}
+		if(val > limitMax) {
+			val = limitMax;
+		}
+
+		if(val < min){
+			val = min;
+		}
+
+		if(val < limitMin){
+			val = limitMin;
+		}
+
+		this.setState({
+			valueText : val
+		});
+
+		this.updateUIval(val);
+		if(isFunction(this.props.onChange)) {
+			this.props.onChange(val, this.props.name);
+		}
 
 	}
 	maxVolume(e) {
@@ -186,26 +232,25 @@ export default class Volume extends React.Component {
 
 		switch(size) {
 			case 'sm': 
-				tubeSize.width = '30%';
+				tubeSize.width = '9rem';
 				break
 			case 'lg': 
-				tubeSize.width = '70%';
+				tubeSize.width = '13rem';
 				break
 			default:
-				tubeSize.width = '40%';
+				tubeSize.width = '11rem';
 				break
-
 		}
 
 		return (
-				<div className="volume_control form-inline">
-					{ btnMinMax === false ? '' : <button className="btn_tuner_volume_minimal" disabled={disabled} onClick={this.minVolume}></button> }
-					<div className="volume_control_tube mx-2" style={tubeSize} ref={this.volumeTube} onMouseDown={this.startDragger} onMouseMove={this.onDrag} onMouseUp={this.stopDrag} onMouseLeave={this.stopDrag}>
+				<div className="volume_control d-inline">
+					{ btnMinMax === false ? '' : <button className="btn_tuner_volume_minimal align-middle" disabled={disabled} onClick={this.minVolume}></button> }
+					<div className="volume_control_tube mx-2 align-middle" style={tubeSize} ref={this.volumeTube} onMouseDown={this.startDragger} onMouseMove={this.onDrag} onMouseUp={this.stopDrag} onMouseLeave={this.stopDrag}>
 						<div className="volume_bar_status" style={barStyle}></div>
 						<div className="volume_bar_control" style={draggerStyle}></div>
 					</div>
-					{ btnMinMax === false ? '' : <button className="btn_tuner_volume_max mr-2" disabled={disabled} onClick={this.maxVolume}></button> }
-					<input type="number" className="form-control volume_control_value" min={min} max={max} value={valueText} onChange={this.changeVal} disabled={disabled}/>
+					{ btnMinMax === false ? '' : <button className="btn_tuner_volume_max mr-2 align-middle" disabled={disabled} onClick={this.maxVolume}></button> }
+					<input type="number" className="form-control volume_control_value align-middle" min={min} max={max} value={valueText} onChange={this.changeVal} onBlur={this.checkMinMax} disabled={disabled}/>
 				</div>
 			)
 	}

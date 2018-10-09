@@ -97,7 +97,7 @@ function fetchData(params, method, isStore) {
     return fetch(url, reqParams).then(response => {//add time
         if (!response.ok){
             // return Promise.reject({ url: this.url, body: response.statusText, type: 'responseNotOk', status: response.status });
-            throw new { url: this.url, body: response.statusText, type: 'responseNotOk', status: response.status };
+            throw new Error({ url: this.url, body: response.statusText, type: 'responseNotOk', status: response.status });
         }else{
             return response.text();
         }
@@ -106,7 +106,7 @@ function fetchData(params, method, isStore) {
             const bodyAsJson = JSON.parse(responseBodyAsText);
             return bodyAsJson;
         } catch (e) {
-            throw new { url: this.url, body: responseBodyAsText, type: 'unparsable' };
+            throw new Error({ url: this.url, body: responseBodyAsText, type: 'unparsable' });
         }
     })
     .then(json => {

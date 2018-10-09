@@ -140,7 +140,7 @@ class HeaderPanel extends React.Component {
 	}
 
 	render() {
-		const { t, devices, devicesConfig, selectedSource } = this.props;
+		const { t, devices, selectedSource } = this.props;
 		const { preview } = this.state;
 
 		return (

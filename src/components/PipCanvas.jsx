@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
-import Konva from 'konva';
 
 export default class PipCanvas extends React.Component {
 	constructor(props) {
