@@ -14,9 +14,12 @@ import {
 } from "../helper/preloader";
 import { retrieveFromProp } from '../helper/helper';
 import ConfigurationRtmp from './ConfigurationRtmp';
+import ConfigurationYoutube from './ConfigurationYoutube';
 //https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization
 
 
+
+const finishedList = [6, 13];
 
 const OPTION_FIELD = ['ipAddr','port','nic'];
 const STREAM_TYPE_MAP_STREAM_PARAMS = {
@@ -141,8 +144,8 @@ class ConfigurationTasks extends React.Component {
 								// .filter(type => !isNaN(type[0])) //A003670
 								.filter(type =>{
 									// console.log(type[0]);
-									return (!isNaN(type[0]) && Number(type[0]) === 6);
-								} )
+									return (!isNaN(type[0]) && finishedList.includes(Number(type[0])));
+								})
 								.map(type => <option key={type[0]} value={type[0]}>{type[1]}</option>)
 	)
 	nicsDOM = memoize(
@@ -479,6 +482,8 @@ class ConfigurationTasks extends React.Component {
 			switch(Number(streamType)) {
 				case 6:
 					return <ConfigurationRtmp handleStartStreming={this.handleStartStreming} isStreamingCheck={this.state.isStreamingCheck} streamInfo={streamInfo}></ConfigurationRtmp>;
+				case 13:
+					return <ConfigurationYoutube handleStartStreming={this.handleStartStreming} isStreamingCheck={this.state.isStreamingCheck} streamInfo={streamInfo} handleBackdrop={this.props.handleBackdrop}></ConfigurationYoutube>;
 				default: 
 					return null;
 

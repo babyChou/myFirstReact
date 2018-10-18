@@ -20,7 +20,8 @@
     "react-scripts": "2.0.4",
     "reactstrap": "^6.3.0",
     "redux": "^4.0.0",
-    "source-map-explorer": "^1.6.0"
+    "source-map-explorer": "^1.6.0",
+    "url-search-params": "^1.1.0"
   },
   "scripts": {
     "analyze": "source-map-explorer build/static/js/main.*",

@@ -116,19 +116,24 @@ class Header extends React.Component {
 					<nav id="main_tab">
 						<NavLink exact to="/" className="btn_broadcastlist" activeClassName="active"><span>{t('msg_broadcast_list')}</span></NavLink>
 						<NavLink to="/configuration" className="btn_configuration" activeClassName="active"><span>{t('msg_configuration')}</span></NavLink>
-						{/* <NavLink to="/encoding" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink> */}
+						<NavLink to="/encoding" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink>
 						<NavLink to="/pip" className="btn_pip" activeClassName="active"><span>{t('msg_pip')}</span></NavLink>
-						{/* <NavLink to="/log" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink> */}
-						{/* <NavLink to="/administration" className="btn_administration" activeClassName="active"><span>{t('msg_administration')}</span></NavLink> */}
+						<NavLink to="/log" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink>
+						<NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink>
+						<NavLink to="/administration" className="btn_administration" activeClassName="active"><span>{t('msg_administration')}</span></NavLink>
 					</nav>
 				</section>
 
-				<section id="source_panel" style={{ minHeight : ( this.state.collapse ? null : '40px') }}>
-					<button type="button" className={'float-right ' + (this.state.collapse ? 'btn_folding' : 'btn_expand') } onClick={this.panelCollapse}></button>
-					<div className="source_panel_wrapper" style={{ display : ( this.state.collapse ? null : 'none') }}>
-						{ children }
-					</div>
-				</section>
+				{
+					this.props.noPanel ? null :
+					<section id="source_panel" style={{ minHeight : ( this.state.collapse ? null : '40px') }}>
+						<button type="button" className={'float-right ' + (this.state.collapse ? 'btn_folding' : 'btn_expand') } onClick={this.panelCollapse}></button>
+						<div className="source_panel_wrapper" style={{ display : ( this.state.collapse ? null : 'none') }}>
+							{ children }
+						</div>
+					</section>
+				}
+
 			</header>
 		);
 	}

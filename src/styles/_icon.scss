@@ -1,0 +1,24 @@
+
+@mixin icon-size($state, $size) {
+
+	.icon-#{$state} {
+		font-size: $size;
+	}
+
+}
+
+@mixin icon-color($state, $color) {
+	.icon-#{$state} {
+		color: $color
+	}
+
+}
+
+
+@include icon-size('sm', 1rem);
+@include icon-size('md', 1.5rem);
+@include icon-size('lg', 2rem);
+
+@include icon-color('dark', #333);
+@include icon-color('white', #FFF);
+

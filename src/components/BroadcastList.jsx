@@ -373,6 +373,7 @@ class BroadcastList extends React.Component {
 	}
 	outputAddr(streamType, streamProfile, netWorkStatus) {
 		let urls = [];
+		let uri = '';
 	    const { t } = this.props;
 	    const tempUrl = '{protocol}://{@}{ip}:{port}{uri}';
 	    const protocols = ['', 'tcp', 'udp', 'udp', 'rtp', 'rtp', '', '', 'rtsp'];
@@ -419,10 +420,21 @@ class BroadcastList extends React.Component {
 	            });
 	            break;
 	        case 11: //https://www.ustream.tv/broadcaster/'+streamInfo.cdnUrl
+	            // http://www.ustream.tv/channel/11753958 (Not sure channelID)
+	            uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.channelID;
+	           
+				urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            break;
 	        case 12: //https://www.twitch.tv/'+streamInfo.cdnUser
-	        case 13: //https://www.youtube.com/watch?v='+streamInfo.cdnUrl
-
-
+	            //https://dev.twitch.tv/docs/v5/reference/channels/#get-channel
+	            //Get Channel by cancelIdleCallback
+	            //Response -> {... "url": "https://www.twitch.tv/dallas" ..}
+	            uri = 'https://www.twitch.tv/' + streamProfile.twitch.userID;//(or url)
+				urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            break;
+	        case 13:
+				uri = 'https://www.youtube.com/watch?v=' + streamProfile.youtube.videoID;
+				urls.push(<a href={uri} target="_blank">{uri}</a>);
 	            break;
 	        default:
 	            break;

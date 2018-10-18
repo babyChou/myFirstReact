@@ -2,6 +2,7 @@ import './styles/index.css';
 
 // import 'core-js/es6/map';
 // import 'core-js/es6/set';
+import 'url-search-params';
 //https://github.com/facebook/create-react-app/issues/3772
 //https://reactjs.org/docs/javascript-environment-requirements.html
 //https://stackoverflow.com/questions/43756211/best-way-to-polyfill-es6-features-in-react-app-that-uses-create-react-app

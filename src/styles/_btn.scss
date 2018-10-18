@@ -162,3 +162,85 @@ $btn-imgs-h30: (
 .btn_common_sm{width: 70px;}
 .btn_common_md{width: 100px;}
 .btn_common_lg{width: 120px;}
+
+.btn_common_dark{
+    @include gradient-y($start-color: #0e7dd3, $end-color: #002d69, $start-percent: 0%, $end-percent: 100%);
+    border: 1px solid #55a4e1;
+    outline-style: none;
+    cursor: pointer;
+    color : #FFF;
+    * { display : inline-block; vertical-align: middle; color : #FFF;}
+    &:hover{
+        border: 1px solid #ff5a00;
+    }
+    &:active, &.active{
+        @include gradient-y($start-color: #f43c00, $end-color: #fe7100, $start-percent: 0%, $end-percent: 100%);
+        color : #FFF;
+        * { color : #FFF;}
+    }
+    &:disabled, &.disabled{
+        cursor: not-allowed;
+        background-color: #2d2d2d;
+    }
+    &:focus{
+        outline-style: none;
+    }
+}
+
+.btn_common_light{
+    @include gradient-y($start-color: #f8f8f8, $end-color: #d3d3d3, $start-percent: 0%, $end-percent: 100%);
+    border: 2px solid #6c6c6c;
+    outline-style: none;
+    cursor: pointer;
+    color : #333;
+    * { display : inline-block; vertical-align: middle;}
+    .icon {
+        color : #6c6c6c;
+    }
+    &:hover{
+        border: 2px solid #ff5a00;
+    }
+    &:active, &.active{
+        @include gradient-y($start-color: #f43c00, $end-color: #fe7100, $start-percent: 0%, $end-percent: 100%);
+        color : #FFF;
+        * { color : #FFF;}
+    }
+    &:disabled, &.disabled{
+        cursor: not-allowed;
+        background-color: #2d2d2d;
+    }
+    &:focus{
+        outline-style: none;
+    }
+}
+
+.btn_login_google{
+    background-color: #fff;
+}
+
+// @mixin btn_common_basic($state, $border-color) {
+
+//     .btn_common_#{$state}{
+//         height: $btn-h;
+//         border: 0;
+//         background-color: rgba(255, 255, 255, 0);
+//         display: block;
+//         cursor: pointer;
+//         &:hover{
+//             background-position-y: -$btn-h;
+//             background-position-x: right;
+//         }
+//         &:active, &.active{
+//             background-position-y: -($btn-h*2);
+//             background-position-x: right;
+//         }
+//         &:disabled, &.disabled{
+//             cursor: not-allowed;
+//             background-position-y: -($btn-h*3);
+//             background-position-x: right;
+//         }
+//         &:focus{
+//             outline-style: none;
+//         }
+//     }
+// }

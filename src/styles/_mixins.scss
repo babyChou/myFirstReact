@@ -33,8 +33,10 @@
         background-color: rgba($color, .8);
     }
 
+
     .form-control,
-    .custom-select
+    .custom-select,
+    .ip_control
     {
         .my-was-validated &:#{$state},
         &.is-#{$state}

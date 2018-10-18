@@ -176,6 +176,35 @@ function fetchFile(params) {
     });
 }
 
+function postFile(params) {
+
+    const url = hostname + this.url;
+    const method = 'POST';
+    const headers = new Headers({'Authorization' : SESSION, 'Accept-Charset' : 'utf-8'});
+    let formData  = new FormData();
+
+    for(let key in params) {
+        formData.append(key, params[key]);
+    }
+
+    return fetch(url, {
+        method : method,
+        headers : headers,
+        body: formData
+    }).then(response=>{
+         if (!response.ok){
+            throw new Error({ url: this.url, body: response.statusText, type: 'responseNotOk', status: response.status });
+        }else{
+            return response.json();
+        }
+
+    })
+    .catch(err=>{
+        console.log(err);
+        //Handle lose connection
+    });
+}
+
 
 
 const LOGIN = {
@@ -389,6 +418,41 @@ const DELETE_PIP_CONFIG = {
     fetchData
 };
 
+const AUTHENTICATE_CDN = {
+    url: '/api/authenticateCDN',
+    method: 'POST',
+    fetchData
+};
+
+const AUTHENTICATE_OAUTH = {
+    url: '/api/authenticateOauth',
+    method: 'POST',
+    fetchData
+};
+
+const GET_CDN_CHANNEL_LIST = {
+    url: '/api/getCDNchannelList',
+    method: 'GET',
+    fetchData
+};
+
+const LOGOUT_CDN = {
+    url: '/api/logoutCDN',
+    method: 'POST',
+    fetchData
+};
+
+const UPLOAD_FW = {
+    url: '/api/uploadFW',
+    method: 'POST',
+    postFile
+};
+
+const UPDATE_FW = {
+    url: '/api/updateFW',
+    method: 'POST',
+    fetchData
+};
 
 
 export {
@@ -417,5 +481,11 @@ export {
     GET_INPUT_SIGNAL_STATUS,
     GET_PIP_CONFIG_LIST,
     SET_PIP_CONFIG,
-    DELETE_PIP_CONFIG
+    DELETE_PIP_CONFIG,
+    AUTHENTICATE_CDN,
+    AUTHENTICATE_OAUTH,
+    GET_CDN_CHANNEL_LIST,
+    LOGOUT_CDN,
+    UPLOAD_FW,
+    UPDATE_FW
 };

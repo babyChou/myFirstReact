@@ -31,7 +31,8 @@ class Login extends React.Component {
 
 	}
 
-	submitForm() {
+	submitForm(e) {
+		e.preventDefault();
 
 		const { history, actions, t } = this.props;
 		let formValid = true;
@@ -116,7 +117,7 @@ class Login extends React.Component {
 		return (
 			<div id="flexContainer" >
 
-				<Form id="login-form" className="bg_login">
+				<Form id="login-form" className="bg_login" onSubmit={this.submitForm}>
 					<FormGroup>
 						<Label for="login_username">{t("msg_login_username")}</Label>
 						<Input invalid={this.state.userInputErr} type="text" name="username" id="login_username"  bsSize="sm" innerRef={this.userInput} />
@@ -129,9 +130,9 @@ class Login extends React.Component {
 					<FormGroup check>
 						<Label check>
 							<Input type="checkbox" innerRef={this.rememberInput}/>
-							{' ' + t("msg_remember_me")}
+							{' ' + t("msg_keep_login")}
 						</Label>
-						<Btn size="sm" onClick={this.submitForm} className="float-right mt-1">{t("msg_login")}</Btn>
+						<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right mt-1">{t("msg_login")}</Btn>
 					</FormGroup>
 				</Form>
 			

@@ -89,7 +89,7 @@ export default class Volume extends React.Component {
 
 	}
 	onDrag(e) {
-		const { isDrag, draggerWidth } = this.state;
+		const { isDrag } = this.state;
 		const { limitMin, limitMax } = this.props;
 		let { textVal } = this.state;
 
@@ -119,7 +119,6 @@ export default class Volume extends React.Component {
 		e.preventDefault();
 	}
 	startDragger(e) {
-		const { draggerWidth } = this.state;
 		const { limitMin, limitMax } = this.props;
 		let textVal = this.state.valueText;
 

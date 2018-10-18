@@ -10,7 +10,9 @@ import PrivateRoute from './PrivateRoute';
 import BroadcastList from './BroadcastList';
 import Configuration from './Configuration';
 import Pip from './Pip';
+import Admin from './Admin';
 import Login from './Login';
+import Token from './Token';
 
 // const history = createBrowserHistory();
 
@@ -37,9 +39,11 @@ class App extends React.Component {
         return (<Router>
 					<Switch>
 						<Route path="/login" component={Login} />
+						<Route path="/retrieveToken" component={Token} />
 						<PrivateRoute exact={true} path="/" component={BroadcastList} authentication={authentication}/>
 						<PrivateRoute path="/configuration" component={Configuration} authentication={authentication}/>
 						<PrivateRoute path="/pip" component={Pip} authentication={authentication}/>
+						<PrivateRoute path="/administration" component={Admin} authentication={authentication}/>
 						<Redirect from="*" to={"/configuration"} />
 					</Switch>
 				</Router>) ;

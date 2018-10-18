@@ -21,7 +21,7 @@ import ConfigurationTasks from "./ConfigurationTasks";
 
 // import Dialog from "./Dialog";
 
-const defaultStreamType = 6;
+const defaultStreamType = 13;
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
 const mapStateToProps = store => ({

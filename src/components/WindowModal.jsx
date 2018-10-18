@@ -1,6 +1,7 @@
 import * as React from "react";
 
 const WindowModal = (props) => {
+
 	return (
 		<div className="modal-content mb-3">
 			<div className="modal-header">
@@ -11,7 +12,9 @@ const WindowModal = (props) => {
 			<div className="modal-body">
 				{ props.children }
 			</div>
-			<div className="modal-footer"></div>
+			<div className="modal-footer">
+				{props.footer}
+			</div>
 		</div>
 	);
 };

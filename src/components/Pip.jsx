@@ -1,7 +1,5 @@
 import * as React from "react";
 import { translate } from "react-i18next";
-import { connect } from "react-redux";
-import { compose } from "redux";
 import { GET_PIP_CONFIG_LIST, SET_PIP_CONFIG, DELETE_PIP_CONFIG } from "../helper/Services";
 import { } from "../helper/helper";
 
@@ -13,21 +11,6 @@ import Volume from "./Volume";
 // import Dialog from "./Dialog";
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
-const mapStateToProps = store => ({
-	devices: store.configReducer.devices,
-	devicesConfig: store.configReducer.devicesConfig,
-	devicesTasks: store.configReducer.devicesTasks,
-	tasksStatus: store.configReducer.tasksStatus,
-	encodeProfiles: store.profiles.encodeProfiles,
-	streamProfiles: store.profiles.streamProfiles,
-	selectedSource: store.rootReducer.selectedSource
-});
-
-const mapDispatchToProps = dispatch => {
-	return {
-		// setDeviceConfig: config => dispatch(configActions.setDeviceConfig(config))
-	};
-};
 
 class Pip extends React.Component {
 	constructor(props) {
@@ -252,7 +235,5 @@ class Pip extends React.Component {
 	}
 }
 
-export default compose(
-	translate("translation"),
-	connect(mapStateToProps, mapDispatchToProps)
-)(Pip);
+export default translate("translation")(Pip);
+

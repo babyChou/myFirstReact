@@ -35,7 +35,7 @@ class Dialog extends React.Component {
 		let classStr = classTypes[icon];
 		return (
 			<div className="media">
-				{ classStr ? <i className={'align-self-center d-block d-flex mr-3 ' + classStr }></i> : null }
+				{ classStr ? <i className={'d-block d-flex mr-3 ' + classStr }></i> : null }
 				<div className="media-body">
 					<h5 className="mt-0">{this.props.mainMsg}</h5>
 					{this.props.msg}
@@ -71,11 +71,11 @@ class Dialog extends React.Component {
 					<div className="modal-dialog modal-dialog-centered">
 						
 						<div className="modal-content" >
-							<div className="modal-header">
+							<div className="modal-header text-white">
 								<h6 className="modal-title">{this.props.title}</h6>
 								<button type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 							</div>
-							<div className="modal-body">
+							<div className="modal-body px-4">
 								{ this.props.type !== 'custom' ? this.reminderDOM(this.props.icon) : null }
 								{ this.props.children }
 							</div>

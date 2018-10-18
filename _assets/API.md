@@ -295,10 +295,10 @@ streamType:
 
         "youtube" : {
             "userID " : %d,
-            "videoId":%s,
+            "videoID":%s,
             "title": "%s",
             "description": "%s",
-            "privacy": "%s",
+            "privacy": "%s", //"unlisted", "private", "public"
             "tag": "%s,"
         },
 
@@ -961,6 +961,7 @@ Audio Only
 * URL: http://HostName:Port/api/encodeProfile
 * Method: DELETE
 * Parameters
+
 | Name | type |           Description            |
 |------|------|----------------------------------|
 | id   | Int  | the specified profile identifier |
@@ -988,6 +989,15 @@ Audio Only
 |------|--------|-------------------|
 | code | String | Authenticate code |
 
+* Response 
+
+```
+{
+  "result" : %d,
+  "userID" : "%s"
+}
+```
+
 ### 7.13 getCDNchannelList
 * URL: http://HostName:Port/api/CDNchannelList
 * Description: for CDNvideo, Ustream
@@ -1010,7 +1020,7 @@ Audio Only
                "channelName":%s
                "channelUrl":%s,
                "channelStreamName":%s,
-               "videoId":%s
+               "videoID":%s
             },
             …
         ],
@@ -1111,6 +1121,10 @@ Audio Only
 ```
 
 ### 9.3 getNetworkConfig //???
+
+
+
+
 * URL: http://HostName:Port/api/networkConfig
 * Method: GET
 * Response:
@@ -1141,6 +1155,12 @@ Audio Only
   ]
 }
 ```
+
+* Desc
+    - dhcp =" auto_ip", auto get ip & dns
+    - dhcp ="auto_ip_dns", auto get ip & manual set dns
+    - dhcp ="static_ip"
+    
 ### 9.4 setNetworkConfig
 
 * URL: http://HostName:Port/api/networkConfig
@@ -1302,6 +1322,7 @@ PATCH (Update attribute)
             "keepRatio":%b,
             "duplicable":%b,
             "isPBP":%b,
+            "custom":%b,
         }
     ]
 }
@@ -1347,6 +1368,16 @@ PATCH (Modify)
         "duplicable":%b,
         "isPBP":%b,
     }
+}
+```
+
+* Response 
+
+```
+{
+   "result": 0,
+   "id" : 1
+    
 }
 ```
 

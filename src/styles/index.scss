@@ -1,16 +1,20 @@
 @import 'custom_variables';
 //
 // @import 'open-iconic/font/css/open-iconic-bootstrap.scss';
-// @import 'ionicons/dist/scss/ionicons.scss';
+@import 'ionicons/dist/scss/ionicons.scss';
 ///
 @import 'bootstrap/scss/bootstrap';
 @import 'mixins';
 @import 'custom_bootstrap';
 
+@import 'tag';
+@import 'inputs';
+@import 'icon';
 @import 'color';
 @import 'img';
 @import 'btn';
 @import 'volume';
+@import 'loader';
 @import 'login';
 @import 'header';
 

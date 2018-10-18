@@ -12,8 +12,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 // $ip = getHostByName(getHostName());
 
 
-if( $method === 'POST' ) {
-
+if( $method === 'POST' || $method === 'PATCH') {
+	$result = new stdClass();
+	$result->result = -1;
 }else{
 
 	$regIpv4 = '/(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}/';
@@ -54,7 +55,7 @@ if( $method === 'POST' ) {
 			if (preg_match("/(Description)/i", $o)) {
 				// echo substr($o, 0, -1)."\n";
 				$pos = strrpos($o, ":") + 2;
-				$nic["id"] = $nicCount;
+				$nic["id"] = $nicCount.'';
 				$nic["name"] = substr($o, $pos);
 			}
 
