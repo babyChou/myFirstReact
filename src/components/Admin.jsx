@@ -40,7 +40,6 @@ class Admin extends React.Component {
 	
 	render() {
 		const { t, config } = this.props;
-		const { pipList } = this.state;
 
 		return (
 			<div className="">

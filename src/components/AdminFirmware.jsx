@@ -31,8 +31,8 @@ class AdminFirmware extends React.Component {
 		const { t } = this.props;
 		const file = e.target.files[0];
 
-		
-		if(file.name.match(/(.bin)$/)) {
+
+		if(!!file && file.name.match(/(.bin)$/)) {
 
 			this.setState({
 				fileText : file.name,
@@ -42,7 +42,7 @@ class AdminFirmware extends React.Component {
 					file : file
 				}).then(data => {
 					if(data.result === 0) {
-						document.getElementById('firmwareInput').value = null;
+						// document.getElementById('firmwareInput').value = null;
 						this.setState({
 							backdropShow : false,
 							fileOk : true
@@ -60,6 +60,7 @@ class AdminFirmware extends React.Component {
 		}else{
 			
 			this.setState({
+				fileOk : false,
 				fileErrMsg : t('msg_firmware_version_error_format')
 			});
 
@@ -68,7 +69,6 @@ class AdminFirmware extends React.Component {
 		
 	}
 	updateFW(e) {
-		const { t } = this.props;
 		
 		UPDATE_FW.fetchData().then(data => {
 			if(data.result === 0) {
@@ -94,7 +94,7 @@ class AdminFirmware extends React.Component {
 	}
 	
 	render() {
-		const { t, config } = this.props;
+		const { t } = this.props;
 		const { fileText, fileErrMsg, backdropShow, counterShow, counter, fileOk } = this.state;
 
 		return (

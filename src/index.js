@@ -1,5 +1,6 @@
 import './styles/index.css';
-
+import '@babel/polyfill'; //IE11 assign...
+import 'whatwg-fetch';
 // import 'core-js/es6/map';
 // import 'core-js/es6/set';
 import 'url-search-params';

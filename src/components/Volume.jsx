@@ -47,11 +47,11 @@ export default class Volume extends React.Component {
 		// 	tracker.setValue(lastValue);
 		// }
 		// input.dispatchEvent(event);
-		
 		const domNode = ReactDOM.findDOMNode(this.volumeTube.current);
+		
 		this.setState({
 			rangeWidth : domNode.offsetWidth,
-			rangeLeft : domNode.getBoundingClientRect().x
+			rangeLeft : domNode.getBoundingClientRect().x || domNode.getBoundingClientRect().left //IE
 		},()=>{
 			this.updateUIval(this.state.valueText);
 		});
@@ -62,11 +62,12 @@ export default class Volume extends React.Component {
 
 		if(this.volumeTube) {
 			const domNode = ReactDOM.findDOMNode(this.volumeTube.current);
-			if(this.state.rangeWidth !== domNode.offsetWidth || this.state.rangeLeft !== domNode.getBoundingClientRect().x) {
+			const rangeLeft = domNode.getBoundingClientRect().x || domNode.getBoundingClientRect().left; //IE
+			if(this.state.rangeWidth !== domNode.offsetWidth || this.state.rangeLeft !== rangeLeft) {
 
 				this.setState({
 					rangeWidth : domNode.offsetWidth,
-					rangeLeft : domNode.getBoundingClientRect().x
+					rangeLeft : rangeLeft
 				},()=>{
 					this.updateUIval(this.state.valueText);
 				});
@@ -121,6 +122,7 @@ export default class Volume extends React.Component {
 	startDragger(e) {
 		const { limitMin, limitMax } = this.props;
 		let textVal = this.state.valueText;
+
 
 		if(!this.props.disabled) {
 			if(this.ckRange(e)) {

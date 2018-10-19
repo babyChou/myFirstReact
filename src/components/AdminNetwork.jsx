@@ -76,8 +76,8 @@ class AdminNetwork extends React.Component {
 					ipArr : Object.assign(ipArr, currentNic.ip.split('.')),
 					maskArr : Object.assign(maskArr, currentNic.mask.split('.')),
 					gatewayArr : Object.assign(gatewayArr, currentNic.gateway.split('.')),
-					dnsMainArr : (currentNic.dns[0] || '...').split('.'),
-					dnsSubArr : (currentNic.dns[1] || '...').split('.')
+					dnsMainArr : Object.assign(dnsMainArr, (currentNic.dns[0] || '...').split('.')),
+					dnsSubArr : Object.assign(dnsSubArr, (currentNic.dns[1] || '...').split('.'))
 				});
 			}
 		});
@@ -375,13 +375,16 @@ class AdminNetwork extends React.Component {
 			errMsg : ''
 		};
 
+
+
+
 		this.setState({
 			currentNic,
 			ipArr : Object.assign(ipArr, currentNic.ip.split('.')),
 			maskArr : Object.assign(maskArr, currentNic.mask.split('.')),
 			gatewayArr : Object.assign(gatewayArr, currentNic.gateway.split('.')),
-			dnsMainArr : (currentNic.dns[0] || '...').split('.'),
-			dnsSubArr : (currentNic.dns[1] || '...').split('.'),
+			dnsMainArr : Object.assign(dnsMainArr, (currentNic.dns[0] || '...').split('.')),
+			dnsSubArr : Object.assign(dnsSubArr, (currentNic.dns[1] || '...').split('.')),
 			ip,
 			mask,
 			gateway,
@@ -533,7 +536,7 @@ class AdminNetwork extends React.Component {
 								<div className="w-40">
 									{t('msg_subnet_mask')}
 								</div>
-								<div className={maskCss} tabIndex="1" data-name="mask" tabIndex="1" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
+								<div className={maskCss} tabIndex="1" data-name="mask" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
 									{
 										maskArr.map((val,i) =>{
 											return (
@@ -550,7 +553,7 @@ class AdminNetwork extends React.Component {
 								<div className="w-40">
 									{t('msg_default_gateway')}
 								</div>
-								<div className={gatewayCss} tabIndex="1" data-name="gateway" tabIndex="1" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
+								<div className={gatewayCss} tabIndex="1" data-name="gateway" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
 									{
 										gatewayArr.map((val,i) =>{
 											const min = (i === 0 ? 1 : 0);
