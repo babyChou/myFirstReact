@@ -3,6 +3,7 @@ import Header from './Header';
 import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from 'redux';
+import { BROCASTLIST_GLOBAL_UPDATE_TIME } from "../constant/Init.Consts";
 import { INPUT_SOURCES, STREAM_STATUS } from '../constant/Common.Consts';
 import { checkFacilities, checkDeviceConfig, checkDevicesTasks, checkTasksStatus, checkEncodeProfiles, checkStreamProfiles } from '../helper/preloader';
 import { concatTasksStatus } from '../helper/helper';
@@ -10,6 +11,7 @@ import { DELETE_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, GET_NETWORK_ST
 import { NavLink } from 'react-router-dom';
 import BroadcastListPanel from "./BroadcastListPanel";
 import Dialog from "./Dialog";
+import Loader from './Loader';
 
 
 const mapStateToProps = store => (
@@ -19,8 +21,7 @@ const mapStateToProps = store => (
 	}
 );
 
-const updateSec = 10000;
-// const updateSec = 1000;
+const updateSec = BROCASTLIST_GLOBAL_UPDATE_TIME;
 
 class BroadcastList extends React.Component {
 	constructor(props) {
@@ -147,9 +148,7 @@ class BroadcastList extends React.Component {
 			});
 
 			return Promise.all(reqPromise2).then(data => {
-				// console.log(data);
 				let streamProfiles = data[data.length - 1];
-				// console.log(streamProfiles);
 				
 				return 	devicesTasks
 							.map(device => ({
@@ -170,7 +169,8 @@ class BroadcastList extends React.Component {
 			this.setState({
 				devicesTasks : data,
 				btnsStatus,
-				tasksIsChecked
+				tasksIsChecked,
+				backdropShow : false
 			});
 		});
 
@@ -340,10 +340,34 @@ class BroadcastList extends React.Component {
 
 		switch (action) {
 			case 0:
-				resp = DELETE_DEVICE_TASK.fetchData(params, 'DELETE');
+				
+				this.setState({
+					isDialogShow : true,
+					dialogObj : {
+						...this.state.dialogObj,
+						type : 'confirm',
+						icon : 'info',
+						title : t('msg_stream_delete'),
+						msg : t('msg_stream_delete_confirm'),
+						ok : () => {
+							this.setState({
+								backdropShow : true
+							});
+							DELETE_DEVICE_TASK.fetchData(params, 'DELETE').then(data => {
+								if(data.result === 0) {
+									this.renewList();
+								}
+							});
+						}
+					}
+				});
+					
 				break
 			case 1:
 				if(isSourceOk) {
+					this.setState({
+						backdropShow : true
+					});
 					resp = START_DEVICE_TASK.fetchData(params);
 				}else{
 					this.setState({
@@ -359,17 +383,24 @@ class BroadcastList extends React.Component {
 
 				break
 			case 2:
+				this.setState({
+					backdropShow : true
+				});
 				resp = STOP_DEVICE_TASK.fetchData(params);
 				break
 			default:
 				break
 		}
 
-		resp.then(data => {
-			if(data.result === 0) {
-				this.renewList();
-			}
-		});
+		if(resp) {
+			resp.then(data => {
+				if(data.result === 0) {
+					this.renewList();
+				}
+			});
+			
+		}
+
 	}
 	outputAddr(streamType, streamProfile, netWorkStatus) {
 		let urls = [];
@@ -558,8 +589,8 @@ class BroadcastList extends React.Component {
 
 		return (
 			<div className="">
-				{ this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null }
 				{<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>}
+				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Header>
 					<BroadcastListPanel devices={devices} preview={preview} signals={signals}></BroadcastListPanel>
 

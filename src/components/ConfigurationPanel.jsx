@@ -3,11 +3,12 @@ import { compose, bindActionCreators } from 'redux';
 import { connect } from "react-redux";
 import { translate } from "react-i18next";
 import store from '../store/Store';
+import { CONFIGURATION_PANNEL_UPDATE_TIME } from "../constant/Init.Consts";
 import { rootActions } from '../action/Root.Actions';
 import { INPUT_DEVICE_NAME, INPUT_SOURCES } from '../constant/Common.Consts';
 import { SET_DEVICE_CONFIG, GET_PIP_PREVIEW_IMG } from '../helper/Services';
 
-const updateSec = 5000;
+const updateSec = CONFIGURATION_PANNEL_UPDATE_TIME;
 
 const mapDispatchToProps = (dispatch) => {
 	return { actions: bindActionCreators(rootActions, dispatch) };

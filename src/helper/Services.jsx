@@ -454,6 +454,12 @@ const UPDATE_FW = {
     fetchData
 };
 
+const UPDATE_CHECK_NETWORK_CONNECTION = {
+    url: '/api/checkNetworkConnection',
+    method: 'POST',
+    fetchData
+};
+
 
 export {
     LOGIN,
@@ -487,5 +493,6 @@ export {
     GET_CDN_CHANNEL_LIST,
     LOGOUT_CDN,
     UPLOAD_FW,
-    UPDATE_FW
+    UPDATE_FW,
+    UPDATE_CHECK_NETWORK_CONNECTION
 };

@@ -67,3 +67,23 @@ export const STREAM_STYPE = Object.freeze({
     'RTMP Pull' : 23,
     'Record' : 51
 });
+
+export const RECORD_STORE_DEVICE = Object.freeze({
+    'usb' : 'USB',
+    'sd' : 'SD',
+    'nas' : 'NAS'
+});
+
+export const RECORD_CONTAINER = Object.freeze({
+    'flv' : 'FLV',
+    'avi' : 'AVI',
+    'mp4' : 'MP4',
+    'mov' : 'MOV',
+    'ts' : 'TS',
+    'aac' : 'AAC',
+    'mp3' : 'MP3'
+});
+
+
+
+

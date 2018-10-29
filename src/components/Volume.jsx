@@ -173,10 +173,12 @@ export default class Volume extends React.Component {
 		const { min } = this.props;
 		const { draggerWidth, rangeWidth, rangeValue } = this.state;
 		let statusWidth = (Math.abs(min - val)*rangeWidth)/rangeValue;
+
 		if(statusWidth > rangeWidth) {
 			statusWidth = rangeWidth;
 		}
 
+		
 		this.setState({
 			draggerStyle : { left:statusWidth - (draggerWidth/2) },
 			barStyle: { width: statusWidth }
@@ -229,6 +231,7 @@ export default class Volume extends React.Component {
 	render() {
 		const { valueText, draggerStyle, barStyle } = this.state;
 		const { min, max, disabled, btnMinMax, size } = this.props;
+
 		let tubeSize = {};
 
 		switch(size) {
@@ -243,8 +246,9 @@ export default class Volume extends React.Component {
 				break
 		}
 
+				{/* <div className="volume_control d-inline">*/}
 		return (
-				<div className="volume_control d-inline">
+				<div className="volume_control d-flex align-items-center"> 
 					{ btnMinMax === false ? '' : <button className="btn_tuner_volume_minimal align-middle" disabled={disabled} onClick={this.minVolume}></button> }
 					<div className="volume_control_tube mx-2 align-middle" style={tubeSize} ref={this.volumeTube} onMouseDown={this.startDragger} onMouseMove={this.onDrag} onMouseUp={this.stopDrag} onMouseLeave={this.stopDrag}>
 						<div className="volume_bar_status" style={barStyle}></div>

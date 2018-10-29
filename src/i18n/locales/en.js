@@ -638,7 +638,7 @@ export default {
     msg_upper_tuner : 'Upper',
     msg_user_name : 'Username:',
     msg_username : 'Username',
-    msg_verification : '驗證',
+    msg_verification : 'verification',
     msg_vertical : 'Vertical',
     msg_vertical_offset : 'Vertical Offest',
     msg_video_format : 'Format',

@@ -6,7 +6,7 @@ import Volume from './Volume';
 import PipCanvas from './PipCanvas';
 
 const audioParam = ['micMix','mixInput','soundControl','micPercentage','audioPercentage'];
-const videoParma = ['brightness','contrast','hue','saturation'];
+const videoParam = ['brightness','contrast','hue','saturation'];
 const boolValParma = ['micMix'];
 const numberValParma = ['currentPIPId'];
 
@@ -50,16 +50,16 @@ export default class ConfigurationTabs extends React.Component {
 			}
 		}
 
-		if(videoParma.includes(attr)) {
+		if(videoParam.includes(attr)) {
 			passDevice = {
 				...passDevice,
-				videoParma : {
+				videoParam : {
 					[attr] : val
 				}
 			}
 		}
 
-		if(!passDevice.hasOwnProperty('audioParam') && !passDevice.hasOwnProperty('videoParma')) {
+		if(!passDevice.hasOwnProperty('audioParam') && !passDevice.hasOwnProperty('videoParam')) {
 			passDevice = {
 				...passDevice,
 				[attr] : val
@@ -90,16 +90,16 @@ export default class ConfigurationTabs extends React.Component {
 			}
 		}
 
-		if(videoParma.includes(attr)) {
+		if(videoParam.includes(attr)) {
 			passDevice = {
 				...passDevice,
-				videoParma : {
+				videoParam : {
 					[attr] : val
 				}
 			}
 		}
 
-		if(!passDevice.hasOwnProperty('audioParam') && !passDevice.hasOwnProperty('videoParma')) {
+		if(!passDevice.hasOwnProperty('audioParam') && !passDevice.hasOwnProperty('videoParam')) {
 			passDevice = {
 				...passDevice,
 				[attr] : val
@@ -207,22 +207,22 @@ export default class ConfigurationTabs extends React.Component {
 					<section className={'tab-pane ' + tabActive[1]}>
 						<div className="form-row form-group align-items-center">
 							<div className="col-lg-1">{t('msg_brightness')}</div>
-							<div className="col-lg-2"><Volume value={deviceConfig.videoParma.brightness} min={0} max={100} onChange={volumeChange} name={'brightness' + id } size="lg" disabled={false} btnMinMax={false}></Volume></div>
+							<div className="col-lg-2"><Volume value={deviceConfig.videoParam.brightness} min={0} max={100} onChange={volumeChange} name={'brightness' + id } size="lg" disabled={false} btnMinMax={false}></Volume></div>
 							<div className="col-lg-3"></div>
 						</div>
 						<div className="form-row form-group align-items-center">
 							<div className="col-lg-1">{t('msg_contrast')}</div>
-							<div className="col-lg-2"><Volume value={deviceConfig.videoParma.contrast} min={0} max={100} onChange={volumeChange} name={'contrast' + id} size="lg" disabled={false} btnMinMax={false}></Volume></div>
+							<div className="col-lg-2"><Volume value={deviceConfig.videoParam.contrast} min={0} max={100} onChange={volumeChange} name={'contrast' + id} size="lg" disabled={false} btnMinMax={false}></Volume></div>
 							<div className="col-lg-3"></div>
 						</div>
 						<div className="form-row form-group align-items-center">
 							<div className="col-lg-1">{t('msg_hue')}</div>
-							<div className="col-lg-2"><Volume value={deviceConfig.videoParma.hue} min={0} max={100} onChange={volumeChange} name={'hue' + id } size="lg" disabled={false} btnMinMax={false}></Volume></div>
+							<div className="col-lg-2"><Volume value={deviceConfig.videoParam.hue} min={0} max={100} onChange={volumeChange} name={'hue' + id } size="lg" disabled={false} btnMinMax={false}></Volume></div>
 							<div className="col-lg-3"></div>
 						</div>
 						<div className="form-row form-group align-items-center">
 							<div className="col-lg-1">{t('msg_saturation')}</div>
-							<div className="col-lg-2"><Volume value={deviceConfig.videoParma.saturation} min={0} max={100} onChange={volumeChange} name={ 'saturation' + id } size="lg" disabled={false} btnMinMax={false}></Volume></div>
+							<div className="col-lg-2"><Volume value={deviceConfig.videoParam.saturation} min={0} max={100} onChange={volumeChange} name={ 'saturation' + id } size="lg" disabled={false} btnMinMax={false}></Volume></div>
 							<div className="col-lg-3"></div>
 						</div>
 						<div className="form-row form-group align-items-center">

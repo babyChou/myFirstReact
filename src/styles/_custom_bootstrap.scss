@@ -1,6 +1,6 @@
 
 .modal-header{
-    min-height: 27px;
+    min-height: 37px;
     background: linear-gradient(to bottom, #006ABC 0%, #002757 100%);
     .close{
         padding: 0;
@@ -86,6 +86,7 @@ $table-even-bg: #D1D7E1;
 // @include my-form-validation-state("aaa-valid", $form-feedback-invalid-color);
 
 @include my-form-validation-state("invalid", $form-feedback-invalid-color);
+
 
 .form-control{
     input {

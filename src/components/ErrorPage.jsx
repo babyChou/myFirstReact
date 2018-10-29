@@ -47,7 +47,7 @@ class ErrorPage extends React.Component {
 				
 						
 					</div>
-					<div className="modal-footer">
+					<div className="modal-footer pb-4">
 						<Btn size="sm" onClick={()=> { window.location.replace('/') }} className="float-right mt-1">{t("msg_ok")}</Btn>
 					</div>
 				</div>

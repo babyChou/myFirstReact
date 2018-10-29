@@ -321,11 +321,10 @@ streamType:
         "record" : {
             "container":%s, //”flv”,”avi”,”mp4”,”mov”,”ts”,”aac” and “mp3”
             "storeDevice":%s, //”nas”,”sd” and “usb”
-            "record":%d,
-            "recordPath":%s,
-            "filePath":%s,
-            "username":%s,
-            "password":%s
+            "recordPath":%s, // --> \\ip\location 
+            "filePrefix":%s,
+            "username":%s, // --> recordUserName
+            "password":%s, // --> recordPassword
             "segmentDuration":%s
         },
 
@@ -501,7 +500,7 @@ streamType:
             "micPercentage":%d, //0~100
             "audioPercentage":%d //0~100
         },
-        "videoParma":{
+        "videoParam":{
             "brightness":%d,
             "contrast":%d,
             "hue":%d,
@@ -536,7 +535,7 @@ streamType:
             "micPercentage":%d, //0~100
             "audioPercentage":%d //0~100
         },
-        "videoParma":{
+        "videoParam":{
             "brightness":%d,
             "contrast":%d,
             "hue":%d,
@@ -1262,10 +1261,9 @@ PATCH (Update attribute)
 
 ```
 {
-    "recordIP": "",
     "recordPath": "",
-    "recordUserName": "",
-    "recordPassword": ""
+    "username": "",
+    "password": ""
 }
 ```
 

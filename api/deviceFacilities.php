@@ -9,14 +9,14 @@ header('Content-Type: application/json');
             "devices":[
             {
                 "id":1,
-                "videoInput":["hdmi1","hdmi2","sdi1","sdi2"],
+                "videoInput":["sdi1","sdi2", "hdmi1","hdmi2"],
                 "audioInput": [ "hdmi1", "hdmi2"],
                 "audioMix":true,
                 "mixInput": ["xlr", "3.5mm"]
             },
             {
                 "id":2,
-                "videoInput":["hdmi1","hdmi2","sdi1","sdi2"],
+                "videoInput":["sdi1","sdi2", "hdmi1","hdmi2"],
                 "audioInput": [ "hdmi1", "hdmi2", "3.5mm"],
                 "audioMix":false
             }

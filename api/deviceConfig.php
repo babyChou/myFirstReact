@@ -47,7 +47,7 @@ switch ($method) {
         $setArr = [];
 
         foreach ($device as $k => $val) {
-        	if($k === 'audioParam' || $k === 'videoParma') {
+        	if($k === 'audioParam' || $k === 'videoParam') {
         		// $setArr[$k] = $val;
         		 foreach ($val as $k2 => $val2) {
         		 	$setArr[$k.'.'.$k2] = $val2;

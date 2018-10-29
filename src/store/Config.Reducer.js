@@ -82,10 +82,10 @@ const configReducer = (state = initialState, action) => {
                         };
                     }
 
-                    if (action.deviceConfig.hasOwnProperty('videoParma')) {
-                        newConfig.videoParma = {
-                            ...config.videoParma,
-                            ...action.deviceConfig.videoParma
+                    if (action.deviceConfig.hasOwnProperty('videoParam')) {
+                        newConfig.videoParam = {
+                            ...config.videoParam,
+                            ...action.deviceConfig.videoParam
                         };
                     }
 

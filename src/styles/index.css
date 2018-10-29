@@ -9217,7 +9217,7 @@ a.text-dark:hover, a.text-dark:focus {
     border-color: #FFF; } }
 
 .modal-header {
-  min-height: 27px;
+  min-height: 37px;
   background: linear-gradient(to bottom, #006ABC 0%, #002757 100%); }
   .modal-header .close {
     padding: 0;

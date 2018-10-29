@@ -3,6 +3,7 @@ import Header from "./Header";
 import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from "redux";
+import { DEFAULT_STREAM_TYPE, MSG_SUCCESS_SECONDS,  MSG_FAILED_SECONDS} from "../constant/Init.Consts";
 import { configActions } from "../action/Config.Actions";
 import { GET_NETWORK_STATUS, GET_PIP_CONFIG_LIST } from "../helper/Services";
 import { concatTasksStatus } from "../helper/helper";
@@ -18,10 +19,13 @@ import ConfigurationPanel from "./ConfigurationPanel";
 import ConfigurationModal from "./ConfigurationModal";
 import ConfigurationTabs from "./ConfigurationTabs";
 import ConfigurationTasks from "./ConfigurationTasks";
+import Loader from './Loader';
+import { Alert } from 'reactstrap';
+
 
 // import Dialog from "./Dialog";
 
-const defaultStreamType = 13;
+const defaultStreamType = DEFAULT_STREAM_TYPE;
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
 const mapStateToProps = store => ({
@@ -49,12 +53,17 @@ class Configuration extends React.Component {
 			pipList: [],
 			devicesTasksDetail: [],
 			isDeviceConfigSet: false,
-			backdropShow: false
+			backdropShow: false,
+			alert : {
+				msg : '',
+				color : 'info' //danger
+			}
 		};
 
 		this.addSubTask = this.addSubTask.bind(this);
 		this.deleteSubTask = this.deleteSubTask.bind(this);
 		this.handleBackdrop = this.handleBackdrop.bind(this);
+		this.handleAlert = this.handleAlert.bind(this);
 		this.renewDevicesTasksDetail = this.renewDevicesTasksDetail.bind(this);
 	}
 	componentDidMount() {
@@ -298,15 +307,15 @@ class Configuration extends React.Component {
 	}
 	deleteSubTask(deviceID, taskID, rowNo) {
 		let devicesTasksDetail = [];
-		let newTasks = [];
+		let remainTasks = [];
 
 		devicesTasksDetail = this.state.devicesTasksDetail.map(device => {
 			if (device.id === deviceID) {
-				newTasks = device.tasks.filter(
-					(task, i) => task.taskID === taskID && i + 1 === rowNo
+				remainTasks = device.tasks.filter(
+					(task, i) => task.taskID !== taskID && i + 1 !== rowNo
 				);
 
-				if (newTasks.length === 0) {
+				if (remainTasks.length === 0) {
 					alert(
 						`Error deviceID ${deviceID}, taskID ${taskID}, rowNo ${rowNo}`
 					);
@@ -314,7 +323,7 @@ class Configuration extends React.Component {
 
 				return {
 					...device,
-					tasks: newTasks
+					tasks: remainTasks
 				};
 			} else {
 				return device;
@@ -330,6 +339,24 @@ class Configuration extends React.Component {
 			backdropShow: show
 		});
 	}
+	handleAlert(alertObj) {
+		this.setState({
+			alert : {			
+				...this.state.alert,
+				...alertObj
+			}
+		}, ()=>{
+
+			setTimeout(()=>{
+				this.setState({
+					alert : {
+						...this.state.alert,
+						msg : ''
+					}
+				});
+			}, (alertObj.type === 'ok' ? MSG_SUCCESS_SECONDS : MSG_FAILED_SECONDS));
+		});
+	}
 	render() {
 		const {
 			t,
@@ -341,12 +368,15 @@ class Configuration extends React.Component {
 		const {
 			netWorkStatus,
 			devicesTasksDetail,
-			isDeviceConfigSet
+			isDeviceConfigSet,
+			alert
 		} = this.state;
 
 		return (
 			<div className="">
-				{ this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null }
+				{/* { this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null } */}
+				<Loader isOpen={this.state.backdropShow}></Loader>
+				<Alert isOpen={!!alert.msg} className="fixed-top text-center m-5" color={alert.color}>{alert.msg}</Alert>
 				{/* <Dialog isShow={this.state.dia} toggle={()=>{this.setState({dia: !this.state.dia })}} icon="error" title="fsdfdf" mainMsg="sdfsdfs" msg="sdfsdf" type="alert" ok={()=>{alert()}}></Dialog> */}
 				<Header>
 					{isDeviceConfigSet ? (
@@ -394,6 +424,7 @@ class Configuration extends React.Component {
 											addSubTask={this.addSubTask}
 											deleteSubTask={this.deleteSubTask}
 											handleBackdrop={this.handleBackdrop}
+											handleAlert={this.handleAlert}
 											renewDevicesTasksDetail={this.renewDevicesTasksDetail}
 										/>
 									);

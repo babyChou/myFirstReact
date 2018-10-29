@@ -1,6 +1,7 @@
 import * as React from "react";
 import { translate } from "react-i18next";
 import { GET_NETWORK_CONFIG, SET_NETWORK_CONFIG } from "../helper/Services";
+import { MSG_SUCCESS_SECONDS,  MSG_FAILED_SECONDS} from "../constant/Init.Consts";
 
 import Dialog from "./Dialog";
 import Btn from './Btn';
@@ -294,7 +295,9 @@ class AdminNetwork extends React.Component {
 											this.setState({
 												alertMsg : ''
 											});
-										}, 1500);
+										}, MSG_FAILED_SECONDS);
+										
+
 									});
 								}
 							});
@@ -334,7 +337,7 @@ class AdminNetwork extends React.Component {
 								this.setState({
 									alertMsg : ''
 								});
-							}, 1000);
+							}, MSG_SUCCESS_SECONDS);
 						});
 
 					}else{
@@ -346,7 +349,7 @@ class AdminNetwork extends React.Component {
 								this.setState({
 									alertMsg : ''
 								});
-							}, 1500);
+							}, MSG_FAILED_SECONDS);
 						});
 					}
 				});

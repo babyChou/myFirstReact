@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { compose, bindActionCreators } from 'redux';
 import store from '../store/Store';
 import { rootActions } from '../action/Root.Actions';
+import { CONFIGURATION_TASK_UNLOCK_STREAM_TYPES } from "../constant/Init.Consts";
 import { INPUT_SOURCES, STREAM_STYPE } from '../constant/Common.Consts';
 import { SET_STREAM_PROFILE, SET_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, DELETE_DEVICE_TASK, SET_DEVICE_CONFIG } from '../helper/Services';
 import {
@@ -15,11 +16,13 @@ import {
 import { retrieveFromProp } from '../helper/helper';
 import ConfigurationRtmp from './ConfigurationRtmp';
 import ConfigurationYoutube from './ConfigurationYoutube';
+import ConfigurationRecord from './ConfigurationRecord';
+import ConfigurationTcp from './ConfigurationTcp';
 //https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization
 
 
 
-const finishedList = [6, 13];
+const finishedList = CONFIGURATION_TASK_UNLOCK_STREAM_TYPES;
 
 const OPTION_FIELD = ['ipAddr','port','nic'];
 const STREAM_TYPE_MAP_STREAM_PARAMS = {
@@ -479,11 +482,22 @@ class ConfigurationTasks extends React.Component {
 
 		const subDOM = (streamType) => {
 			// console.log(streamType, typeof streamType);
+			const params = {
+				handleStartStreming: this.handleStartStreming,
+				isStreamingCheck: this.state.isStreamingCheck,
+				streamInfo: streamInfo,
+				handleBackdrop: this.props.handleBackdrop,
+				handleAlert: this.props.handleAlert
+			};
 			switch(Number(streamType)) {
+				case 1:
+					return <ConfigurationTcp {...params}></ConfigurationTcp>;
 				case 6:
-					return <ConfigurationRtmp handleStartStreming={this.handleStartStreming} isStreamingCheck={this.state.isStreamingCheck} streamInfo={streamInfo}></ConfigurationRtmp>;
+					return <ConfigurationRtmp {...params}></ConfigurationRtmp>;
 				case 13:
-					return <ConfigurationYoutube handleStartStreming={this.handleStartStreming} isStreamingCheck={this.state.isStreamingCheck} streamInfo={streamInfo} handleBackdrop={this.props.handleBackdrop}></ConfigurationYoutube>;
+					return <ConfigurationYoutube {...params}></ConfigurationYoutube>;
+				case 51: 
+					return <ConfigurationRecord {...params}></ConfigurationRecord>;
 				default: 
 					return null;
 
@@ -524,7 +538,7 @@ class ConfigurationTasks extends React.Component {
 				</tr>
 				<tr ref={this.trRow2} className={'table-common-odd table-bordered ' + (this.state.wasValidated ? 'my-was-validated' : '')}>
 					{ rowDOM(2) }
-					<td></td>
+					{ !isAddRow ? <td></td> : null }
 					<td className="px-3 py-4" colSpan="7">
 						{ subDOM(streamType.value) }
 					</td>
