@@ -278,7 +278,7 @@ class ConfigurationRecord extends React.Component {
 
 		return (
 			<fieldset className="container-fluid" disabled={streamInfo.isStart}>
-				<div className="mb-2 row">
+				<div className="mb-2 row align-items-center">
 					<div className="col-lg-2">{t('msg_store_device')}</div>
 					<div className="col-lg-3">
 						<select className="form-control" value={storeDevice} onChange={e => this.onChangeVal(e, 'storeDevice')} >
@@ -288,13 +288,13 @@ class ConfigurationRecord extends React.Component {
 						</select>
 					</div>
 				</div>
-				<div className="mb-2 row">
+				<div className="mb-2 row align-items-center">
 					<div className="col-lg-2">{t('msg_backup_path')}</div>
 					<div className="col-lg-3">
 						<input className="form-control" type="text" value={this.getRenderPath()} onChange={e => this.onChangeVal(e, '')} readOnly={true}/>
 					</div>
 				</div>
-				<div className="mb-2 row">
+				<div className="mb-2 row align-items-center">
 					<div className="col-lg-2">{t('msg_video_format')}</div>
 					<div className="col-lg-3">
 						<select className="form-control" value={container} onChange={e => this.onChangeVal(e, 'container')} >
@@ -304,7 +304,7 @@ class ConfigurationRecord extends React.Component {
 						</select>
 					</div>
 				</div>
-				<div className="mb-2 row">
+				<div className="mb-2 row align-items-center">
 					<div className="col-lg-2">{t('msg_file_duration')}</div>
 					<div className="col-lg-3 d-flex align-items-center ">
 						<input className={`form-control ${( hour.invalid ? 'is-invalid' : '')}`} type="number" value={hour.value} onChange={e => this.onChangeVal(e, 'hour')} />
@@ -325,7 +325,7 @@ class ConfigurationRecord extends React.Component {
 							<span className={( ip.invalid ? 'text-danger' : 'text-secondary')}>{t('msg_example') + ' ' + t('msg_tip_record_IP')}</span>
 						</div>
 					</div>
-					<div className="mb-2 row">
+					<div className="mb-2 row align-items-center">
 						<div className="col-lg-2">{t('msg_backup_path')}</div>
 						<div className="col-lg-3">
 							<input className={`form-control ${( folderPath.invalid ? 'is-invalid' : '')}`} type="text" value={folderPath.value} onChange={e => this.onChangeVal(e, 'folderPath')} ref={this.pathDOM} pattern={regxFolderPathStr} required={isEditing}/>
@@ -334,27 +334,27 @@ class ConfigurationRecord extends React.Component {
 							<span className={( folderPath.invalid ? 'text-danger' : 'text-secondary')}>{t('msg_example') + ' ' + t('msg_tip_record_path')}</span>
 						</div>
 					</div>
-					<div className="mb-2 row">
+					<div className="mb-2 row align-items-center">
 						<div className="col-lg-2">{t('msg_user_name')}</div>
 						<div className="col-lg-3">
 							<input className="form-control" type="text" value={username.value} onChange={e => this.onChangeVal(e, 'username')} />
 						</div>
 					</div>
-					<div className="mb-2 row">
+					<div className="mb-2 row align-items-center">
 						<div className="col-lg-2">{t('msg_backup_password')}</div>
 						<div className="col-lg-3">
 							<input className="form-control" type="text" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
 						</div>
 						
 					</div>
-					<div className="mb-2 row">
+					<div className="mb-2 row align-items-center">
 						<div className="offset-2 col-lg-2">
 							<span className='text-danger'>{connectionMsg}</span>
 						</div>
 					</div>
 				</fieldset>
 
-				<div className={'mb-2 row ' + (storeDevice !== 'nas' ? 'd-none' : '')}>
+				<div className={'mb-2 row align-items-center ' + (storeDevice !== 'nas' ? 'd-none' : '')}>
 					<div className="col-lg-5">
 						{
 							isEditing ? <Btn type="submit" onClick={this.checkConnection} className="float-right mt-1">{t("msg_btn_connect")}</Btn>

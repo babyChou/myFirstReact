@@ -63,7 +63,7 @@ const NOT_NECESSARY_FIELD = {
 	21 : [],
 	22 : [],
 	23 : [],
-	51 : ['ipAddr']
+	51 : ['ipAddr','port']
 }
 
 function isFieldDisabled(key, streamType, isStart) {
@@ -301,6 +301,30 @@ class ConfigurationTasks extends React.Component {
 						return Promise.all([checkDevicesTasks(true), checkTasksStatus(true)]).then(() => {
 							this.props.renewDevicesTasksDetail(task);
 							this.props.handleBackdrop(false);
+							
+							//update disabled btn
+							this.setState({
+								streamType : {
+									...this.state.streamType,
+									disabled : true
+								},
+								encodingProfile : {
+									...this.state.encodingProfile,
+									disabled : true
+								},
+								ipAddr : {
+									...this.state.ipAddr,
+									disabled : true
+								},
+								port : {
+									...this.state.port,
+									disabled : true
+								},
+								nic : {
+									...this.state.nic,
+									disabled : true
+								}
+							});
 						});
 					}else{
 						//dialog error
@@ -344,6 +368,30 @@ class ConfigurationTasks extends React.Component {
 				checkTasksStatus(true).then(()=>{				
 					this.props.renewDevicesTasksDetail(taskInfo);
 					this.props.handleBackdrop(false);
+
+					//update disabled btn
+					this.setState({
+						streamType : {
+							...this.state.streamType,
+							disabled : false
+						},
+						encodingProfile : {
+							...this.state.encodingProfile,
+							disabled : false
+						},
+						ipAddr : {
+							...this.state.ipAddr,
+							disabled : isFieldDisabled('ipAddr', this.state.streamType.value, 0)
+						},
+						port : {
+							...this.state.port,
+							disabled : isFieldDisabled('port', this.state.streamType.value, 0)
+						},
+						nic : {
+							...this.state.nic,
+							disabled : isFieldDisabled('nic', this.state.streamType.value, 0)
+						}
+					});
 				});
 			}else{
 				//dialog error
@@ -508,15 +556,23 @@ class ConfigurationTasks extends React.Component {
 
 		const subDOM = (streamType) => {
 			// console.log(streamType, typeof streamType);
+
 			const params = {
 				handleStartStreming: this.handleStartStreming,
 				isStreamingCheck: this.state.isStreamingCheck,
-				streamInfo: streamInfo,
+				streamInfo: {
+					...streamInfo,
+					streamType : streamType
+				},
 				handleBackdrop: this.props.handleBackdrop,
 				handleAlert: this.props.handleAlert
 			};
 			switch(Number(streamType)) {
 				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
 					return <ConfigurationTcp {...params}></ConfigurationTcp>;
 				case 6:
 					return <ConfigurationRtmp {...params}></ConfigurationRtmp>;
@@ -541,11 +597,11 @@ class ConfigurationTasks extends React.Component {
 						<select className="form-control" disabled={encodingProfile.disabled} value={encodingProfile.value} onChange={e => this.onChangeVal(e, 'encodingProfile')}>{ encodeProfilesDOM }</select>
 					</td>
 					<td className="align-top">
-						<input type="text" className="form-control" disabled={ipAddr.disabled} value={ipAddr.value} onChange={e => this.onChangeVal(e, 'ipAddr')} required />
+						<input type="text" className="form-control" disabled={ipAddr.disabled} value={ipAddr.value} onChange={e => this.onChangeVal(e, 'ipAddr')} required={!ipAddr.disabled} />
 						<div className="invalid-feedback">{t('msg_ip_addr_error')}</div>
 					</td>
 					<td className="align-top">
-						<input type="number" className="form-control" disabled={port.disabled} value={port.value} onChange={e => this.onChangeVal(e, 'port')} required min="1" max="65535" />
+						<input type="number" className="form-control" disabled={port.disabled} value={port.value} onChange={e => this.onChangeVal(e, 'port')} required={!port.disabled} min="1" max="65535" />
 						<div className="invalid-feedback">1~65535</div>
 					</td>
 					<td className="align-top">

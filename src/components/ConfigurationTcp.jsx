@@ -1,107 +1,123 @@
 import * as React from 'react';
 import { translate } from "react-i18next";
 import { randomID, retrieveFromProp } from '../helper/helper';
-import { AUTHENTICATE_OAUTH, LOGOUT_CDN } from '../helper/Services';
-import Tag from './Tag';
 
-const HOSTNAME = 'http://' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
-const HOST_URI = `${HOSTNAME}/retrieveToken`;
-const REDIRECT_URI = `https://accounts.google.com/o/oauth2/auth?client_id=320053556772-ims85cqoo8k8ti1c2fal45libubi732t.apps.googleusercontent.com&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&scope=https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/userinfo.profile&response_type=code&state=${HOST_URI}&access_type=offline&approval_prompt=force`;
+const STREAM_TYPE_MAP_STREAM_PARAMS = {
+	1 : 'tcp',
+	2 : 'udp',
+	3 : 'udp', //udp Multicast
+	4 : 'rtp',
+	5 : 'rtp' //RTP Multicast
+};
 
-// 
-//  authUrl = 'https://api.twitch.tv/kraken/oauth2/authenticate?action=authorize&client_id=nwv779kj9s4wjdn1dkdrnc4duq8fe0&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&response_type=token&scope=channel_read&state={IP}/cgi-bin/twitchAuth',
-// authUrl = 'https://www.facebook.com/dialog/oauth?client_id=1288773337839988&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&scope=publish_actions&response_type=token&state={IP}/cgi-bin/facebookAuth';
-// console.log(HOST_URI);
-
-class ConfigurationYoutube extends React.Component {
+class ConfigurationTcp extends React.Component {
 	constructor(props) {
 		super(props);
-		const objProps = props.streamInfo.youtube || {};
+		const streamType = Number(props.streamInfo.streamType);
+		const objProps = props.streamInfo[STREAM_TYPE_MAP_STREAM_PARAMS[streamType]] || {};
 
 		this.state = {
-			userID: retrieveFromProp('userID', objProps),
-			title: {
-				value: retrieveFromProp('title', objProps),
+			setPid: retrieveFromProp('setPid', objProps) || false,
+			videoPid: {
+				value: retrieveFromProp('description', objProps) || 8176,
 				invalid: false,
-				textLength: 0,
+				textLength: 4,
 				errMsg: ''
 			},
-			description: {
-				value: retrieveFromProp('description', objProps),
+			audioPid: {
+				value:  retrieveFromProp('privacy', objProps) || 8177,
 				invalid: false,
-				textLength: 0,
+				textLength: 4,
 				errMsg: ''
 			},
-			privacy: {
-				value:  retrieveFromProp('privacy', objProps) || 'unlisted',
+			pmtPid: {
+				value: retrieveFromProp('tag', objProps) || 256,
 				invalid: false,
+				textLength: 4,
 				errMsg: ''
 			},
-			tag: {
-				value: retrieveFromProp('tag', objProps),
+			pcrPid: {
+				value: retrieveFromProp('tag', objProps) || 257,
 				invalid: false,
+				textLength: 4,
 				errMsg: ''
-			}
+			},
+			ttl: {				
+				value: retrieveFromProp('ttl', objProps) || 64,
+				invalid: false,
+				textLength: 3,
+				errMsg: ''
+			},
+			sap: retrieveFromProp('sap', objProps) || true
 		};
 
-		this.postKey = randomID();
-		this.popup = null;
-		this.timer = null;
+		this.adjustPidID = randomID();
+		this.sapID = randomID();
 
-		this.logout = this.logout.bind(this);
-		this.login = this.login.bind(this);
+		this.multicastDOM = this.multicastDOM.bind(this);
 		this.onChangeVal = this.onChangeVal.bind(this);
 
 	}
 	componentDidMount() {
-		window.addEventListener('message', e => {
-			if (e.data.key !== this.postKey)
-				return;
-
-			this.props.handleBackdrop(true);
-
-			AUTHENTICATE_OAUTH.fetchData({
-				code : e.data.code
-			}).then(data => {
-				if(data.result === 0) {
-					this.setState({
-						userID : data.userID
-					}, () => {
-						this.props.handleBackdrop(false);
-					});
-				}
-			});
-
-			if(this.popup) {
-				this.popup.close();
-				clearInterval(this.timer);
-			}
-		}, false);
 	}
 	componentWillUnmount() {
 
 	}
 	componentDidUpdate(prevProps, prevState) {
 		if(this.props.isStreamingCheck) {
+			const { streamInfo } = this.props;
+			const streamType = streamInfo.streamType;
+			const deviceID = streamInfo.deviceID;
 
-			const passData = {
-				userID : this.state.userID,
-				title : this.state.title.value,
-				description : this.state.description.value,
-				privacy : this.state.privacy.value,
-				tag : this.state.tag.value,
+			let passData = {
+				setPid : this.state.setPid
 			};
 
 			let updateState = {
-				title : {
-					...this.state.title,
-					invalid : (this.state.title.value.length === 0 || this.state.title.value.length > 150)
+				videoPid : {
+					...this.state.videoPid,
+					invalid : false
 				},
-				description : {
-					...this.state.description,
-					invalid : (this.state.description.value.length === 0 || this.state.description.value.length > 5000)
+				audioPid : {
+					...this.state.audioPid,
+					invalid : false
+				},
+				pmtPid : {
+					...this.state.pmtPid,
+					invalid : false
+				},
+				pcrPid : {
+					...this.state.pcrPid,
+					invalid : false
+				},
+				ttl : {
+					...this.state.ttl,
+					invalid : false
 				}
 			};
+
+			const invalidDOMs = document.querySelectorAll(`#tsForm_${deviceID} input:invalid`);
+
+			invalidDOMs.forEach(el => {
+				let key = el.dataset.name;
+				updateState[key].invalid = true;
+
+			});
+
+			if(this.state.setPid) {
+				passData = {
+					setPid : this.state.setPid,
+					videoPid : this.state.videoPid.value,
+					audioPid : this.state.audioPid.value,
+					pmtPid : this.state.pmtPid.value,
+					pcrPid : this.state.pcrPid.value
+				};
+			}
+
+			if(Number(streamInfo.streamType) === 3 || Number(streamInfo.streamType) === 5) {
+				passData.ttl = this.state.ttl.value;
+				passData.sap = this.state.sap;
+			}
 
 			this.setState(updateState);
 			this.props.handleStartStreming(passData);
@@ -109,101 +125,99 @@ class ConfigurationYoutube extends React.Component {
 	}
 	onChangeVal(e, key) {
 
-		let updateObj = {
-			[key] : {			
-				...this.state[key],
-				value : e.target.value
-			}
-		};
+		let updateObj = {};
 
-		if(key === 'title' || key === 'description') {
-			updateObj[key].textLength = e.target.value.length;
-
-			if(key === 'title') {
-				updateObj[key].invalid = e.target.value.length > 150;
-			}else{
-				updateObj[key].invalid = e.target.value.length > 5000;
-			}
-			
+		if(key === 'setPid' || key === 'sap') {
+			updateObj[key] = !this.state[key];
+		}else{
+			updateObj = {
+				[key] : {			
+					...this.state[key],
+					value : Number(e.target.value)
+				}
+			};
 		}
 
 
 		this.setState(updateObj);
 	}
 
-	logout(e) {
-		
-		LOGOUT_CDN.fetchData({
-			streamType : 13
-		}).then(() => {
-			this.setState({
-				userID : null
-			});
-		});
+	multicastDOM() {
+		const { ttl, sap } = this.state;
+		return (
+			<React.Fragment>
+				<div className="mb-2 row align-items-start">
+					<div className="col-lg-1">TTL :</div>
+					<div className="col-lg-2 d-flex align-items-start">
+						<input className="form-control mr-2 w-45" type="number" value={ttl.value} data-name="ttl" onChange={e => this.onChangeVal(e, 'ttl')} required maxLength={ttl.textLength} min="1" max="255"/>
+						<span className={( ttl.invalid ? 'text-danger' : 'text-secondary')}>(1 ~ 255)</span>
+					</div>
+				</div>
+				<div className="mb-4 row align-items-start">
+					<div className="col-lg-1">SAP :</div>
+					<div className="col-lg-2">
+						<div className="form-check">					
+							<input className="form-check-input" type="checkbox" value="1" id={this.sapID} checked={sap} onChange={e => this.onChangeVal(e, 'sap')}/>
+							<label className="form-check-label" htmlFor={this.sapID}>{this.props.t('msg_enable')}</label>
+						</div>
+					</div>
+				</div>
+			</React.Fragment>
+		);
 	}
-	login(e) {
-		this.popup = window.open(REDIRECT_URI,'' , 'height=550px, width=980px');
-		
-		// console.log(REDIRECT_URI);
-		this.timer = setInterval(() => { 
-		    if(!this.popup.closed) {
-		        this.popup.postMessage({
-		        	key : this.postKey
-		        }, HOSTNAME);
-		    }
-		}, 2000);
-		
 
-	}
 	render() {
 		const { t, streamInfo } = this.props;
-		const { userID, title, description, privacy, tag } = this.state;
+		const { setPid, videoPid, audioPid, pmtPid, pcrPid } = this.state;
 
 		return (
-			userID ?
-			<fieldset className="container-fluid" disabled={streamInfo.isStart}>
-				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_title')}</div>
-					<div className="col-lg-2">
-						<input className="form-control" type="text" value={title.value} onChange={e => this.onChangeVal(e, 'title')} required maxLength="150"/>
-						<small className={( title.invalid ? 'text-danger' : 'text-secondary')}>({title.textLength}/150)</small>
-					</div>
-					
-				</div>
-				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_description')}</div>
-					<div className="col-lg-2"><textarea className="form-control" type="text" value={description.value} onChange={e => this.onChangeVal(e, 'description')} required maxLength="5000"></textarea>
-						<small className={( description.invalid ? 'text-danger' : 'text-secondary')}>({description.textLength}/5000)</small>
+			<fieldset id={`tsForm_${streamInfo.deviceID}`} className="container-fluid" disabled={streamInfo.isStart}>
+				{ (Number(streamInfo.streamType) === 3 || Number(streamInfo.streamType) === 5 ? this.multicastDOM() : null) }
+				<div className="mb-3 row form-check">
+					<div className="col-lg">
+						<input className="form-check-input" type="checkbox" value="1" id={this.adjustPidID} checked={setPid} onChange={e => this.onChangeVal(e, 'setPid')}/>
+						<label className="form-check-label" htmlFor={this.adjustPidID}>{t('msg_enable_ts_pid_adjust')}</label>
 					</div>
 				</div>
-				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_tag')}</div>
-					<div className="col-lg-2">
-						<Tag value={tag.value} onChange={tag => this.onChangeVal({target:{value:tag}}, 'tag')} disabled={streamInfo.isStart}></Tag>
-					</div>
-				</div>
-				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_privacy')}</div>
-					<div className="col-lg-2">
-						<select className="form-control" value={privacy.value} onChange={e => this.onChangeVal(e, 'privacy')} >
-							<option value="unlisted">{t('msg_privacy_unlisted')}</option>
-							<option value="private">{t('msg_privacy_private')}</option>
-							<option value="public">{t('msg_privacy_public')}</option>
-						</select>
-					</div>
-				</div>
-				<div className="mb-2 mt-4 row">
-					<div className="col-lg-4">
-						<button className="btn btn-outline-danger float-right" onClick={this.logout}><i className="icon icon-md ion-logo-google mr-2 align-middle"></i>{t("msg_logout")}</button>
-					</div>
-				</div>
-			</fieldset>
-			: <button className="btn btn-outline-danger" onClick={this.login}><i className="icon icon-md ion-logo-google mr-2 align-middle"></i>{t("msg_login")}</button>
 
+				{ setPid ? 
+					<React.Fragment>
+						<div className="mb-2 row align-items-start">
+							<div className="col-lg-1">Video PID :</div>
+							<div className="col-lg-2 d-flex align-items-start">
+								<input className="form-control mr-2 w-45" type="number" value={videoPid.value} data-name="videoPid" onChange={e => this.onChangeVal(e, 'videoPid')} required maxLength={videoPid.textLength} min="32" max="8190"/>
+								<span className={( videoPid.invalid ? 'text-danger' : 'text-secondary')}>(32 ~ 8190)</span>
+							</div>
+						</div>
+						<div className="mb-2 row align-items-start">
+							<div className="col-lg-1">Audio PID :</div>
+							<div className="col-lg-2 d-flex align-items-start">
+								<input className="form-control mr-2 w-45" type="number" value={audioPid.value} data-name="audioPid" onChange={e => this.onChangeVal(e, 'audioPid')} required maxLength={audioPid.textLength} min="32" max="8190"/>
+								<span className={( audioPid.invalid ? 'text-danger' : 'text-secondary')}>(32 ~ 8190)</span>
+							</div>
+						</div>
+						<div className="mb-2 row align-items-start">
+							<div className="col-lg-1">PMT PID :</div>
+							<div className="col-lg-2 d-flex align-items-start">
+								<input className="form-control mr-2 w-45" type="number" value={pmtPid.value} data-name="pmtPid" onChange={e => this.onChangeVal(e, 'pmtPid')} required maxLength={audioPid.textLength} min="32" max="8190"/>
+								<span className={( pmtPid.invalid ? 'text-danger' : 'text-secondary')}>(32 ~ 8190)</span>
+							</div>
+						</div>
+						<div className="mb-2 row align-items-start">
+							<div className="col-lg-1">PCR PID :</div>
+							<div className="col-lg-2 d-flex align-items-start">
+								<input className="form-control mr-2 w-45" type="number" value={pcrPid.value} data-name="pcrPid" onChange={e => this.onChangeVal(e, 'pcrPid')} required maxLength={audioPid.textLength} min="32" max="8190"/>
+								<span className={( pcrPid.invalid ? 'text-danger' : 'text-secondary')}>(32 ~ 8190)</span>
+							</div>
+						</div>
+					</React.Fragment>
+					: null
+				}
+			</fieldset>
 		);
 	}
 
 };
 
-export default translate('translation')(ConfigurationYoutube);
+export default translate('translation')(ConfigurationTcp);
 
