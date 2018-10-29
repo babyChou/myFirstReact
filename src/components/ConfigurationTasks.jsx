@@ -14,6 +14,7 @@ import {
     checkTasksStatus
 } from "../helper/preloader";
 import { retrieveFromProp } from '../helper/helper';
+import Dialog from "./Dialog";
 import ConfigurationRtmp from './ConfigurationRtmp';
 import ConfigurationYoutube from './ConfigurationYoutube';
 import ConfigurationRecord from './ConfigurationRecord';
@@ -91,6 +92,14 @@ class ConfigurationTasks extends React.Component {
 			videoSelected : ['',''],
 			wasValidated : false,
 			isStreamingCheck : false,
+			isDialogShow : false,
+			dialogObj : {
+				title : '',
+				type : 'alert',
+				icon : 'warning',
+				mainMsg : '',
+				msg : '',
+			},
 			streamType: { 
 				value : streamType,
 				disabled: !!streamInfo.isStart
@@ -346,33 +355,50 @@ class ConfigurationTasks extends React.Component {
 		this.props.addSubTask(this.props.streamInfo.deviceID);
 	}
 	btnDelete(e) {
-		const rowNo = this.props.rowNo;
-		const { deviceID, taskID } = this.props.streamInfo;
+		const { t, rowNo, streamInfo } = this.props;
+		const { deviceID, taskID } = streamInfo;
 
-		this.props.handleBackdrop(true);
+		this.setState({
+			isDialogShow : true,
+			dialogObj : {
+				...this.state.dialogObj,
+				type : 'confirm',
+				icon : 'info',
+				title : t('msg_stream_delete'),
+				msg : t('msg_stream_delete_confirm'),
+				ok : () => {
 
-		if(taskID !== -1) {
-			DELETE_DEVICE_TASK.fetchData({
-				tasks : [{
-					deviceID,
-					taskID
-				}]
-			}).then(data => {
-				if(data.result === 0) {
-					checkTasksStatus(true).then(()=>{				
+					this.props.handleBackdrop(true);
+
+					if(taskID !== -1) {
+						DELETE_DEVICE_TASK.fetchData({
+							tasks : [{
+								deviceID,
+								taskID
+							}]
+						}).then(data => {
+							if(data.result === 0) {
+								checkTasksStatus(true).then(()=>{				
+									this.props.deleteSubTask(deviceID, taskID, rowNo);
+									this.props.handleBackdrop(false);
+								});
+							}else{
+								//dialog error
+								this.props.handleAlert({
+									type : 'failed',
+									msg : <React.Fragment><h4 className="alert-heading">{t('msg_failed')}</h4><p>Error code : {data.result}</p></React.Fragment>
+								});
+							}
+						});
+						
+					}else{
 						this.props.deleteSubTask(deviceID, taskID, rowNo);
 						this.props.handleBackdrop(false);
-					});
-				}else{
-					//dialog error
-				}
-			});
-			
-		}else{
-			this.props.deleteSubTask(deviceID, taskID, rowNo);
-			this.props.handleBackdrop(false);
-		}
+					}
 
+				}
+			}
+		});
 		
 	}
 	onChangeVal(e, key) {
@@ -541,6 +567,7 @@ class ConfigurationTasks extends React.Component {
 					{ !isAddRow ? <td></td> : null }
 					<td className="px-3 py-4" colSpan="7">
 						{ subDOM(streamType.value) }
+						<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>
 					</td>
 				</tr>
 			</React.Fragment>

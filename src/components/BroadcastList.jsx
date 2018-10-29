@@ -4,7 +4,7 @@ import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from 'redux';
 import { BROCASTLIST_GLOBAL_UPDATE_TIME } from "../constant/Init.Consts";
-import { INPUT_SOURCES, STREAM_STATUS } from '../constant/Common.Consts';
+import { INPUT_SOURCES, STREAM_STATUS, RECORD_STORE_DEVICE, RECORD_CONTAINER } from '../constant/Common.Consts';
 import { checkFacilities, checkDeviceConfig, checkDevicesTasks, checkTasksStatus, checkEncodeProfiles, checkStreamProfiles } from '../helper/preloader';
 import { concatTasksStatus } from '../helper/helper';
 import { DELETE_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, GET_NETWORK_STATUS, GET_PIP_PREVIEW_IMG, GET_INPUT_SIGNAL_STATUS } from '../helper/Services';
@@ -466,6 +466,15 @@ class BroadcastList extends React.Component {
 	        case 13:
 				uri = 'https://www.youtube.com/watch?v=' + streamProfile.youtube.videoID;
 				urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            break;
+	        case 51:
+	        	urls.push(
+	        		<ul className="list-unstyled">
+	        			<li>{t('msg_store_device')} : { RECORD_STORE_DEVICE[streamProfile.record.storeDevice] }</li>
+	        			<li>{t('msg_video_format')} : { RECORD_CONTAINER[streamProfile.record.container] }</li>
+	        			<li>{t('msg_backup_path')} : { streamProfile.record.recordPath }</li>
+	        		</ul>
+	        	);
 	            break;
 	        default:
 	            break;

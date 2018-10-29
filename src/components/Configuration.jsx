@@ -22,9 +22,6 @@ import ConfigurationTasks from "./ConfigurationTasks";
 import Loader from './Loader';
 import { Alert } from 'reactstrap';
 
-
-// import Dialog from "./Dialog";
-
 const defaultStreamType = DEFAULT_STREAM_TYPE;
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
@@ -351,7 +348,8 @@ class Configuration extends React.Component {
 				this.setState({
 					alert : {
 						...this.state.alert,
-						msg : ''
+						msg : '',
+						color : (alertObj.type === 'ok' ? 'info' : 'danger')
 					}
 				});
 			}, (alertObj.type === 'ok' ? MSG_SUCCESS_SECONDS : MSG_FAILED_SECONDS));
@@ -377,7 +375,6 @@ class Configuration extends React.Component {
 				{/* { this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null } */}
 				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Alert isOpen={!!alert.msg} className="fixed-top text-center m-5" color={alert.color}>{alert.msg}</Alert>
-				{/* <Dialog isShow={this.state.dia} toggle={()=>{this.setState({dia: !this.state.dia })}} icon="error" title="fsdfdf" mainMsg="sdfsdfs" msg="sdfsdf" type="alert" ok={()=>{alert()}}></Dialog> */}
 				<Header>
 					{isDeviceConfigSet ? (
 						<ConfigurationPanel

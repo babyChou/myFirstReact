@@ -3,7 +3,6 @@ import { translate } from "react-i18next";
 import { retrieveFromProp } from '../helper/helper';
 import { RECORD_FILE_PREFIX_NAME, RECORD_ROOT_FOLDER, MAX_RECORD_DURATION, MIN_RECORD_DURATION } from "../constant/Init.Consts";
 import { RECORD_STORE_DEVICE, RECORD_CONTAINER } from "../constant/Common.Consts";
-import { IPV4 } from "../constant/Regx.Consts";
 import { UPDATE_CHECK_NETWORK_CONNECTION } from '../helper/Services';
 import Btn from './Btn';
 
@@ -296,7 +295,7 @@ class ConfigurationRecord extends React.Component {
 					</div>
 				</div>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_format')}</div>
+					<div className="col-lg-2">{t('msg_video_format')}</div>
 					<div className="col-lg-3">
 						<select className="form-control" value={container} onChange={e => this.onChangeVal(e, 'container')} >
 							{
