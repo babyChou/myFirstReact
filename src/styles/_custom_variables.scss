@@ -45,6 +45,8 @@ $modal-header-padding: .5rem 1rem;
 $close-color: #FFF;
 $close-text-shadow: 2px 2px 1px #000;
 
+//feedback
+$form-feedback-font-size : 1rem;
 
 //icon
 $icon-font-path: '../../node_modules/open-iconic/font/fonts/';//https://useiconic.com/open
@@ -54,7 +56,9 @@ $ionicons-font-path: '../../node_modules/ionicons/dist/fonts';//https://ionicons
 $table-border-color: #FFF;
 
 //Size
-$sizes: (
+$sizes: map-merge(
+  $sizes,
+   (
     5: 5%,
     10: 10%,
     15: 15%,
@@ -70,6 +74,7 @@ $sizes: (
     70: 70%,
     80: 80%,
     90: 90%
+  )
 );
 
 //custom-form
@@ -82,5 +87,17 @@ $custom-file-text : (
 	tw: attr(data-content)
 );
 
+$ustream-color: #38f;
 
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors: map-merge(
+  $theme-colors,
+   (
+    "google":    #ed1b24,
+    "twitch":  #6541a5,
+    "facebook":  #3c5b9b,
+    "ustream":  $ustream-color,
+    "cdnvideo":  #fab60f
+  )
+);
 

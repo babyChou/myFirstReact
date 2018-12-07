@@ -1,0 +1,35 @@
+
+// @include my-form-validation-state("aaa-valid", $form-feedback-invalid-color);
+
+@include my-form-validation-state("invalid", $form-feedback-invalid-color);
+@include my-form-validation-state("valid", $secondary);
+
+
+.form-control{
+    input {
+        outline: 0;
+    }
+}
+
+.form-control:focus-within {
+    color: $input-focus-color;
+    background-color: $input-focus-bg;
+    border-color: $input-focus-border-color;
+    outline: 0;
+    // Avoid using mixin so we can pass custom focus shadow properly
+    @if $enable-shadows {
+      box-shadow: $input-box-shadow, $input-focus-box-shadow;
+    } @else {
+      box-shadow: $input-focus-box-shadow;
+    }
+}
+
+.encoding_form{
+    .encoding_form_title{
+        min-width:190px;
+    }
+
+    .encoding_form_divider_right{
+        border-right: 1px dotted $input-border-color;
+    }
+}

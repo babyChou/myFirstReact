@@ -1,9 +1,12 @@
 export const DEFAULT_STREAM_TYPE = 1;
+
 export const MSG_SUCCESS_SECONDS = 1000;
 export const MSG_FAILED_SECONDS = 1500;
 export const CONFIGURATION_PANNEL_UPDATE_TIME = 5000;
 export const BROCASTLIST_GLOBAL_UPDATE_TIME = 1000;
-export const CONFIGURATION_TASK_UNLOCK_STREAM_TYPES = [1, 2, 3, 4, 5, 6, 13, 51];
+// export const CONFIGURATION_TASK_UNLOCK_STREAM_TYPES = (process.env.NODE_ENV === 'production' ? [1, 2, 3, 6, 51] : [1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 51]);
+export const CONFIGURATION_TASK_UNLOCK_STREAM_TYPES = [1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 51];
+
 export const RECORD_FILE_PREFIX_NAME = 'AVT_';
 export const RECORD_ROOT_FOLDER = '\\\\AVerMedia\\';
 export const MAX_RECORD_DURATION = 120;

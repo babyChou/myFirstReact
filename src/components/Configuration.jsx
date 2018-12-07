@@ -6,7 +6,7 @@ import { compose } from "redux";
 import { DEFAULT_STREAM_TYPE, MSG_SUCCESS_SECONDS,  MSG_FAILED_SECONDS} from "../constant/Init.Consts";
 import { configActions } from "../action/Config.Actions";
 import { GET_NETWORK_STATUS, GET_PIP_CONFIG_LIST } from "../helper/Services";
-import { concatTasksStatus } from "../helper/helper";
+import { concatTasksStatus, randomID } from "../helper/helper";
 import {
 	checkFacilities,
 	checkDevicesTasks,
@@ -44,7 +44,7 @@ const mapDispatchToProps = dispatch => {
 class Configuration extends React.Component {
 	constructor(props) {
 		super(props);
-
+		
 		this.state = {
 			netWorkStatus: [],
 			pipList: [],
@@ -117,8 +117,9 @@ class Configuration extends React.Component {
 				let streamProfiles = data[data.length - 1];
 				let streamInfo = {
 					deviceID: -1,
+					taskKey: -1,
 					taskID: -1,
-					profileID: encodeProfiles[0]['id'],
+					profileID: null,
 					isStart: 0,
 					streamStatus: 0,
 					id: -1,
@@ -144,6 +145,7 @@ class Configuration extends React.Component {
 								return {
 									deviceID: device.id,
 									taskID: task.id,
+									taskKey: randomID(),
 									profileID: task.profileID,
 									isStart: task.isStart,
 									streamStatus: task.status,
@@ -153,6 +155,7 @@ class Configuration extends React.Component {
 						});
 
 					if (tasks.length === 0) {
+						streamInfo.taskKey = randomID();
 						tasks.push(Object.assign({}, streamInfo, {
 							deviceID : facility.id
 						}));
@@ -239,6 +242,7 @@ class Configuration extends React.Component {
 									return {
 										...task,
 										taskID: taskID,
+										taskKey: randomID(),
 										profileID: profileID, 
 										isStart: taskStatus.isStart,
 										streamStatus: taskStatus.status,
@@ -279,7 +283,8 @@ class Configuration extends React.Component {
 		let streamInfo = {
 			deviceID: deviceID,
 			taskID: -1,
-			profileID: this.props.encodeProfiles[0]['id'],
+			taskKey: randomID(),
+			profileID: null,
 			isStart: 0,
 			streamStatus: 0,
 			id: -1,
@@ -302,15 +307,14 @@ class Configuration extends React.Component {
 			devicesTasksDetail
 		});
 	}
-	deleteSubTask(deviceID, taskID, rowNo) {
+	deleteSubTask(deviceID, taskID, taskKey, rowNo) {
 		let devicesTasksDetail = [];
 		let remainTasks = [];
 
 		devicesTasksDetail = this.state.devicesTasksDetail.map(device => {
 			if (device.id === deviceID) {
-				remainTasks = device.tasks.filter(
-					(task, i) => task.taskID !== taskID && i + 1 !== rowNo
-				);
+
+				remainTasks = device.tasks.filter(task => task.taskKey !== taskKey);
 
 				if (remainTasks.length === 0) {
 					alert(
@@ -371,7 +375,7 @@ class Configuration extends React.Component {
 		} = this.state;
 
 		return (
-			<div className="">
+			<div className="container_wrapper">
 				{/* { this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null } */}
 				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Alert isOpen={!!alert.msg} className="fixed-top text-center m-5" color={alert.color}>{alert.msg}</Alert>
@@ -403,12 +407,14 @@ class Configuration extends React.Component {
 										pipList={this.state.pipList}
 										updateDeviceConfig={this.props.setDeviceConfig}
 										renewDevicesTasksDetail={this.renewDevicesTasksDetail}
+										selectedSource={selectedSource}
 									/>
 								}
 								{ device.tasks.map((task, i) => {
 									return (
 										<ConfigurationTasks
-											key={i}
+											key={task.taskKey}
+											taskKey={task.taskKey}
 											rowNo={i + 1}
 											totalTaskCount={totalTaskCount}
 											nics={netWorkStatus}

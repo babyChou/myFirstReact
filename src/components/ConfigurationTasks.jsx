@@ -7,18 +7,21 @@ import { compose, bindActionCreators } from 'redux';
 import store from '../store/Store';
 import { rootActions } from '../action/Root.Actions';
 import { CONFIGURATION_TASK_UNLOCK_STREAM_TYPES } from "../constant/Init.Consts";
-import { INPUT_SOURCES, STREAM_STYPE } from '../constant/Common.Consts';
+import { INPUT_SOURCES, STREAM_STYPE, ENCODE_VIDEO_CODEC, ENCODE_AUDIO_CODEC } from '../constant/Common.Consts';
+import { IPV4_STR, IPV4_MULTICAST_STR } from '../constant/Regx.Consts';
 import { SET_STREAM_PROFILE, SET_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, DELETE_DEVICE_TASK, SET_DEVICE_CONFIG } from '../helper/Services';
-import {
-    checkDevicesTasks,
-    checkTasksStatus
-} from "../helper/preloader";
+import { checkDevicesTasks, checkTasksStatus, checkStreamProfiles } from "../helper/preloader";
 import { retrieveFromProp } from '../helper/helper';
 import Dialog from "./Dialog";
 import ConfigurationRtmp from './ConfigurationRtmp';
 import ConfigurationYoutube from './ConfigurationYoutube';
+import ConfigurationTwitch from './ConfigurationTwitch';
+import ConfigurationUstream from './ConfigurationUstream';
+import ConfigurationFacebook from './ConfigurationFacebook';
 import ConfigurationRecord from './ConfigurationRecord';
 import ConfigurationTcp from './ConfigurationTcp';
+import ConfigurationHls from './ConfigurationHls';
+import ConfigurationRtsp from './ConfigurationRtsp';
 //https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization
 
 
@@ -50,7 +53,7 @@ const NOT_NECESSARY_FIELD = {
 	1 : ['ipAddr','nic'],
 	2 : [],
 	3 : [],
-	4 : ['ipAddr','port'],
+	4 : [],
 	5 : [],
 	6 : ['ipAddr','port'],
 	7 : ['ipAddr','port'],
@@ -75,10 +78,23 @@ function isFieldDisabled(key, streamType, isStart) {
 
 }
 
+function getCheckIpPattern(streamType) {
+	if(streamType === 3 || streamType === 5) {
+		return IPV4_MULTICAST_STR;
+	}else{
+		return IPV4_STR;
+	}
+}
+
 
 const mapDispatchToProps = (dispatch) => {
 	return { actions: bindActionCreators(rootActions, dispatch) };
 };
+
+const mapStateToProps = store => ({
+	devicesTasks: store.configReducer.devicesTasks,
+	streamProfiles: store.profiles.streamProfiles
+});
 
 class ConfigurationTasks extends React.Component {
 	constructor(props) {
@@ -87,6 +103,12 @@ class ConfigurationTasks extends React.Component {
 		const streamType = retrieveFromProp('streamType', streamInfo);
 		const subPropsKey = STREAM_TYPE_MAP_STREAM_PARAMS[streamType];
 		const restData = streamInfo[subPropsKey] || {};
+		const filterProfiles = props.encodeProfiles.filter(profile => profile.streamType.includes(streamType) || profile.streamType.includes(0));
+
+		let encodingProfileID = retrieveFromProp('profileID', streamInfo);
+		if(!encodingProfileID && filterProfiles[0]) {
+			encodingProfileID = filterProfiles[0].id;
+		}
 
 		this.state = {
 			videoSelected : ['',''],
@@ -105,15 +127,17 @@ class ConfigurationTasks extends React.Component {
 				disabled: !!streamInfo.isStart
 			},
 			encodingProfile: { 
-				value : retrieveFromProp('profileID', streamInfo) || 1,
+				value : encodingProfileID,
 				disabled: !!streamInfo.isStart
 			},
 			ipAddr: {
 				value: retrieveFromProp('ip', restData) || '',
+				pattern : getCheckIpPattern(streamType),
 				disabled: isFieldDisabled('ipAddr', streamType, streamInfo.isStart)
 			},
 			port: {
-				value: retrieveFromProp('port', restData) || '',
+				value: retrieveFromProp('port', restData) || 1234,
+				errMsg: '1~65535',
 				disabled: isFieldDisabled('port', streamType, streamInfo.isStart)
 			}, 
 			nic: {
@@ -122,12 +146,15 @@ class ConfigurationTasks extends React.Component {
 			}
 		};
 
+
 		this.subProp = {};
 		this.trRow1 = React.createRef();
 		this.trRow2 = React.createRef();
 
 		this.cgVideoSource = this.cgVideoSource.bind(this);
 		this.handleStartStreming = this.handleStartStreming.bind(this);
+		this.getDefaultVal = this.getDefaultVal.bind(this);
+		this.getCurrEncodingProfile = this.getCurrEncodingProfile.bind(this);
 	}
 	static getDerivedStateFromProps(props, state) {
 		const deviceID = props.streamInfo.deviceID;
@@ -148,9 +175,93 @@ class ConfigurationTasks extends React.Component {
 
 		return { videoSelected };
 	}
+
 	encodeProfilesDOM = memoize(
-		(encodeProfiles) => encodeProfiles.map(profile => <option key={profile.id} value={profile.id}>{profile.name}</option>)
+		(encodeProfiles, streamType, t) => {
+			let formatName = '';
+			let formatKey = '';
+			let formatTypes = [];
+			let group = [];
+			let group0 = {
+				name : t('msg_profile_category_name_0'),
+				formatTypes : []
+			};
+
+			encodeProfiles
+			.filter(profile => profile.streamType.includes(streamType) || profile.streamType.includes(0))
+			.forEach((profile, i) => {
+				if(!!profile.videoType && !!profile.audioType) {
+					formatKey = `${profile.videoType}_${profile.audioType}`;
+
+					if(ENCODE_VIDEO_CODEC[profile.videoType] && ENCODE_AUDIO_CODEC[profile.audioType]) {
+						formatName = `${ENCODE_VIDEO_CODEC[profile.videoType]}\\${ENCODE_AUDIO_CODEC[profile.audioType]}`;
+					}else{
+						
+						formatName = `--${profile.videoType}\\---${profile.audioType}`;
+					}
+				}else{
+					if(!!profile.videoType) {
+						formatKey = profile.videoType;
+						formatName = ENCODE_VIDEO_CODEC[profile.videoType] || `--${profile.videoType}`;
+					}else{
+						formatKey = profile.audioType;
+						formatName = ENCODE_VIDEO_CODEC[profile.audioType] || `--${profile.audioType}`;
+					}
+				}
+
+				if(profile.category === 0) {
+					if(group0[formatKey]) {
+						group0[formatKey]['doms'].push(<option key={profile.id} value={profile.id}>{profile.name}</option>);
+					}else{					
+						group0['formatTypes'].push(formatKey);
+						group0[formatKey] = {
+							format : formatName,
+							doms : [<option key={profile.id} value={profile.id}>{profile.name}</option>]
+						};
+					}
+					return true;
+				}
+
+				if(!group[profile.category]) {
+					group[profile.category] = {
+						name : t(`msg_profile_category_name_${profile.category}`),
+						formatTypes : [formatKey],
+						[formatKey] : {
+							format : formatName,
+							doms : [<option key={profile.id} value={profile.id}>{profile.name}</option>]
+						}
+					};
+					
+
+				}else{
+					if(group[profile.category][formatKey]) {
+						group[profile.category][formatKey]['doms'].push(<option key={profile.id} value={profile.id}>{profile.name}</option>);
+					}else{
+						group[profile.category]['formatTypes'].push(formatKey);
+						group[profile.category][formatKey] = {
+							format : formatName,
+							doms : [<option key={profile.id} value={profile.id}>{profile.name}</option>]
+						};
+					}
+				}
+			});
+
+			group.push(group0);
+
+			return group
+					.filter(group => !!group)
+					.map((group, i) => {
+						return (<React.Fragment key={'encodeFrame' + i}>
+							<optgroup key={group.name + i} label={group.name}></optgroup>
+							{
+								group.formatTypes.map((formatKey,i) => <optgroup key={formatKey + i} label={'\u00A0\u00A0'+group[formatKey]['format']}>{group[formatKey]['doms']}</optgroup>)
+							}
+						</React.Fragment>);
+		
+					});
+		}
 	)
+
 	streamTypesDOM = memoize(
 		(STREAM_STYPE) => Object.entries(STREAM_STYPE)
 								// .filter(type => !isNaN(type[0])) //A003670
@@ -168,9 +279,9 @@ class ConfigurationTasks extends React.Component {
 		(videoInputs, deviceID, selectedSource) => [<option  key="none" value=""></option>].concat(videoInputs.map((input, i) => {
 														let otherDeviceID = (deviceID % 2) + 1;
 														let isDisabled = false;
-														if(selectedSource[otherDeviceID].filter(type => type.match(input)).length > 0) {
-															isDisabled = true;																	
-														}
+														// if(selectedSource[otherDeviceID].filter(type => type.match(input)).length > 0) {
+														// 	isDisabled = true;																	
+														// }
 
 														return <option key={i} value={input} disabled={isDisabled}>{INPUT_SOURCES[input]}</option>;
 													}))
@@ -178,7 +289,7 @@ class ConfigurationTasks extends React.Component {
 	cgVideoSource(e) {
 
 		const { streamInfo, selectedSource } = this.props;
-		const { addSourceType, deleteSourceType } = this.props.actions;
+		const { deleteSourceType, replaceSourceType } = this.props.actions;
 		const deviceID = Number(streamInfo.deviceID);
 		const currSelectedSource = this.state.videoSelected;
 		const selectedRow = e.target.dataset.sourceRow;
@@ -189,12 +300,7 @@ class ConfigurationTasks extends React.Component {
 		if(type === '') {
 			deleteSourceType(prevType, deviceID);
 		}else{
-			if(selectedSource[deviceID].length < 2) {
-				addSourceType(type, deviceID);
-			}else{
-				deleteSourceType(prevType, deviceID);
-				addSourceType(type, deviceID);
-			}
+			replaceSourceType(type, deviceID, selectedRow);
 		}
 
 		currSourceType = store.getState().rootReducer.selectedSource[deviceID];
@@ -212,21 +318,68 @@ class ConfigurationTasks extends React.Component {
 		this.setState({
 			isStreamingCheck : false
 		});
-		const rowNo = this.props.rowNo;
-		const { deviceID, taskID, id } = this.props.streamInfo;
+		const { t, streamInfo, devicesTasks, streamProfiles, rowNo } = this.props;
+		const { deviceID, taskID, id } = streamInfo;
 		const streamID = id;
 		const streamProfileMethod = ( streamID !== -1 ? 'PUT' : 'POST');
 		const taskMethod = ( taskID !== -1 ? 'PATCH' : 'POST');
-		const streamType = this.state.streamType.value;
-		const invalidRow1DomNodes = ReactDOM.findDOMNode(this.trRow1.current).querySelectorAll('input:invalid, select:invalid');
-		const invalidRow2DomNodes = ReactDOM.findDOMNode(this.trRow2.current).querySelectorAll('input:invalid, select:invalid');
+		const streamType = Number(this.state.streamType.value);
 		const subPropsKey = STREAM_TYPE_MAP_STREAM_PARAMS[streamType];
+		// let currEncodeProfileID = this.state.encodingProfile.value;
+		let configPortDom = document.getElementById(`configPort${deviceID}${rowNo}`);
+		let invalidRow1DomNodes;
+		let invalidRow2DomNodes;
+		let checkStreamProfileID = [];
 		let streamProfile = {
-			streamType
+			streamType,
+			[subPropsKey] : {}
 		};
-
-
 		let task = {};
+
+		configPortDom.setCustomValidity('');
+
+		//get check stream profile
+		devicesTasks.forEach(device => {
+			device.tasks.forEach(task => {
+				// console.log(task);
+				if(streamID !== task.streamID) {
+					checkStreamProfileID.push(task.streamID);
+				}
+			});
+		});
+
+		// console.log(streamID, this.props.streamProfiles, checkStreamProfileID);
+
+
+		//Check port conflict [tcp,udp..rtsp]
+		if(streamType < 6 ||  streamType === 8) {
+			streamProfiles.filter(profile => (checkStreamProfileID.includes(profile.id) && (profile.streamType < 6 || profile.streamType === 8)))
+							.forEach(profile => {
+								let paramsKey = STREAM_TYPE_MAP_STREAM_PARAMS[profile.streamType];
+								let params = profile[paramsKey];
+								let isPortConflict = false;
+
+								if(this.state.ipAddr.disabled) {//tcp,rtsp
+									isPortConflict = (this.state.port.value === params.port);
+								}else{
+									isPortConflict = (this.state.ipAddr.value === params.ip && this.state.port.value === params.port);
+								}
+
+								if(isPortConflict) {
+									configPortDom.setCustomValidity(t('msg_port_error'));
+									this.setState({
+										port : {
+											...this.state.port,
+											errMsg : t('msg_port_error')
+										}
+									});
+								}
+							});	
+		}
+
+		invalidRow1DomNodes = ReactDOM.findDOMNode(this.trRow1.current).querySelectorAll('input:invalid, select:invalid');
+		invalidRow2DomNodes = ReactDOM.findDOMNode(this.trRow2.current).querySelectorAll('input:invalid, select:invalid');
+
 		
 		//Check invalid input
 		if(invalidRow1DomNodes.length > 0 || invalidRow2DomNodes.length > 0 || data.invalidForm) {
@@ -234,6 +387,8 @@ class ConfigurationTasks extends React.Component {
 		}
 
 		this.props.handleBackdrop(true);
+
+		//this.props.streamProfiles
 		
 		//setup values
 		OPTION_FIELD.forEach(oKey => {
@@ -241,18 +396,28 @@ class ConfigurationTasks extends React.Component {
 				return false;
 			}
 
-			if(oKey === 'nic') {
-				streamProfile.nic = Number(this.state.nic.value);
-			}else{
-				streamProfile[subPropsKey] = this.state[oKey]['value'];
+			switch(oKey) {
+				case 'nic':
+					streamProfile.nic = Number(this.state.nic.value);
+					break;
+				case 'port':
+					streamProfile[subPropsKey]['port'] = Number(this.state.port.value);
+					break;
+				case 'ipAddr':
+					streamProfile[subPropsKey]['ip'] = this.state[oKey]['value'];
+					break;
+				default:
+					streamProfile[subPropsKey][oKey] = this.state[oKey]['value'];
+					break;
 			}
+
 		});
 		
 		//setup sub values
 		delete data.invalidForm;
 
 
-		streamProfile[subPropsKey] = {...data};
+		streamProfile[subPropsKey] = Object.assign(streamProfile[subPropsKey], {...data});
 
 		if(streamID !== -1) {
 			streamProfile.id = streamID;
@@ -298,7 +463,9 @@ class ConfigurationTasks extends React.Component {
 					tasks : [...data.tasks]
 				}).then(data => {
 					if(data.result === 0) {
-						return Promise.all([checkDevicesTasks(true), checkTasksStatus(true)]).then(() => {
+
+						return Promise.all([checkDevicesTasks(true), checkTasksStatus(true), checkStreamProfiles(task.streamID, true)]).then(() => {
+
 							this.props.renewDevicesTasksDetail(task);
 							this.props.handleBackdrop(false);
 							
@@ -318,6 +485,7 @@ class ConfigurationTasks extends React.Component {
 								},
 								port : {
 									...this.state.port,
+									errMsg : '1~65535',
 									disabled : true
 								},
 								nic : {
@@ -385,6 +553,7 @@ class ConfigurationTasks extends React.Component {
 						},
 						port : {
 							...this.state.port,
+							errMsg : '1~65535',
 							disabled : isFieldDisabled('port', this.state.streamType.value, 0)
 						},
 						nic : {
@@ -403,7 +572,7 @@ class ConfigurationTasks extends React.Component {
 		this.props.addSubTask(this.props.streamInfo.deviceID);
 	}
 	btnDelete(e) {
-		const { t, rowNo, streamInfo } = this.props;
+		const { t, rowNo, streamInfo, taskKey } = this.props;
 		const { deviceID, taskID } = streamInfo;
 
 		this.setState({
@@ -427,7 +596,7 @@ class ConfigurationTasks extends React.Component {
 						}).then(data => {
 							if(data.result === 0) {
 								checkTasksStatus(true).then(()=>{				
-									this.props.deleteSubTask(deviceID, taskID, rowNo);
+									this.props.deleteSubTask(deviceID, taskID, taskKey, rowNo);
 									this.props.handleBackdrop(false);
 								});
 							}else{
@@ -440,7 +609,7 @@ class ConfigurationTasks extends React.Component {
 						});
 						
 					}else{
-						this.props.deleteSubTask(deviceID, taskID, rowNo);
+						this.props.deleteSubTask(deviceID, taskID, taskKey, rowNo);
 						this.props.handleBackdrop(false);
 					}
 
@@ -449,27 +618,65 @@ class ConfigurationTasks extends React.Component {
 		});
 		
 	}
+	getCurrEncodingProfile(streamType) {
+		const { encodeProfiles } = this.props;
+		
+		return encodeProfiles.filter(profile => profile.streamType.includes(streamType) || profile.streamType.includes(0));
+	}
+
+	getDefaultVal(key, streamType) {
+		const { nics, encodeProfiles } = this.props;
+		let encodeProfileID = 0;
+		switch(key) {
+			case 'encodingProfile':
+				// console.log('a,',this.getCurrEncodingProfile()[0]['id']);
+				if(this.getCurrEncodingProfile(streamType)[0]) {
+					encodeProfileID = this.getCurrEncodingProfile(streamType)[0]['id'];
+				}
+				return encodeProfileID;
+			case 'port':
+				return 1234;
+			case 'nic':
+				return nics[0]['id'];
+			default:
+				return '';
+		}
+	}
 	onChangeVal(e, key) {
 		let updateObj = {
 			wasValidated : false
 		};
 		let val = e.target.value;
 
-
 		if(key === 'streamType') {
+			val = Number(val);
+
 			OPTION_FIELD.forEach(oKey => {
 				if(isFieldDisabled(oKey, val, false)) {
 					updateObj[oKey] = {
 						...this.state[oKey],
-						disabled : true
+						disabled : true,
+						value : ''
 					};
 				}else{
 					updateObj[oKey] = {
 						...this.state[oKey],
-						disabled : false
+						disabled : false,
+						value : this.getDefaultVal(oKey, val)
 					};
+
+					if(oKey === 'ipAddr') {
+						updateObj[oKey]['pattern'] = getCheckIpPattern(Number(val));
+					}
 				}
 			});
+
+			updateObj.encodingProfile = {
+				...this.state.encodingProfile,
+				value : this.getDefaultVal('encodingProfile', val)
+			};
+
+
 		}
 
 		updateObj[key] = {
@@ -503,7 +710,7 @@ class ConfigurationTasks extends React.Component {
 		const deviceID = streamInfo.deviceID;
 		const videoInputOptionDOM = this.videoInputOptionDOM(videoInputs, deviceID, selectedSource);
 		const streamTypesDOM = this.streamTypesDOM(STREAM_STYPE);
-		const encodeProfilesDOM = this.encodeProfilesDOM(encodeProfiles);
+		const encodeProfilesDOM = this.encodeProfilesDOM(encodeProfiles, Number(streamType.value), t);
 		const nicsDOM = this.nicsDOM(nics);
 		const isAddRow = (rowNo > 1);
 		const videoInputDOM = disabledType => (videoInputOptionDOM.map(obj => {
@@ -517,13 +724,15 @@ class ConfigurationTasks extends React.Component {
 				}else{
 					return obj;
 				}
+
 			})
 
 		);
 		const rowDOM = (buildRow) => {
 			let dom = [];
 			let selected = videoSelected[buildRow - 1];
-			let disabledType = videoSelected[buildRow%2];
+			// let disabledType = videoSelected[buildRow%2];
+			let disabledType = selectedSource[deviceID][buildRow%2];
 			let isCheck = (videoSelected.length === 0);
 
 			if(buildRow === 1) {
@@ -533,7 +742,7 @@ class ConfigurationTasks extends React.Component {
 								<select className="form-control" onChange={this.cgVideoSource} data-source-row="0" value={ selected || ''} disabled={streamInfo.isStart} required={isCheck}>{ videoInputDOM(disabledType) }</select>
 								<div className="invalid-feedback">{t('msg_not_setup_yet')}</div>
 							</td>);
-					dom.push(<td key="3" style={{width:'21px', paddingTop:'10px'}} className="align-top text-center"><button className={"btn_reversed " + (reverseInputSource ? 'active' : '')} onClick={e => this.changeSourceReversed(e, !reverseInputSource)} ></button></td>);//reverseInputSource
+					dom.push(<td key="3" className="align-top text-center pt_10px_impt w_21px"><button className={"btn_reversed " + (reverseInputSource ? 'active' : '')} onClick={e => this.changeSourceReversed(e, !reverseInputSource)} ></button></td>);//reverseInputSource
 				}else{
 					
 					dom.push(<td key="4" className="align-middle text-center" rowSpan="2">{rowNo}</td>);
@@ -556,18 +765,20 @@ class ConfigurationTasks extends React.Component {
 
 		const subDOM = (streamType) => {
 			// console.log(streamType, typeof streamType);
+			const _streamType = Number(streamType);
 
 			const params = {
 				handleStartStreming: this.handleStartStreming,
 				isStreamingCheck: this.state.isStreamingCheck,
 				streamInfo: {
 					...streamInfo,
-					streamType : streamType
+					profileID: Number(this.state.encodingProfile.value),
+					streamType : _streamType
 				},
 				handleBackdrop: this.props.handleBackdrop,
 				handleAlert: this.props.handleAlert
 			};
-			switch(Number(streamType)) {
+			switch(_streamType) {
 				case 1:
 				case 2:
 				case 3:
@@ -576,10 +787,21 @@ class ConfigurationTasks extends React.Component {
 					return <ConfigurationTcp {...params}></ConfigurationTcp>;
 				case 6:
 					return <ConfigurationRtmp {...params}></ConfigurationRtmp>;
+				case 7:
+					return <ConfigurationHls {...params}></ConfigurationHls>;
+				case 8:
+					return <ConfigurationRtsp {...params}></ConfigurationRtsp>;
+				case 11:
+				case 14:
+					return <ConfigurationUstream {...params}></ConfigurationUstream>;
+				case 12:
+					return <ConfigurationTwitch {...params}></ConfigurationTwitch>;
 				case 13:
 					return <ConfigurationYoutube {...params}></ConfigurationYoutube>;
+				case 15:
+					return <ConfigurationFacebook {...params}></ConfigurationFacebook>;
 				case 51: 
-					return <ConfigurationRecord {...params}></ConfigurationRecord>;
+					return <ConfigurationRecord {...params} encodeProfiles={this.getCurrEncodingProfile(_streamType)}></ConfigurationRecord>;
 				default: 
 					return null;
 
@@ -597,20 +819,20 @@ class ConfigurationTasks extends React.Component {
 						<select className="form-control" disabled={encodingProfile.disabled} value={encodingProfile.value} onChange={e => this.onChangeVal(e, 'encodingProfile')}>{ encodeProfilesDOM }</select>
 					</td>
 					<td className="align-top">
-						<input type="text" className="form-control" disabled={ipAddr.disabled} value={ipAddr.value} onChange={e => this.onChangeVal(e, 'ipAddr')} required={!ipAddr.disabled} />
+						<input type="text" className="form-control" disabled={ipAddr.disabled} value={ipAddr.value} onChange={e => this.onChangeVal(e, 'ipAddr')} required={!ipAddr.disabled} pattern={ipAddr.pattern}/>
 						<div className="invalid-feedback">{t('msg_ip_addr_error')}</div>
 					</td>
 					<td className="align-top">
-						<input type="number" className="form-control" disabled={port.disabled} value={port.value} onChange={e => this.onChangeVal(e, 'port')} required={!port.disabled} min="1" max="65535" />
-						<div className="invalid-feedback">1~65535</div>
+						<input type="number" id={`configPort${deviceID}${rowNo}`} className="form-control" disabled={port.disabled} value={port.value} onChange={e => this.onChangeVal(e, 'port')} required={!port.disabled} min="1" max="65535" />
+						<div className="invalid-feedback">{port.errMsg}</div>
 					</td>
 					<td className="align-top">
 						<select className="form-control" disabled={nic.disabled} value={nic.value} onChange={e => this.onChangeVal(e, 'nic')} >{ nicsDOM }</select>
 					</td>
-					<td className="" style={{width:'21px', paddingTop:'10px'}}>
+					<td className="pt_10px_impt w_21px">
 						<button className={ streamInfo.isStart ? 'btn_stop' : 'btn_start'} onClick={ streamInfo.isStart ? this.btnStop.bind(this) : this.btnStart.bind(this)}></button>
 					</td>
-					<td className="" style={{width:'21px', paddingTop:'10px'}}>
+					<td className="pt_10px_impt w_21px">
 						{
 							isAddRow ? <button className="btn_delete" onClick={ this.btnDelete.bind(this) } disabled={(streamInfo.isStart )}></button> :
 										<button className="btn_add" onClick={ this.btnAdd.bind(this) } disabled={ totalTaskCount >= 2 }></button>
@@ -636,6 +858,6 @@ class ConfigurationTasks extends React.Component {
 
 export default compose(
 	translate('translation'),
-	connect(null, mapDispatchToProps)
+	connect(mapStateToProps, mapDispatchToProps)
 )(ConfigurationTasks);
 

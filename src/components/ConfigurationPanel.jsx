@@ -159,7 +159,7 @@ class HeaderPanel extends React.Component {
 										</h4>
 									</div>
 									<div className="p-2">
-										<figure className="figure" style={{ overflow: 'hidden', height: '92px' }}>
+										<figure className="figure" style={{ overflow: 'hidden', width: '95px', height: '92px' }}>
 											{ preview[device.id] === '' ? <div className="border border-secondary bg-dark" style={{ width: '95px', height: '92px' }}></div> : <img className="figure-img img-fluid" src={preview[device.id]} alt={device.id}/> }
 										</figure>
 									</div>
@@ -173,9 +173,10 @@ class HeaderPanel extends React.Component {
 											if(selectedSource[device.id].indexOf(type) !== -1) {
 												btnClass += ' active';
 											}else{
-												if(selectedSource[otherDeviceID].filter(selectedType => selectedType.match(type)).length > 0) {
+												/* Disable another source
+													if(selectedSource[otherDeviceID].filter(selectedType => selectedType.match(type)).length > 0) {
 													isDisabled = true;
-												}
+												} */
 											}
 
 											return (<div key={device.id + type} className="p-2">

@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import { translate } from "react-i18next";
-import { SET_CONFIG } from '../helper/Services';
+import { SET_CONFIG, LOGOUT } from '../helper/Services';
 import { configActions } from '../action/Config.Actions';
 import { connect } from "react-redux";
 import { compose  } from 'redux';
-import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import i18n from "../i18n";
+import { deleteCookie } from '../helper/helper';
+import { USER } from '../constant/User.Consts';
+
 
 const languageEmu = {
 	'en': 'English',
@@ -31,20 +34,18 @@ class Header extends React.Component {
 		super(props);
 
 		this.state = {
-			language: '',
+			language: languageEmu[props.config.language],
 			collapse: true,
+			dropdownOpen: false,
 			pannelStyle : {}
 		};
 
 		this.changeLang = this.changeLang.bind(this);
 		this.panelCollapse = this.panelCollapse.bind(this);
+		this.toggleDropDown = this.toggleDropDown.bind(this);
 
 	}
 
-	static getDerivedStateFromProps(nextProps, prevState) { //Update init state value relate by props
-		prevState.language = languageEmu[nextProps.config.language];
-		return prevState;
-	}
 
 	changeLang(langCode, lang) {
 
@@ -72,6 +73,20 @@ class Header extends React.Component {
 		});
 
 	}
+	toggleDropDown(e) {
+		this.setState({
+			dropdownOpen : !this.state.dropdownOpen
+		});
+	}
+
+	logout(e) {
+		
+		LOGOUT.fetchData({}, 'POST', false).then(() => {
+			window.name = '';
+			deleteCookie(btoa(USER));
+			window.location.reload();
+		});
+	}
 
 	render() {
 		const { t, children } = this.props;
@@ -88,8 +103,8 @@ class Header extends React.Component {
 					<div className="head_1"></div>
 					<div className="logo"></div>
 					<ul id="menu_config">
-						<li className="btn_menu_language">
-							<UncontrolledDropdown size="sm">
+						<li className="btn_menu_language" onClick={this.toggleDropDown}>
+							<Dropdown size="sm" isOpen={this.state.dropdownOpen} toggle={this.toggleDropDown}>
 								<DropdownToggle tag="span" >{this.state.language}</DropdownToggle>
 								<DropdownMenu className="common-dp-menu"
 									modifiers={{
@@ -109,17 +124,19 @@ class Header extends React.Component {
 								>
 								{dropdownRow}
 								</DropdownMenu>
-							</UncontrolledDropdown>
+							</Dropdown>
 						</li>
-						<li className="btn_menu_logout"><span>{t('msg_logout')}</span></li>
+						<li className="btn_menu_logout" onClick={this.logout}><span>{t('msg_logout')}</span></li>
 					</ul>
+
+
 					<nav id="main_tab">
 						<NavLink exact to="/" className="btn_broadcastlist" activeClassName="active"><span>{t('msg_broadcast_list')}</span></NavLink>
 						<NavLink to="/configuration" className="btn_configuration" activeClassName="active"><span>{t('msg_configuration')}</span></NavLink>
-						<NavLink to="/encoding" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink>
+						<NavLink to="/encoding_profile" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink>
 						<NavLink to="/pip" className="btn_pip" activeClassName="active"><span>{t('msg_pip')}</span></NavLink>
-						<NavLink to="/log" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink>
-						<NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink>
+						{/* <NavLink to="/log_management" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink> */}
+						{/* <NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink> */}
 						<NavLink to="/administration" className="btn_administration" activeClassName="active"><span>{t('msg_administration')}</span></NavLink>
 					</nav>
 				</section>

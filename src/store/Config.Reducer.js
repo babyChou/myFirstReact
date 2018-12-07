@@ -28,7 +28,8 @@ const configReducer = (state = initialState, action) => {
                 config: Object.assign({}, action.config, state.config)
             };
         case LOAD_CONFIG:
-            return { ...state,
+            return { 
+                ...state,
                 config: action.config
             };
         case LOAD_DEVICES_FACILITIES:

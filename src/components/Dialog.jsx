@@ -48,8 +48,9 @@ class Dialog extends React.Component {
 		return e => {
 			if(isFunction(action)) {
 				action();
+			}else{
+				this.props.toggle();
 			}
-			this.props.toggle();
 		};
 	}
 
@@ -59,6 +60,14 @@ class Dialog extends React.Component {
 		const cancelLabel = this.props.cancelLabel || t('msg_cancel');
 		const onOk = this.btnAction(this.props.ok);
 		const onCancel = this.btnAction(this.props.cancel);
+		let diaSize = this.props.size;
+
+		if(diaSize === 'lg') {
+			diaSize = 'modal-lg';
+		}
+		if(diaSize === 'sm') {
+			diaSize = 'modal-sm';
+		}
 
 
 		if(!this.props.isShow) {
@@ -68,12 +77,12 @@ class Dialog extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="modal fade show d-block" >
-					<div className="modal-dialog modal-dialog-centered">
+					<div className={`modal-dialog modal-dialog-centered ${diaSize ? diaSize : ''}`}>
 						
 						<div className="modal-content" >
 							<div className="modal-header text-white">
 								<h6 className="modal-title">{this.props.title}</h6>
-								<button type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								<button type="button" className="close" aria-label="Close" onClick={onCancel}><span aria-hidden="true">&times;</span></button>
 							</div>
 							<div className="modal-body px-4">
 								{ this.props.type !== 'custom' ? this.reminderDOM(this.props.icon) : null }

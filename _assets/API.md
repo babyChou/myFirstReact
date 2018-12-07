@@ -319,13 +319,13 @@ streamType:
 - 51: Record
 
         "record" : {
-            "container":%s, //”flv”,”avi”,”mp4”,”mov”,”ts”,”aac” and “mp3”
-            "storeDevice":%s, //”nas”,”sd” and “usb”
+            "container":%s, //"flv","avi","mp4","mov","ts","aac" and "mp3"
+            "storeDevice":%s, //"nas","sd" and “usb"
             "recordPath":%s, // --> \\ip\location 
             "filePrefix":%s,
             "username":%s, // --> recordUserName
             "password":%s, // --> recordPassword
-            "segmentDuration":%s
+            "segmentDuration": %d //minutes
         },
 
 - 21: TS over Http
@@ -746,20 +746,20 @@ session, deviceID, taskID = 0 , list all device tasks
 
 |     Name    |                     Description                     |
 |-------------|-----------------------------------------------------|
-| type        | the encoding type of the profile                    |
+| x type        | the encoding type of the profile                    |
 | streamType  | Filter by specific protocol."TCP,RTMP…"             |
 | category    | Box define group.                                   |
 | name        | Name of this profile                                |
 | width       | the width of the video resolution                   |
 | height      | the height of the video resolution                  |
-| bitrate     | the bitrate of the video encoding, its unit is kbps |
+| bitrate     | the bitrate of the video encoding, its unit is kbps  2~102400 |
 | profile     | the profile type of the video encoding              |
 | level       | the level of the video encoding                     |
 | encodeMode  | the mode of the video encoding                      |
 | entropyMode | the Entropy Mode of the video encoding              |
-| frame       | Value = 6~63                                        |
+| frame       | Keyframe Value = 1~65536                                         |
+| frameRate   | 30,50,60                                         |
 | bframeNum   | the B frame number of the video encoding            |
-| nullPacket  | If value equal on. Bitrate keep height              |
 | outputRatio |                                                     |
 | audioInfo   | If is exist mean audio only                         |
 | channel     | the channel number for audio encoding               |
@@ -767,11 +767,14 @@ session, deviceID, taskID = 0 , list all device tasks
 | bitrate     | the bitrate for audio encoding, its unit is bps     |
 | encodeMode  | the mode of the video encoding                      |
 
-- type :
-    - 1: H.264/AAC
-    - 2: H264/MP3
-    - 3: AAC Only
-    - 4: MP3
+| container | "flv","avi","mp4","mov","ts","aac","mp3" |
+| videoType | h264,h265,mjpeg                          |
+| audioType | mp3,aac-lc                               |
+
+
+
+- videoType ['h264','h265','mjpeg']
+- audioType ['aac','mp3']
 
 - category: 
     - 0: the custom profile (id from 1001 ~ )
@@ -788,6 +791,15 @@ session, deviceID, taskID = 0 , list all device tasks
     - "high"
     - "main"
 
+- bitrate : 2~102400 (video)
+
+- frame : 1~65536
+
+- entropyMode: 
+  - CAVLC
+  - CABAC
+
+- bframeNum: 0-3
 - level:
     - "1"
     - "1.1"
@@ -808,19 +820,15 @@ session, deviceID, taskID = 0 , list all device tasks
 - encodeMode:
     - "cbr"
     - "vbr"
-    - "cbr_bitrate_first"
-    - "cbr_quality_first"
+    - "avbr_fixqp"
 
 - entropyMode:
     - "cavlc"
     - "cabac"
 
-- nullPacket:
-    - "on"
-    - "off
 
 - outputRatio:
-    - 0: source type
+    - 0: original ratio 
     - 1: 16:9
     - 2: 4:3
 
@@ -832,8 +840,16 @@ session, deviceID, taskID = 0 , list all device tasks
     - "aac"
     - "mp3"
 
+- bitrate : (audio)
+  - AACLC:
+    - Mono: 48000, 64000, 96000, 128000, 256000
+    - Stereo : 48000, 64000, 96000, 128000, 256000,320000
+
+  - MP3
+    - Stereo : 32000, 40000,48000, 56000,64000,80000,96000,112000,128000,160000,192000,224000,256000,320000
+
 ### 5.1 getEncodeProfileList
-* URL: http://HostName:Port/api/encodProfileList
+* URL: http://HostName:Port/api/encodeProfileList
 * Method: GET
 * Response
 
@@ -841,13 +857,17 @@ session, deviceID, taskID = 0 , list all device tasks
 {
 		"result":%d,
 		"profiles": 
-			[{
-				"id": %d,
-				"type":%d,
-				"streamType": [%d,%d…],
-				"category ": %d,
-				"name ": "%s"
-			}]
+			[
+        {
+            "id":1,
+            "videoType":"h265",
+            "audioType":"aac",
+            "container":["mp4","mov","ts","aac"],
+            "streamType":[1,2,3,6,7,8,11,13,14,51,106],
+            "category":1,
+            "name":"H.265 Main Profile VBR 1920x1080 [11.192 Mbps]"
+        }
+      ]
 }
 
 ```
@@ -872,7 +892,9 @@ Video
     "profile": 
     {
         "id": %d,
-        "type":%d,
+        "videoType":%d,
+        "audioType":%d,
+        "container": [%d,%d…],
         "streamType": [%d,%d…],
         "category ": %d,
         "name ": "%s",
@@ -882,13 +904,13 @@ Video
         "videoInfo" : {
             "width":%d,
             "height":%d,
-            "format":%d,
             "bitrate":%d,
             "profile":%d,
-            "level ":%d,
+            "level ":%s,
             "encodeMode":%d,
             "entropyMode":%d,
-            "frame":%d,
+            "frame":%d, //keyframe
+            "frameRate":%d,
             "bframeNum":%d,
             "outputRatio":%d,
             "nullPacket":%s
@@ -897,8 +919,7 @@ Video
             "channel":%d,
             "sampleRate":%d,
             "bitrate":%d,
-            "encodeMode":%d,
-            "nullPacket":%s
+            "encodeMode":%d
         }
     }
 }
@@ -912,7 +933,7 @@ Video Only
     "profile": 
     {
         "id": %d,
-        "type":%d,
+        "VideoType":%d,
         "streamType": [%d,%d…],
         "category ": %d,
         "name ": "%s",
@@ -932,13 +953,13 @@ Audio Only
     "profile": 
     {
         "id": %d,
-        "type":%d,
         "streamType": [%d,%d…],
         "category ": %d,
         "name ": "%s",
         "dropFrameMode":%d,
         "delayTime":%d,
         "lastFrameMode:%d,
+        "audioType" : "%s"
         "audioInfo" : { ... }
     }
 }
@@ -948,7 +969,32 @@ Audio Only
 
 * URL: http://HostName:Port/api/encodeProfile
 * Method: POST
-
+```
+{
+    "profile": {
+        "audioInfo": {
+            "bitrate": 64000,
+            "channel": "stereo"
+        },
+        "audioType": "aac",
+        "name": "asdasd",
+        "videoInfo": {
+            "bframeNum": 0,
+            "bitrate": 17500,
+            "encodeMode": "avbr_fixqp",
+            "entropyMode": "cabac",
+            "frame": 28,
+            "frameRate": 30,
+            "gopMode": "normalp",
+            "height": 720,
+            "outputRatio": 0,
+            "profile": "high",
+            "width": 1280
+        },
+        "videoType": "h264"
+    }
+}
+```
 ### 5.4 modifyEncodeProfile
 
 * URL: http://HostName:Port/api/encodeProfile
@@ -974,8 +1020,8 @@ Audio Only
 
 |   Name   |  Type  |                  Description                  |
 |----------|--------|-----------------------------------------------|
-| type     | int    | 6 RTMP, 14 CDNvideo, 106 RTMP CMS, 11:Ustream |
-| userName | String | Login username                                |
+| streamType     | int    | 6  RTMP, 14 CDNvideo, 106 RTMP CMS, 11:Ustream |
+| username | String | Login username                                |
 | password | String | Login password                                |
 
 ### 7.2 authenticateOauth
@@ -986,6 +1032,7 @@ Audio Only
 
 | Name |  Type  |    Description    |
 |------|--------|-------------------|
+| streamType   | int | 12:twitch, 13:youtube, 15:facebook |
 | code | String | Authenticate code |
 
 * Response 
@@ -1004,7 +1051,7 @@ Audio Only
 
 | Name | Type |       Description       |
 |------|------|-------------------------|
-| type | int  | 14 CDNvideo, 11:Ustream |
+| streamType | int  | 14 CDNvideo, 11:Ustream |streamTy
 
 
 * Response:
@@ -1012,7 +1059,7 @@ Audio Only
 {
     "result":%d,
     "channelList":{
-        "type":%d,
+        "streamType":%d,//streamType
         "channels":[ 
             {
                "channelID":%d,

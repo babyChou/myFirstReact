@@ -1,12 +1,16 @@
-@import 'custom_variables';
+// @import 'custom_variables';
 //
-// @import 'open-iconic/font/css/open-iconic-bootstrap.scss';
-@import 'ionicons/dist/scss/ionicons.scss';
+
+
 ///
-@import 'bootstrap/scss/bootstrap';
+// @import 'bootstrap/scss/bootstrap';
 @import 'mixins';
 @import 'custom_bootstrap';
+@import 'ionicons/dist/scss/ionicons.scss';
+// @import 'open-iconic/font/css/open-iconic-bootstrap.scss';
 
+@import 'form';
+@import 'utilities';
 @import 'tag';
 @import 'inputs';
 @import 'icon';
@@ -29,4 +33,19 @@ body{
     justify-content: center;
     align-items: center;
 }
+
+.container_wrapper{
+	min-width : 1362px;
+}
+
+
+
+.overflow-wrap {
+  overflow-wrap: break-word;
+}
+
+.word-break {
+  word-break: break-all;
+}
+
 

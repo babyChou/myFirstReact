@@ -42,29 +42,30 @@ class Admin extends React.Component {
 		const { t, config } = this.props;
 
 		return (
-			<div className="">
+			<div className="container_wrapper">
 				<Header noPanel={true}></Header>
 				<div className="m-3 row">
-					<div className="col-md-6">
+					<div className="col-6">
 						<WindowModal title={t('msg_basic_information')} >
 							<fieldset className="">
-								<div className="form-group row">
-									<label htmlFor="msg_input_username_old" className="col-md-3 col-form-label">{t('msg_device_name')}</label>
-									<div className="col">
+								<div className="d-flex align-items-center">
+									<div className="w-20">{t('msg_device_name')}</div>
+									<div className="">
 										<span className="align-middle">{ config.deviceName }</span>
 										<button className="btn_rename_edit d-inline-block align-middle mx-3"></button>
 									</div>
 								</div>
-								<div className="form-group row">
-									<label htmlFor="msg_input_username_old" className="col-md-3 col-form-label">{t('msg_firmware_version')}</label>
-									<div className="col-md-9">{config.version}</div>
+								<div className="d-flex align-items-center mt-3">
+									<div className="w-20">{t('msg_firmware_version')}</div>
+									<div className="">{ config.version}</div>
 								</div>
 							</fieldset>
 						</WindowModal>
 						<WindowModal title={t('msg_firmware_title')}>
 							<AdminFirmware></AdminFirmware>
 						</WindowModal>
-						<WindowModal title={t('msg_backup_restore_sitting')} footer={<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right">{t("msg_submit")}</Btn>}>
+
+						{/* <WindowModal title={t('msg_backup_restore_sitting')} footer={<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right">{t("msg_submit")}</Btn>}>
 							<fieldset className="">
 								<div className="form-group row">								
 									<div className="col-md-2">
@@ -116,10 +117,13 @@ class Admin extends React.Component {
 								</div>
 								
 							</fieldset>
-						</WindowModal>
+						</WindowModal> */}
 					</div>
-					<div className="col-md-6">
-						<WindowModal title={t('msg_cms_server_settings')} footer={<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right">{t("msg_enable")}</Btn>}>
+					<div className="col-6">
+						<WindowModal title={t('msg_network_setting')}>
+							<AdminNetwork></AdminNetwork>
+						</WindowModal>
+						{/* <WindowModal title={t('msg_cms_server_settings')} footer={<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right">{t("msg_enable")}</Btn>}>
 							<div className="form-group">
 								{t('msg_cms_server_enable')}
 							</div>
@@ -133,9 +137,7 @@ class Admin extends React.Component {
 								</div>
 							</fieldset>
 						</WindowModal>
-						<WindowModal title={t('msg_network_setting')}>
-							<AdminNetwork></AdminNetwork>
-						</WindowModal>
+					
 						
 						<WindowModal title={t('msg_sap_group_setting')} >
 							<fieldset >
@@ -147,7 +149,7 @@ class Admin extends React.Component {
 									</div>
 								</div>
 							</fieldset>
-						</WindowModal>
+						</WindowModal> */}
 					</div>
 				</div>
 

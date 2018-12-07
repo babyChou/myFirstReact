@@ -59,7 +59,7 @@ class ConfigurationRecord extends React.Component {
 
 		this.state = {
 			storeDevice: storeDevice,
-			container: retrieveFromProp('container', objProps) || 'mp4',
+			container: retrieveFromProp('container', objProps) || this.getFirstContaner(props.encodeProfiles, props.streamInfo.profileID),
 			ip: {
 				value:  getValFormRecordPath('ip', recordPath),
 				invalid: false,
@@ -103,9 +103,7 @@ class ConfigurationRecord extends React.Component {
 		this.editConnection = this.editConnection.bind(this);
 
 	}
-	componentDidMount() {
-		
-	}
+	componentDidMount() {}
 	componentWillUnmount() {
 
 	}
@@ -159,6 +157,16 @@ class ConfigurationRecord extends React.Component {
 			this.setState(updateState);
 			this.props.handleStartStreming(passData);
 		}
+
+		if(this.props.streamInfo.profileID !== prevProps.streamInfo.profileID) {
+			this.setState({
+				container : this.getFirstContaner(this.props.encodeProfiles, this.props.streamInfo.profileID)
+			});
+		}
+
+	}
+	getFirstContaner(profiles, profileID) {
+		return profiles.find(profile => profile.id === profileID).container[0];
 	}
 	onChangeVal(e, key) {
 
@@ -273,15 +281,16 @@ class ConfigurationRecord extends React.Component {
 	}
 
 	render() {
-		const { t, streamInfo } = this.props;
+		const { t, streamInfo, encodeProfiles } = this.props;
+		const profileID = streamInfo.profileID
 		const { isEditing, storeDevice, container, ip, folderPath, hour, min, username, password, connectionMsg } = this.state;
 
 		return (
 			<fieldset className="container-fluid" disabled={streamInfo.isStart}>
 				<div className="mb-2 row align-items-center">
-					<div className="col-lg-2">{t('msg_store_device')}</div>
-					<div className="col-lg-3">
-						<select className="form-control" value={storeDevice} onChange={e => this.onChangeVal(e, 'storeDevice')} >
+					<div className="col-2 col-lg-2 text-capitalize">{t('msg_store_device')}</div>
+					<div className="col d-flex">
+						<select className="form-control col-3" value={storeDevice} onChange={e => this.onChangeVal(e, 'storeDevice')} >
 							{
 								Object.entries(RECORD_STORE_DEVICE).map(item => <option key={item[0]} value={item[0]}>{item[1]}</option>)
 							}
@@ -289,77 +298,86 @@ class ConfigurationRecord extends React.Component {
 					</div>
 				</div>
 				<div className="mb-2 row align-items-center">
-					<div className="col-lg-2">{t('msg_backup_path')}</div>
-					<div className="col-lg-3">
-						<input className="form-control" type="text" value={this.getRenderPath()} onChange={e => this.onChangeVal(e, '')} readOnly={true}/>
+					<div className="col-2 col-lg-2">{t('msg_backup_path')}</div>
+					<div className="col d-flex">
+						<input className="form-control col-3" type="text" value={this.getRenderPath()} onChange={e => this.onChangeVal(e, '')} readOnly={true}/>
 					</div>
 				</div>
 				<div className="mb-2 row align-items-center">
-					<div className="col-lg-2">{t('msg_video_format')}</div>
-					<div className="col-lg-3">
-						<select className="form-control" value={container} onChange={e => this.onChangeVal(e, 'container')} >
+					<div className="col-2 col-lg-2">{t('msg_format')}</div>
+					<div className="col d-flex">
+						<select className="form-control col-3" value={container} onChange={e => this.onChangeVal(e, 'container')} >
 							{
-								Object.entries(RECORD_CONTAINER).map(item => <option key={item[0]} value={item[0]}>{item[1]}</option>)
+								Object.entries(RECORD_CONTAINER)
+								.filter(item => {
+									const container = encodeProfiles.find(profile => profile.id === profileID).container;
+									return container.includes(item[0]);
+								})
+								.map(item => <option key={item[0]} value={item[0]}>{item[1]}</option>)
 							}
 						</select>
 					</div>
 				</div>
 				<div className="mb-2 row align-items-center">
-					<div className="col-lg-2">{t('msg_file_duration')}</div>
-					<div className="col-lg-3 d-flex align-items-center ">
-						<input className={`form-control ${( hour.invalid ? 'is-invalid' : '')}`} type="number" value={hour.value} onChange={e => this.onChangeVal(e, 'hour')} />
-						<span className={'px-2 ' + ( hour.invalid ? 'text-danger' : '')}>{t('msg_hour')}</span>
-						<input className={`form-control ${( min.invalid ? 'is-invalid' : '')}`} type="number" value={min.value} onChange={e => this.onChangeVal(e, 'min')} />
-						<span className={'px-2 ' + ( hour.invalid ? 'text-danger' : '')}>{t('msg_minutes')}</span>
+					<div className="col-2 col-lg-2">{t('msg_file_duration')}</div>
+					<div className="col row align-items-center">
+						<div className="col-3 d-flex mr-4 align-items-center">
+							<input className={`form-control w-35 ${( hour.invalid ? 'is-invalid' : '')}`} type="number" value={hour.value} onChange={e => this.onChangeVal(e, 'hour')} />
+							<span className={'px-2 ' + ( hour.invalid ? 'text-danger' : '')}>{t('msg_hour')}</span>
+							<input className={`form-control w-35 ${( min.invalid ? 'is-invalid' : '')}`} type="number" value={min.value} onChange={e => this.onChangeVal(e, 'min')} />
+							<span className={'px-2 ' + ( hour.invalid ? 'text-danger' : '')}>{t('msg_minutes')}</span>
+						</div>
+						<span className={( hour.invalid ? 'text-danger' : 'text-secondary')}>( {MIN_RECORD_DURATION +' '+ t('msg_minutes')} ~ 2 {t('msg_hour')} )</span>
 					</div>
-					<div className="col-lg-2 d-flex align-items-center"><span className={( hour.invalid ? 'text-danger' : 'text-secondary')}>( {MIN_RECORD_DURATION +' '+ t('msg_minutes')} ~ 2 {t('msg_hour')} )</span></div>
+					{/* <div className="col-2 col-lg-2 d-flex align-items-center"><span className={( hour.invalid ? 'text-danger' : 'text-secondary')}>( {MIN_RECORD_DURATION +' '+ t('msg_minutes')} ~ 2 {t('msg_hour')} )</span></div> */}
 				</div>
 
 				<fieldset className={storeDevice !== 'nas' ? 'd-none' : ''} disabled={streamInfo.isStart || !isEditing}>
 					<div className="mb-2 mt-4 row">
-						<div className="col-lg-2">{t('msg_IP_addr')}</div>
-						<div className="col-lg-3">
-							<input className={`form-control ${( ip.invalid ? 'is-invalid' : '')}`} type="text" value={ip.value} onChange={e => this.onChangeVal(e, 'ip')} ref={this.ipDOM} pattern={regxRecordIpStr} required={isEditing}/>
-						</div>
-						<div className="col-lg-2">
-							<span className={( ip.invalid ? 'text-danger' : 'text-secondary')}>{t('msg_example') + ' ' + t('msg_tip_record_IP')}</span>
-						</div>
-					</div>
-					<div className="mb-2 row align-items-center">
-						<div className="col-lg-2">{t('msg_backup_path')}</div>
-						<div className="col-lg-3">
-							<input className={`form-control ${( folderPath.invalid ? 'is-invalid' : '')}`} type="text" value={folderPath.value} onChange={e => this.onChangeVal(e, 'folderPath')} ref={this.pathDOM} pattern={regxFolderPathStr} required={isEditing}/>
-						</div>
-						<div className="col-lg-2">
-							<span className={( folderPath.invalid ? 'text-danger' : 'text-secondary')}>{t('msg_example') + ' ' + t('msg_tip_record_path')}</span>
+						<div className="col-2 col-lg-2">{t('msg_IP_addr')}</div>
+						<div className="col d-flex align-items-center">
+							<input className={`form-control col-3 ${( ip.invalid ? 'is-invalid' : '')}`} type="text" value={ip.value} onChange={e => this.onChangeVal(e, 'ip')} ref={this.ipDOM} pattern={regxRecordIpStr} required={isEditing}/>
+							<div className="valid-inline-feedback col">{t('msg_example_dot') + ' ' + t('msg_tip_record_IP')}</div>
+							<div className="invalid-inline-feedback col">{t('msg_example_dot') + ' ' + t('msg_tip_record_IP')}</div>
 						</div>
 					</div>
 					<div className="mb-2 row align-items-center">
-						<div className="col-lg-2">{t('msg_user_name')}</div>
-						<div className="col-lg-3">
-							<input className="form-control" type="text" value={username.value} onChange={e => this.onChangeVal(e, 'username')} />
+						<div className="col-2 col-lg-2">{t('msg_backup_path')}</div>
+						<div className="col d-flex align-items-center">
+							<input className={`form-control col-3 ${( folderPath.invalid ? 'is-invalid' : '')}`} type="text" value={folderPath.value} onChange={e => this.onChangeVal(e, 'folderPath')} ref={this.pathDOM} pattern={regxFolderPathStr} required={isEditing}/>
+							<div className="valid-inline-feedback col">{t('msg_example_dot') + ' ' + t('msg_tip_record_path')}</div>
+							<div className="invalid-inline-feedback col">{t('msg_example_dot') + ' ' + t('msg_tip_record_path')}</div>
 						</div>
 					</div>
 					<div className="mb-2 row align-items-center">
-						<div className="col-lg-2">{t('msg_backup_password')}</div>
-						<div className="col-lg-3">
-							<input className="form-control" type="text" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
+						<div className="col-2 col-lg-2">{t('msg_user_name')}</div>
+						<div className="col d-flex">
+							<input className="form-control col-3" type="text" value={username.value} onChange={e => this.onChangeVal(e, 'username')} />
+						</div>
+					</div>
+					<div className="mb-2 row align-items-center">
+						<div className="col-2 col-lg-2">{t('msg_backup_password')}</div>
+						<div className="col d-flex">
+							<input className="form-control col-3" type="text" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
 						</div>
 						
 					</div>
 					<div className="mb-2 row align-items-center">
-						<div className="offset-2 col-lg-2">
+						<div className="offset-2 col-2 col-lg-2">
 							<span className='text-danger'>{connectionMsg}</span>
 						</div>
 					</div>
 				</fieldset>
 
 				<div className={'mb-2 row align-items-center ' + (storeDevice !== 'nas' ? 'd-none' : '')}>
-					<div className="col-lg-5">
-						{
-							isEditing ? <Btn type="submit" onClick={this.checkConnection} className="float-right mt-1">{t("msg_btn_connect")}</Btn>
-							: <Btn type="submit" onClick={this.editConnection} className="float-right mt-1">{t("msg_edit")}</Btn>
-						}
+					<div className="col-2"></div>
+					<div className="col">
+						<div className="col-3 px-0">						
+							{
+								isEditing ? <Btn type="submit" onClick={this.checkConnection} className="float-right mt-1">{t("msg_btn_connect")}</Btn>
+								: <Btn type="submit" onClick={this.editConnection} className="float-right mt-1">{t("msg_edit")}</Btn>
+							}
+						</div>
 						
 					</div>
 				</div>

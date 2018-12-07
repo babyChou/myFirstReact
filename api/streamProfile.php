@@ -59,14 +59,17 @@ switch ($method) {
             exit();
         }
 
-        foreach ($device as $k => $val) {
+        $setArr = new stdClass();
+
+        foreach ($profile as $k => $val) {
             if(is_object($val) || is_array($val)) {
                 // $setArr[$k] = $val;
                  foreach ($val as $k2 => $val2) {
-                    $setArr[$k.'.'.$k2] = $val2;
+                    // $setArr[$k.'.'.$k2] = $val2;
+                    $setArr->$k->$k2 = $val2;
                  }
             }else{
-                $setArr[$k] = $val;
+                $setArr->$k = $val;
             }
 
         }
@@ -92,9 +95,11 @@ switch ($method) {
             exit();
         }
 
-        $document = $collection->findOneAndUpdate(
+
+
+        $document = $collection->findOneAndReplace(
             ['id' => $profile['id']],
-            ['$set' => $profile],
+            $profile,
             ['upsert' => true]
         );
 

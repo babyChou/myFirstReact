@@ -9,6 +9,7 @@ import { LOGIN } from '../helper/Services';
 import PrivateRoute from './PrivateRoute';
 import BroadcastList from './BroadcastList';
 import Configuration from './Configuration';
+import EncodingProfile from './EncodingProfile';
 import Pip from './Pip';
 import Admin from './Admin';
 import Login from './Login';
@@ -44,6 +45,9 @@ class App extends React.Component {
 						<PrivateRoute path="/configuration" component={Configuration} authentication={authentication}/>
 						<PrivateRoute path="/pip" component={Pip} authentication={authentication}/>
 						<PrivateRoute path="/administration" component={Admin} authentication={authentication}/>
+						<PrivateRoute path="/encoding_profile" component={EncodingProfile} authentication={authentication}/>
+						<PrivateRoute path="/log_management" component={EncodingProfile} authentication={authentication}/>
+						<PrivateRoute path="/filebrowser" component={EncodingProfile} authentication={authentication}/>
 						<Redirect from="*" to={"/configuration"} />
 					</Switch>
 				</Router>) ;

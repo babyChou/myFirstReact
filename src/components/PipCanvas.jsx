@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Stage, Layer, Rect, Text } from 'react-konva';
+import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 
 export default class PipCanvas extends React.Component {
 	constructor(props) {
@@ -38,7 +38,7 @@ export default class PipCanvas extends React.Component {
 		return (<React.Fragment>
 					<Rect x={1} y={1} width={width - borderW} height={height - borderW} strokeWidth={borderW} stroke="#FFF" />
 					<Text x={width/2 - 5} y={height/2 - 10} text="1" fill="#FFF" fontSize="20"></Text>
-					<Rect x={mainX} y={mainY} width={mainW} height={mainH} strokeWidth={borderW} stroke="#FFF" 
+					<Rect x={mainX} y={mainY} width={mainW + borderW} height={mainH + borderW} strokeWidth={borderW} stroke="#FFF" 
 						fillLinearGradientStartPoint={{ x: mainW/2, y: -(10*sizeRadio) }}
 			            fillLinearGradientEndPoint={{ x: mainW/2, y: mainH + 15 }}
 			            fillLinearGradientColorStops={[0, 'red', 1, 'yellow']}
@@ -54,6 +54,10 @@ export default class PipCanvas extends React.Component {
 		let x1 = 2, y1 = 2, w1, h1, txtX1, txtY1;
 		let x2 = 2 , y2 = 2,w2, h2, txtX2, txtY2;
 		let fontSize1 = 20, fontSize2 = 20;
+		let cropW = 0;
+		let cropH = 0;
+		let cropX = 0;
+		let cropY = 0;
 		let margin = 0;
 
 		if(keepRadio) {
@@ -68,16 +72,23 @@ export default class PipCanvas extends React.Component {
 
 			if(h1 > h2) {
 				margin = (height - h1)/2;
-				y1 = margin;
-				y2 = (h1 - h2) + margin;
+				y1 = cropY = margin;
+				cropX = x2;
+				cropW = w2;
+				cropH = h1;
+				// y2 = (h1 - h2) + margin;
+				y2 = height/2 - h2/2;
 				
 			}else{
 				margin = (height - h2)/2;
-				y1 = (h2 - h1) + margin;
-				y2 = margin;
+				// y1 = (h2 - h1) + margin;
+				y1 = height/2 - h1/2;
+				cropX = x1;
+				cropW = w1;
+				cropH = h2;
+				y2 = cropY = margin;
 				
 			}
-
 
 			txtX1 = (x1 + (w1/2)) - (3*sizeRadio1);
 			txtY1 = (y1 + (h1/2)) - (10*sizeRadio1);
@@ -101,13 +112,19 @@ export default class PipCanvas extends React.Component {
 		
 		return (<React.Fragment>
 					<Rect x="2" y="2" width={width - borderW} height={height - borderW} strokeWidth={borderW} stroke="#FFF" />
+					<Line x={2} y={cropY + borderW} strokeWidth={borderW} points={[0, 0, width - borderW , 0]}  stroke="#FFF" />
+					<Line x={2} y={cropY + Math.max(h1, h2) - borderW} strokeWidth={borderW} points={[0, 0, width - borderW , 0]}  stroke="#FFF" />
+					{/* <Rect x={cropX} y={cropY + borderW} width={cropW} height={cropH - borderW*2} strokeWidth={borderW} stroke="#FFF" /> */}
+
 					<Rect x={x1} y={y1} width={w1 - borderW} height={h1 - borderW*2} strokeWidth={borderW} stroke="#FFF" />
 					
-					<Rect x={x2} y={y2} width={w2 - borderW} height={h2 - borderW*2} strokeWidth={borderW} stroke="#FFF" 
+					<Rect x={x2} y={y2} width={w2 - borderW/2} height={h2 - borderW*2} strokeWidth={borderW} stroke="#FFF" 
 						fillLinearGradientStartPoint={{ x: w2/2, y: - (10*sizeRadio) }}
 			            fillLinearGradientEndPoint={{ x: w2/2, y: h2 + 15 }}
 			            fillLinearGradientColorStops={[0, 'red', 1, 'yellow']}
 					/>
+
+					
 					<Text x={txtX1} y={txtY1} text="1" fill="#FFF" fontSize={fontSize1}></Text>
 					<Text x={txtX2} y={txtY2} text="2" fill="#FFF" fontSize={fontSize2}></Text>
 				</React.Fragment>);

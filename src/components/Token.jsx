@@ -1,16 +1,29 @@
 import * as React from 'react';
-import WindowModal from "./WindowModal";
+import i18n from '../i18n';
+import { Alert } from 'reactstrap';
+
+function getUrlVars(uri)
+{
+        var vars = {}, hash;
+        var hashes = uri.slice(uri.indexOf('?') + 1).split('&');
+        for(var i = 0; i < hashes.length; i++)
+        {
+                hash = hashes[i].split('=');
+                vars[hash[0]] = hash[1];                 
+        }
+        return vars;
+}
+
+
 
 const Token = (props) => {
-	const uri = new URL(window.location.href);
+	const urlVars = getUrlVars(window.location.href);
 
-	// console.log(uri.searchParams.get('code'));
 	window.addEventListener('message', e => {
 		if(e.data.key) {
-			
 			e.source.postMessage({
 				key : e.data.key,
-				code : uri.searchParams.get('code')
+				...urlVars
 			},  e.origin);
 			
 		}
@@ -18,14 +31,16 @@ const Token = (props) => {
 	}, false);
 
 	return (
-		<div className="d-flex justify-content-center m-4">
-			<div className="w-50">			
-				<WindowModal title="Login Success">
-					<h3>Login Success</h3>
-				</WindowModal>
-			</div>
-		</div>
-		);
+
+		<Alert className="m-5">
+			<h3>{i18n.t('translation:msg_success')}</h3>
+			<pre>
+			{
+				JSON.stringify(urlVars, null, 2)
+			}
+			</pre>
+		</Alert>
+	);
 };
 
 export default Token;

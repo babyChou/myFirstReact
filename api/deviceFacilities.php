@@ -10,7 +10,7 @@ header('Content-Type: application/json');
             {
                 "id":1,
                 "videoInput":["sdi1","sdi2", "hdmi1","hdmi2"],
-                "audioInput": [ "hdmi1", "hdmi2"],
+                "audioInput": [ "hdmi1", "hdmi2","3.5mm"],
                 "audioMix":true,
                 "mixInput": ["xlr", "3.5mm"]
             },

@@ -41,7 +41,8 @@ class ConfigurationYoutube extends React.Component {
 				value: retrieveFromProp('tag', objProps),
 				invalid: false,
 				errMsg: ''
-			}
+			},
+			loginErrMsg : ''
 		};
 
 		this.postKey = randomID();
@@ -61,7 +62,8 @@ class ConfigurationYoutube extends React.Component {
 			this.props.handleBackdrop(true);
 
 			AUTHENTICATE_OAUTH.fetchData({
-				code : e.data.code
+				code : e.data.code,
+				streamType : 13
 			}).then(data => {
 				if(data.result === 0) {
 					this.setState({
@@ -73,7 +75,9 @@ class ConfigurationYoutube extends React.Component {
 			});
 
 			if(this.popup) {
-				this.popup.close();
+				setTimeout(()=>{
+					this.popup.close();
+				}, 300);
 				clearInterval(this.timer);
 			}
 		}, false);
@@ -84,12 +88,12 @@ class ConfigurationYoutube extends React.Component {
 	componentDidUpdate(prevProps, prevState) {
 		if(this.props.isStreamingCheck) {
 
-			const passData = {
+			let passData = {
 				userID : this.state.userID,
 				title : this.state.title.value,
 				description : this.state.description.value,
 				privacy : this.state.privacy.value,
-				tag : this.state.tag.value,
+				tag : this.state.tag.value
 			};
 
 			let updateState = {
@@ -100,8 +104,15 @@ class ConfigurationYoutube extends React.Component {
 				description : {
 					...this.state.description,
 					invalid : (this.state.description.value.length === 0 || this.state.description.value.length > 5000)
-				}
+				},
+				loginErrMsg : ''
 			};
+
+			if(this.state.userID === '' || !this.state.userID) {
+				passData.invalidForm = true;
+				updateState.loginErrMsg = this.props.t('msg_please_login');
+			}
+
 
 			this.setState(updateState);
 			this.props.handleStartStreming(passData);
@@ -137,7 +148,8 @@ class ConfigurationYoutube extends React.Component {
 			streamType : 13
 		}).then(() => {
 			this.setState({
-				userID : null
+				userID : null,
+				loginErrMsg : ''
 			});
 		});
 	}
@@ -157,34 +169,34 @@ class ConfigurationYoutube extends React.Component {
 	}
 	render() {
 		const { t, streamInfo } = this.props;
-		const { userID, title, description, privacy, tag } = this.state;
+		const { userID, title, description, privacy, tag, loginErrMsg } = this.state;
 
 		return (
 			userID ?
 			<fieldset className="container-fluid" disabled={streamInfo.isStart}>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_title')}</div>
-					<div className="col-lg-2">
+					<div className="col-2 col-xl-2">{t('msg_title')}</div>
+					<div className="col-3 col-xl-2">
 						<input className="form-control" type="text" value={title.value} onChange={e => this.onChangeVal(e, 'title')} required maxLength="150"/>
 						<small className={( title.invalid ? 'text-danger' : 'text-secondary')}>({title.textLength}/150)</small>
 					</div>
 					
 				</div>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_description')}</div>
-					<div className="col-lg-2"><textarea className="form-control" type="text" value={description.value} onChange={e => this.onChangeVal(e, 'description')} required maxLength="5000"></textarea>
+					<div className="col-2 col-xl-2">{t('msg_description')}</div>
+					<div className="col-3 col-xl-2"><textarea className="form-control" type="text" value={description.value} onChange={e => this.onChangeVal(e, 'description')} required maxLength="5000"></textarea>
 						<small className={( description.invalid ? 'text-danger' : 'text-secondary')}>({description.textLength}/5000)</small>
 					</div>
 				</div>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_tag')}</div>
-					<div className="col-lg-2">
+					<div className="col-2 col-xl-2">{t('msg_tag')}</div>
+					<div className="col-3 col-xl-2">
 						<Tag value={tag.value} onChange={tag => this.onChangeVal({target:{value:tag}}, 'tag')} disabled={streamInfo.isStart}></Tag>
 					</div>
 				</div>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_privacy')}</div>
-					<div className="col-lg-2">
+					<div className="col-2 col-xl-2">{t('msg_privacy')}</div>
+					<div className="col-3 col-xl-2">
 						<select className="form-control" value={privacy.value} onChange={e => this.onChangeVal(e, 'privacy')} >
 							<option value="unlisted">{t('msg_privacy_unlisted')}</option>
 							<option value="private">{t('msg_privacy_private')}</option>
@@ -193,12 +205,16 @@ class ConfigurationYoutube extends React.Component {
 					</div>
 				</div>
 				<div className="mb-2 mt-4 row">
-					<div className="col-lg-4">
-						<button className="btn btn-outline-danger float-right" onClick={this.logout}><i className="icon icon-md ion-logo-google mr-2 align-middle"></i>{t("msg_logout")}</button>
+					<div className="col-5 col-xl-4">
+						<button className="btn btn-outline-google float-right" onClick={this.logout}><i className="icon icon-md ion-logo-google mr-2 align-middle"></i>{t("msg_logout")}</button>
 					</div>
 				</div>
 			</fieldset>
-			: <button className="btn btn-outline-danger" onClick={this.login}><i className="icon icon-md ion-logo-google mr-2 align-middle"></i>{t("msg_login")}</button>
+			: 
+			<div>
+				<button className="btn btn-outline-google mr-3" onClick={this.login}><i className="icon icon-md ion-logo-google mr-2 align-middle"></i>{t("msg_login")}</button>
+				<span className="text-danger">{loginErrMsg}</span>
+			</div>
 
 		);
 	}

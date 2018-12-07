@@ -9,6 +9,7 @@ import { userActions } from '../action/User.Actions';
 import { Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
 import { userConsts } from '../constant/User.Consts';
 import { LOGIN } from '../helper/Services';
+import { setCookie, deleteCookie } from '../helper/helper';
 
 
 class Login extends React.Component {
@@ -65,11 +66,14 @@ class Login extends React.Component {
 					let user = btoa(userConsts.USER);
 					actions.login(data.session);
 					LOGIN.updateSession(data.session);
-					
+					window.name = data.session;
+
 					if(this.rememberInput.current.checked) {
-						window.localStorage.setItem(user, data.session);
+						// window.localStorage.setItem(user, data.session);
+						setCookie( user, data.session, 7, '/');
 					}else{
-						window.localStorage.removeItem(user);
+						// window.localStorage.removeItem(user);
+						deleteCookie(user);
 					}
 					history.push('/');
 				}else{

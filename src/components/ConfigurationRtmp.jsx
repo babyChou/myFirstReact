@@ -190,35 +190,35 @@ class ConfigurationRtmp extends React.Component {
 		return (
 			<fieldset className="container-fluid" disabled={streamInfo.isStart}>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_fms_addr')}</div>
-					<div className="col-lg-2"><input className={'form-control ' + (addr.invalid ?  ' is-invalid' : '')} type="text" value={addr.value} onChange={e => this.onChangeVal(e, 'addr')}/></div>
-					<div className={'col-lg-2 ' + ( addr.invalid ? 'text-danger' : 'text-secondary')}>{t('msg_fms_addr_example')}</div>
+					<div className="col-xl-2 col-3">{t('msg_fms_addr')}</div>
+					<div className="col-xl-2 col-3"><input className={'form-control ' + (addr.invalid ?  ' is-invalid' : '')} type="text" value={addr.value} onChange={e => this.onChangeVal(e, 'addr')}/></div>
+					<div className={'col ' + ( addr.invalid ? 'text-danger' : 'text-secondary')}>{t('msg_fms_addr_example')}</div>
 				</div>
 				<div className="mb-2 row">
-					<div className="col-lg-2">{t('msg_fms_stream_name')}</div>
-					<div className="col-lg-2"><input className={'form-control ' + (streamName.invalid ?  ' is-invalid' : '')} type="text" value={streamName.value} onChange={e => this.onChangeVal(e, 'streamName')}/></div>
-					<div className="col-lg text-danger">{streamName.errMsg}</div>
+					<div className="col-xl-2 col-3">{t('msg_fms_stream_name')}</div>
+					<div className="col-xl-2 col-3"><input className={'form-control ' + (streamName.invalid ?  ' is-invalid' : '')} type="text" value={streamName.value} onChange={e => this.onChangeVal(e, 'streamName')}/></div>
+					<div className="col text-danger">{streamName.errMsg}</div>
 				</div>
 				<div className="my-3 row form-check">
-					<div className="col-lg">
+					<div className="col">
 						<input className="form-check-input" type="checkbox" value={enableAuthorize.value ? 0 : 1} id={rtmpCertID} checked={enableAuthorize.value} onChange={e => this.onChangeVal(e, 'enableAuthorize')}/>
 						<label className="form-check-label" htmlFor={rtmpCertID}>{t('msg_enable_rtmp_cert')}</label>
 					</div>
 				</div>
 				<div className={"mb-2 row" + (enableAuthorize.value ? '' : ' d-none')}>
-					<div className="col-lg-2">{t('msg_rtmp_username')}</div>
-					<div className="col-lg-2"><input className={'form-control ' + (username.invalid ?  ' is-invalid' : '')} type="text" value={username.value} onChange={e => this.onChangeVal(e, 'username')} /></div>
-					<div className="col-lg text-danger">{username.errMsg}</div>
+					<div className="col-xl-2 col-3">{t('msg_rtmp_username')}</div>
+					<div className="col-xl-2 col-3"><input className={'form-control ' + (username.invalid ?  ' is-invalid' : '')} type="text" value={username.value} onChange={e => this.onChangeVal(e, 'username')} /></div>
+					<div className="col text-danger">{username.errMsg}</div>
 				</div>
 				<div className={"mb-2 row" + (enableAuthorize.value ? '' : ' d-none')}>
-					<div className="col-lg-2">{t('msg_rtmp_password')}</div>
-					<div className="col-lg-2"><input className={'form-control ' + (password.invalid ?  ' is-invalid' : '')} type="text" value={password.value} onChange={e => this.onChangeVal(e, 'password')}/></div>
-					<div className="col-lg-2 text-danger">{password.errMsg}</div>
+					<div className="col-xl-2 col-3">{t('msg_rtmp_password')}</div>
+					<div className="col-xl-2 col-3"><input className={'form-control ' + (password.invalid ?  ' is-invalid' : '')} type="text" value={password.value} onChange={e => this.onChangeVal(e, 'password')}/></div>
+					<div className="col-xl-2 col-3 text-danger">{password.errMsg}</div>
 				</div>
 				<div className={"row" + (enableAuthorize.value ? '' : ' d-none')}>
-					<div className="col-lg-2">{t('msg_rtmp_password_confirm')}</div>
-					<div className="col-lg-2"><input className={'form-control ' + (cmPassword.invalid ?  ' is-invalid' : '')} type="text" value={cmPassword.value} onChange={e => this.onChangeVal(e, 'cmPassword')}/></div>
-					<div className="col-lg text-danger">{cmPassword.errMsg}</div>
+					<div className="col-xl-2 col-3">{t('msg_rtmp_password_confirm')}</div>
+					<div className="col-xl-2 col-3"><input className={'form-control ' + (cmPassword.invalid ?  ' is-invalid' : '')} type="text" value={cmPassword.value} onChange={e => this.onChangeVal(e, 'cmPassword')}/></div>
+					<div className="col text-danger">{cmPassword.errMsg}</div>
 				</div>
 			</fieldset>
 		);

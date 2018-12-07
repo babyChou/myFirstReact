@@ -12,7 +12,18 @@ if(!isset($_GET['id'])) {
 $id = $_GET['id'];
 
 
-$imgArr = ['', realpath('H:\TEST_FILE\img\techi.jpg'), realpath('H:\TEST_FILE\img\yurina.jpg')];
+$imgArr = [
+    realpath('H:\TEST_FILE\img\6be772fe477919520623da8aadd03086.jpg'),
+    realpath('H:\TEST_FILE\img\techi.jpg'),
+    realpath('H:\TEST_FILE\img\yurina.jpg'),
+    realpath('H:\TEST_FILE\img\aramajapan.com-keyakizaka46.jpg'),
+    realpath('H:\TEST_FILE\img\img_Keyakizaka46_AS_5th.jpg'),
+    realpath('H:\TEST_FILE\img\keyakizaka46.jpg'),
+    realpath('H:\TEST_FILE\img\Keyakizaka46-Fukyouwaon-keyakizaka46-40327669-1019-342.jpg'),
+    realpath('H:\TEST_FILE\img\maxresdefault.jpg'),
+    realpath('H:\TEST_FILE\img\keyakizaka46-discord.jpg'),
+    realpath('H:\TEST_FILE\img\kanji.jpg')
+];
 
 
 function LoadJpeg($imgname)
@@ -37,9 +48,14 @@ function LoadJpeg($imgname)
     return $im;
 }
 
+$arrIndx = rand(0, count($imgArr) - 1);
+$code = 200;
+http_response_code($code);
 header('Content-Type: image/jpeg');
 
-$img = LoadJpeg($imgArr[$id]);
+
+// $img = LoadJpeg($imgArr[$id]);
+$img = LoadJpeg($imgArr[$arrIndx]);
 
 imagejpeg($img);
 imagedestroy($img);

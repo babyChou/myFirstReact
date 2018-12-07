@@ -82,7 +82,8 @@ $btn-imgs-h30: (
         background-color: rgba(255, 255, 255, 0);
         color:$white;
         font-weight: 600;
-        width: 100px;
+        width: auto;
+        min-width: 100px;
         outline: 0;
         cursor: pointer;
         &::before{
@@ -90,7 +91,7 @@ $btn-imgs-h30: (
             content: '';
             background-position: 0 0;
             position: absolute;
-            width: 50%;
+            width: 51%;
             height: $btn-common-h;
             top: 0;
             left: 0;
@@ -100,7 +101,7 @@ $btn-imgs-h30: (
             content: '';
             background-position: right 0;
             position: absolute;
-            width: 50%;
+            width: 51%;
             height: $btn-common-h;
             top: 0;
             right: 0;
@@ -216,6 +217,20 @@ $btn-imgs-h30: (
 
 .btn_login_google{
     background-color: #fff;
+}
+
+.btn-outline-ustream{
+
+    svg{
+        width: 2rem;
+        fill: $ustream-color;
+    }
+
+    &:hover{
+        svg{
+            fill: $white;
+        }
+    }
 }
 
 // @mixin btn_common_basic($state, $border-color) {

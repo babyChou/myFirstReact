@@ -7,8 +7,8 @@ import Header from "./Header";
 import WindowModal from "./WindowModal";
 import PipCanvas from "./PipCanvas";
 import Volume from "./Volume";
+import Dialog from "./Dialog";
 
-// import Dialog from "./Dialog";
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
 
@@ -17,7 +17,15 @@ class Pip extends React.Component {
 		super(props);
 
 		this.state = {
-			pipList : []
+			pipList : [],
+			isDialogShow : false,
+			dialogObj : {
+				title : '',
+				type : 'alert',
+				icon : 'warning',
+				mainMsg : '',
+				msg : '',
+			},
 		};
 
 		this.volumeChange = this.volumeChange.bind(this);
@@ -37,17 +45,34 @@ class Pip extends React.Component {
 		let pipList = JSON.parse(JSON.stringify(this.state.pipList));
 		const pipIndex = pipList.findIndex(pipConfig => (pipConfig.id === id));
 
-		pipList.splice(pipIndex, 1);
+		this.setState({
+			isDialogShow : true,
+			dialogObj : {
+				...this.state.dialogObj,
+				type : 'confirm',
+				icon : 'info',
+				title : this.props.t('msg_delete_confirmation'),
+				msg : this.props.t('msg_confirm_delete_profile'),
+				ok : () => {
 
-		DELETE_PIP_CONFIG.fetchData({
-			ids : [id]
-		}).then(data => {
-			if(data.result === 0) {
-				this.setState({
-					pipList
-				});
+					pipList.splice(pipIndex, 1);
+
+					DELETE_PIP_CONFIG.fetchData({
+						ids : [id]
+					}).then(data => {
+						if(data.result === 0) {
+							this.setState({
+								isDialogShow : false,
+								pipList
+							});
+						}
+					});
+					
+				}
 			}
 		});
+		
+
 
 
 	}
@@ -153,7 +178,7 @@ class Pip extends React.Component {
 		const { pipList } = this.state;
 
 		return (
-			<div className="">
+			<div className="container_wrapper">
 				<Header>
 					<div className="d-flex flex-wrap px-2">
 					{
@@ -170,6 +195,7 @@ class Pip extends React.Component {
 				</Header>
 				<div className="mx-3">	
 					<WindowModal title={t('msg_pip_setting')} >
+						<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>
 						<div className="table-responsive">
 							<table className="table-configuration">
 								<thead className="thead-blue">
@@ -185,10 +211,6 @@ class Pip extends React.Component {
 									{
 										pipList.map((pipConfig, i) => {
 											let maxSize = Math.min(100 - pipConfig.windowPosition.x, 100 - pipConfig.windowPosition.y);
-
-											if(pipConfig.isPBP) {
-												maxSize = 75;
-											}
 			
 											return (
 												<tr key={pipConfig.id} className="table-common-odd table-bordered">
@@ -207,8 +229,10 @@ class Pip extends React.Component {
 														</div>
 													</td>
 													<td className="align-middle">
-														<Volume value={pipConfig.windowSize} min={0} max={100} limitMin="25" limitMax={maxSize} onChange={this.volumeChange} name={ 'size_' + pipConfig.id } size="lg" disabled={!pipConfig.custom} btnMinMax={false}></Volume>
+														<div className="d-flex">
+															<Volume value={pipConfig.windowSize} min={pipConfig.isPBP ? 25 : 16} max={pipConfig.isPBP ? 75 : 50} limitMax={maxSize} onChange={this.volumeChange} name={ 'size_' + pipConfig.id } size="lg" disabled={!pipConfig.custom} btnMinMax={false}></Volume>
 															<span className="mt-1 ml-1">%</span>
+														</div>
 													</td>
 													<td className="align-middle">
 														<div className="form-check form-check-inline">

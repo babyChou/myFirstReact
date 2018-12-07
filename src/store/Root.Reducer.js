@@ -2,6 +2,7 @@ import {
     ADD_VIDEO_SOURCE,
     DELETE_VIDEO_SOURCE,
     REPLACE_LAST_VIDEO_SOURCE,
+    REPLACE_VIDEO_SOURCE,
     LOAD_VIDEO_SOURCES,
     STACK_ERROR,
     DISPLAY_ERROR
@@ -57,6 +58,19 @@ const rootReducer = (state = initialState, action) => {
             selectedSource = { ...state.selectedSource,
                 [action.id]: sourceArr
             };
+
+            return { 
+                ...state,
+                selectedSource
+            };
+        case REPLACE_VIDEO_SOURCE:
+
+            selectedSource = { 
+                ...state.selectedSource,
+                [action.id]: state.selectedSource[action.id]
+            };
+
+            selectedSource[action.id][action.index] = action.videoType;
 
             return { 
                 ...state,

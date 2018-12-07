@@ -7,6 +7,7 @@ import {
 	DELETE_VIDEO_SOURCE,
 	REPLACE_LAST_VIDEO_SOURCE,
 	LOAD_VIDEO_SOURCES,
+	REPLACE_VIDEO_SOURCE,
 	STACK_ERROR
 } from '../constant/Root.Consts';
 
@@ -14,6 +15,7 @@ export const rootActions = {
 	addSourceType,
 	deleteSourceType,
 	replaceLastSourceType,
+	replaceSourceType,
 	loadSourceType,
 	stackError,
 	displayError
@@ -51,6 +53,16 @@ function replaceLastSourceType(videoType, deviceID) {
 		id: deviceID
 	};
 }
+
+function replaceSourceType(videoType, deviceID, index) {
+	return {
+		type: REPLACE_VIDEO_SOURCE,
+		videoType,
+		id: deviceID,
+		index: index
+	};
+}
+
 
 function stackError(error) {
 	return {

@@ -16,6 +16,7 @@ class BroadcastListPanel extends React.Component {
 			<React.Fragment>
 				{
 					devices.map(device => {
+						let imgUri = preview[device.id];
 						
 						return (
 								<div key={device.id} className="input_panel rounded p-2 d-flex align-items-start d-inline-flex mr-2">
@@ -25,7 +26,7 @@ class BroadcastListPanel extends React.Component {
 									</div>
 									<div className="p-2">
 										<figure className="figure" style={{ overflow: 'hidden', width: '95px', height: '92px' }}>
-											{ preview[device.id] === '' ? <div className="border border-secondary bg-dark" style={{ width: '95px', height: '92px' }}></div> : <img className="figure-img img-fluid" src={preview[device.id]} alt={device.id}/> }
+											{ imgUri === '' ? <div className="border border-secondary bg-dark" style={{ width: '95px', height: '92px' }}></div> : <img className="figure-img img-fluid" src={imgUri} alt={device.id}/> }
 										</figure>
 									</div>
 									{

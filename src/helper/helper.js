@@ -1,4 +1,7 @@
 export {
+    setCookie,
+    getCookie,
+    deleteCookie,
     arrayBufferToBase64,
     isString,
     isNumber,
@@ -16,6 +19,31 @@ export {
     concatTasksStatus,
     serializeParams
 };
+
+function setCookie(cKey, cValue, exDays, cPath) {
+    let d = new Date(), expires, path;//, domain
+
+    d.setTime(d.getTime() + (exDays * 24 * 60 * 60 * 1000));
+    expires = "expires=" + d.toUTCString();
+            // domain = "domain=" + cDomain;
+    path = "path=" + cPath;
+    document.cookie = cKey + "=" + cValue + "; " + expires + ';' + path;
+}
+
+function getCookie(cKey) {
+    let key = cKey + "=";
+    let ca = document.cookie.split(';');
+    for(let i=0; i<ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1);
+        if (c.indexOf(key) === 0) return c.substring(key.length,c.length);
+    }
+    return "";
+}
+
+function deleteCookie(cKey,cPath) {
+    document.cookie = `${cKey}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${cPath}`;//cKey + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC;"+"path=" + cPath;
+}
 
 function randomID() {
     return Math.random().toString(36).slice(2);

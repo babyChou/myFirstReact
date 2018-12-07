@@ -35,7 +35,7 @@ class ErrorPage extends React.Component {
 						<h6 className="modal-title">{t('msg_an_error_occurred')}</h6>
 					</div>
 					<div className="modal-body">
-						<div className="media">
+						<div className="media word-break">
 							<i className="align-self-center d-block d-flex icon_dialogboxe_4 mr-5"></i>
 							<div className="media-body">
 								<h5 className="mt-0">{t('msg_server_connection_failed')}</h5>

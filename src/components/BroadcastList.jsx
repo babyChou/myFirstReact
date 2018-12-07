@@ -96,6 +96,7 @@ class BroadcastList extends React.Component {
 		clearInterval(this.interval);
 	}
 	componentDidCatch(error, info) {
+		clearInterval(this.interval);
 	}
 	renewList() {
 		let reqPromise = [checkDevicesTasks(true), checkEncodeProfiles(), GET_NETWORK_STATUS.fetchData(), checkTasksStatus(true), GET_INPUT_SIGNAL_STATUS.fetchData()];
@@ -207,12 +208,13 @@ class BroadcastList extends React.Component {
 			devices.forEach(device => {
 				let deviceID = device.id;
 				if(selectedSource[deviceID].length > 0) {
+
 					queryP.push(GET_PIP_PREVIEW_IMG.fetchFile({
 						id : deviceID
 					}).then(url => {
 						return {
 							id : deviceID,
-							url:url
+							url: url
 						};
 					}));
 					
@@ -221,8 +223,11 @@ class BroadcastList extends React.Component {
 
 
 			Promise.all(queryP).then(data => {
-				let updateData = {};
-				
+				let updateData = {
+					preview : {
+						...this.state.preview
+					}
+				};
 				data.forEach((uData, i) => {
 					switch(i) {
 						case 0:
@@ -232,10 +237,7 @@ class BroadcastList extends React.Component {
 							updateData.signals = uData.signalStatuses;
 							break;
 						default: 
-							updateData.preview = {
-								...this.state.preview,
-								[uData.id] : uData.url
-							};
+							updateData.preview[uData.id] = uData.url
 							break;
 					}
 				});
@@ -351,6 +353,7 @@ class BroadcastList extends React.Component {
 						msg : t('msg_stream_delete_confirm'),
 						ok : () => {
 							this.setState({
+								isDialogShow : false,
 								backdropShow : true
 							});
 							DELETE_DEVICE_TASK.fetchData(params, 'DELETE').then(data => {
@@ -414,8 +417,12 @@ class BroadcastList extends React.Component {
 	            .forEach(data => {
 	                if (streamType === 8) {
 	                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{protocol}', protocols[streamType]));
-	                } else {
+	                }else if(streamType === 1){
 	                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{uri}', '').replace('{protocol}', protocols[streamType]));
+	                }else{
+	                	if(streamProfile.nic === data.id) {
+	                		urls.push(tempUrl.replace('{ip}', data.ip).replace('{uri}', '').replace('{protocol}', protocols[streamType]));
+	                	}
 	                }
 	            });
 	    }
@@ -444,10 +451,14 @@ class BroadcastList extends React.Component {
 	            urls = [t('msg_fms_addr') + ' ' + streamProfile.rtmp.rtmpUrl ,t('msg_fms_stream_name') + ' ' + streamProfile.rtmp.rtmpStreamName ];
 	            break;
 	        case 7: // http://xxxxx/xxxxx.m3u8
+	            // console.log(streamProfile.hls.hlsLocation);
+	            let hlsLocation = streamProfile.hls.hlsLocation ? '/'+streamProfile.hls.hlsLocation : '';
+	            uri = `http://${streamProfile.hls.hlsUrl}${hlsLocation}/index.m3u8`;
+	            urls = [uri];
 	            break;
 	        case 8: //rtsp://ip:port/uri
 	            urls = urls.map(url => {
-	                return url.replace('{@}', '').replace('{port}', streamProfile.rtsp.port).replace('{uri}', 'rtspUrl');
+	                return url.replace('{@}', '').replace('{port}', streamProfile.rtsp.port).replace('{uri}', '/'+streamProfile.rtsp.rtspUrl);
 	            });
 	            break;
 	        case 11: //https://www.ustream.tv/broadcaster/'+streamInfo.cdnUrl
@@ -471,7 +482,7 @@ class BroadcastList extends React.Component {
 	        	urls.push(
 	        		<ul className="list-unstyled">
 	        			<li>{t('msg_store_device')} : { RECORD_STORE_DEVICE[streamProfile.record.storeDevice] }</li>
-	        			<li>{t('msg_video_format')} : { RECORD_CONTAINER[streamProfile.record.container] }</li>
+	        			<li>{t('msg_format')} : { RECORD_CONTAINER[streamProfile.record.container] }</li>
 	        			<li>{t('msg_backup_path')} : { streamProfile.record.recordPath }</li>
 	        		</ul>
 	        	);
@@ -551,8 +562,11 @@ class BroadcastList extends React.Component {
 			let channelName = [];
 			let streamStatus = 0;
 			let streamStatusInfo = [];
-			console.log(task, task.streamProfile);
-			const addrs = outputAddr(task.streamProfile.streamType, task.streamProfile, netWorkStatus).map((url, i) => (<span className="d-block" key={i}>{url}</span>));
+			let addrs = [];
+
+			if(task.streamProfile) {
+				addrs = outputAddr(task.streamProfile.streamType, task.streamProfile, netWorkStatus).map((url, i) => (<span className="d-block" key={i}>{url}</span>));
+			}
 	
 			tasksIsChecked.forEach(obj => {
 				if(obj.deviceID === deviceID && obj.taskID === task.id) {
@@ -597,7 +611,7 @@ class BroadcastList extends React.Component {
 		}
 
 		return (
-			<div className="">
+			<div className="container_wrapper">
 				{<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>}
 				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Header>

@@ -1,4 +1,4 @@
-import './styles/index.css';
+import './styles/index.scss';
 import '@babel/polyfill'; //IE11 es6.. assign...
 import 'whatwg-fetch'; // IE10 new Header()
 // import 'core-js/es6/map';

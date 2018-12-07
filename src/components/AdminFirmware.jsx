@@ -102,8 +102,8 @@ class AdminFirmware extends React.Component {
 				{ counterShow ? <Loader innerText={ counter + 's'} text={t('msg_firmware_updateing')}></Loader> : null }
 				{ backdropShow ? <Loader></Loader> : null }
 				
-				<div className="text-capitalize">{t('msg_firmware_update_file')}</div>
-				<div className="custom-file w-50 mx-3">
+				<div className="text-capitalize w-30">{t('msg_firmware_update_file')}</div>
+				<div className="custom-file mx-3">
 					<input type="file" className={'custom-file-input ' + (fileErrMsg ? 'is-invalid' : '')} id="firmwareInput" onChange={this.onUploadFile} accept=".bin"/>
 					<label className="custom-file-label" htmlFor="customFile" data-content={t('msg_browse')}>{ fileText }</label>
 					<div className="invalid-feedback">{ fileErrMsg }</div>

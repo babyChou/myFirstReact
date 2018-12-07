@@ -17,7 +17,9 @@
     a {
         display: inline-block;
         width: auto;
-        padding-right: 25px;
+        padding-right: 1.5rem;
+        margin-right: 0.3rem;
+        margin-bottom: 0.2rem;
         text-decoration: none;
         >* {
             padding-left: 40px; 
@@ -25,6 +27,7 @@
     }
 
 }
+
 
 ul#menu_config{
     position: absolute;

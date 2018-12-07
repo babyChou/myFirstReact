@@ -280,6 +280,7 @@ class AdminNetwork extends React.Component {
 								if(data.result === 0) {
 
 									this.setState({
+										isDialogShow : false,
 										isLoaderShow : true
 									});
 									
@@ -493,11 +494,11 @@ class AdminNetwork extends React.Component {
 
 		return (
 			<fieldset>
-				<div className="row">
-					<div className="col-md-3">{t('msg_network_interface')}</div>
-					<div className="col-md-8 my-was-validated" ref={this.formDOM}>
+				<div className="row mt-3">
+					<div className="col-auto ml-3">{t('msg_network_interface')}</div>
+					<div className="col-lg-7 col-md-8 my-was-validated" ref={this.formDOM}>
 						<div className="form-group">
-							<select className="form-control w-50" value={currentNic.id} onChange={this.onChangeNicID}>
+							<select className="form-control w-60" value={currentNic.id} onChange={this.onChangeNicID}>
 								{
 									netWorkStatus.map(nic => <option key={nic.id} value={nic.id}>{nic.name}</option>)
 								}
@@ -513,7 +514,7 @@ class AdminNetwork extends React.Component {
 						</div>
 						<div className="form-group ml-3">
 							<div className="m-2 d-flex align-items-center">
-								<div className="w-40">{t('msg_ip_addr')}</div>
+								<div className="w-45">{t('msg_ip_addr')}</div>
 								<div className={ipCss} tabIndex="1" data-name="ip" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
 								{
 									ipArr.map((val,i) =>{
@@ -534,9 +535,9 @@ class AdminNetwork extends React.Component {
 								}
 								</div>
 							</div>
-							<div className="mx-2 d-flex align-items-center"><div className="w-40"></div><small className="text-danger">{ip.errMsg}</small></div>
+							<div className="mx-2 d-flex align-items-center"><div className="w-45"></div><small className="text-danger">{ip.errMsg}</small></div>
 							<div className="m-2 d-flex align-items-center">
-								<div className="w-40">
+								<div className="w-45">
 									{t('msg_subnet_mask')}
 								</div>
 								<div className={maskCss} tabIndex="1" data-name="mask" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
@@ -551,9 +552,9 @@ class AdminNetwork extends React.Component {
 									}
 								</div>
 							</div>
-							<div className="mx-2 d-flex align-items-center"><div className="w-40"></div><small className="text-danger">{mask.errMsg}</small></div>
+							<div className="mx-2 d-flex align-items-center"><div className="w-45"></div><small className="text-danger">{mask.errMsg}</small></div>
 							<div className="m-2 d-flex align-items-center">
-								<div className="w-40">
+								<div className="w-45">
 									{t('msg_default_gateway')}
 								</div>
 								<div className={gatewayCss} tabIndex="1" data-name="gateway" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
@@ -574,7 +575,7 @@ class AdminNetwork extends React.Component {
 									}
 								</div>
 							</div>
-							<div className="mx-2 d-flex align-items-center"><div className="w-40"></div><small className="text-danger">{gateway.errMsg}</small></div>
+							<div className="mx-2 d-flex align-items-center"><div className="w-45"></div><small className="text-danger">{gateway.errMsg}</small></div>
 						</div>
 						<div className="form-group form-check">
 							<input className="form-check-input" type="radio" value="1" name="dns_setting" id="auto_set_dns" onChange={this.onChangeCheck} checked={currentNic.dhcp === 'auto_ip_dns'} disabled={currentNic.dhcp === 'static_ip'} ref={this.checkedDOMs[2]}/>
@@ -586,7 +587,7 @@ class AdminNetwork extends React.Component {
 						</div>
 						<div className="form-group ml-3">
 							<div className="m-2 d-flex align-items-center">
-								<div className="w-40">{t('msg_primary_dns_server')}</div>
+								<div className="w-45">{t('msg_primary_dns_server')}</div>
 								<div className={dnsMainCss} data-name="dnsMain" tabIndex="1" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
 									{
 										dnsMainArr.map((val,i) =>{
@@ -601,9 +602,9 @@ class AdminNetwork extends React.Component {
 									}
 								</div>
 							</div>
-							<div className="mx-2 d-flex align-items-center"><div className="w-40"></div><small className="text-danger">{dnsMain.errMsg}</small></div>
+							<div className="mx-2 d-flex align-items-center"><div className="w-45"></div><small className="text-danger">{dnsMain.errMsg}</small></div>
 							<div className="m-2 d-flex align-items-center">
-								<div className="w-40">{t('msg_secondary_dns_server')}</div>
+								<div className="w-45">{t('msg_secondary_dns_server')}</div>
 								<div className={dnsDubCss} data-name="dnsSub" tabIndex="1" onFocus={this.onFocusInput} onKeyDown={this.onKeydown}>
 									{
 										dnsSubArr.map((val,i) =>{
@@ -618,16 +619,15 @@ class AdminNetwork extends React.Component {
 									}
 								</div>
 							</div>
-							<div className="mx-2 d-flex align-items-center"><div className="w-40"></div><small className="text-danger">{dnsSub.errMsg}</small></div>
+							<div className="mx-2 d-flex align-items-center"><div className="w-45"></div><small className="text-danger">{dnsSub.errMsg}</small></div>
 
 						</div>
 					</div>
+					
 				</div>
 				<div className="row">
-					<div className="col-md-8 offset-3 mt-3">
-						<div className="w-90">
-							<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right">{t("msg_ok")}</Btn>
-						</div>
+					<div className="col offset-3 mt-3">
+						<Btn size="sm" type="submit" onClick={this.submitForm} className="float-right mr-4">{t("msg_ok")}</Btn>
 					</div>
 					<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>
 					<Loader isOpen={isLoaderShow}></Loader>
