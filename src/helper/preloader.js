@@ -44,15 +44,7 @@ function checkTasksStatus(renew) {
             return JSON.parse(JSON.stringify(store.getState().configReducer.tasksStatus));
         });
     } else {
-        if (tasksStatus.length === 0) {
-            return Services.GET_TASKS_STATUS.fetchData({
-                id: 0
-            }).then(() => {
-                return JSON.parse(JSON.stringify(store.getState().configReducer.tasksStatus));
-            });
-        } else {
-            return Promise.resolve(tasksStatus);
-        }
+        return Promise.resolve(tasksStatus);
     }
 }
 
@@ -88,7 +80,7 @@ function checkStreamProfiles(id, renew) {
             }
         });
     } else {
-        return JSON.parse(JSON.stringify(store.getState().profiles.streamProfiles));
+        return Promise.resolve(JSON.parse(JSON.stringify(store.getState().profiles.streamProfiles)));
     }
 }
 

@@ -1,3 +1,16 @@
 .gradient-blue-bg {
     @include gradient-y($start-color: #294168, $end-color: #182840, $start-percent: 0%, $end-percent: 100%)
 }
+
+.gradient-orange-bg {
+    @include gradient-y($start-color: #f43c00, $end-color: #fe7100, $start-percent: 0%, $end-percent: 100%)
+}
+
+
+.bg-tree-selected{
+	background-color: #fff1d2;
+}
+
+.color-attention{
+	color: #fbfb4d;
+}

@@ -5,7 +5,7 @@ import { AUTHENTICATE_OAUTH, LOGOUT_CDN } from '../helper/Services';
 
 const HOSTNAME = 'http://' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 const HOST_URI = `${HOSTNAME}/retrieveToken`;
-const REDIRECT_URI = `https://api.twitch.tv/kraken/oauth2/authenticate?action=authorize&client_id=nwv779kj9s4wjdn1dkdrnc4duq8fe0&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&response_type=token&scope=channel_read&state=${HOST_URI}/cgi-bin/twitchAuth`;
+const REDIRECT_URI = `https://api.twitch.tv/kraken/oauth2/authenticate?action=authorize&client_id=nwv779kj9s4wjdn1dkdrnc4duq8fe0&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&response_type=token&scope=channel_read&state=${HOST_URI}`;
  
 // authUrl = 'https://www.facebook.com/dialog/oauth?client_id=1288773337839988&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&scope=publish_actions&response_type=token&state={IP}/cgi-bin/facebookAuth';
 // console.log(HOST_URI);

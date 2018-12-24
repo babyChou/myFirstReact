@@ -16,13 +16,13 @@ const ConfigurationModal = (props) => {
 					<table className="table-configuration">
 						<thead className="thead-blue">
 							<tr className="table-bordered">
-								<th scope="col" className="w-5">{t('msg_no')}</th>
+								<th scope="col" className="w_85px">{t('msg_no')}</th>
 								<th scope="col" className="w-10">{t('msg_channel_name')}</th>
 								<th scope="col" className=""></th>
 								<th scope="col" className="w-15">{t('msg_stream_type')}</th>
 								<th scope="col" className="w-25">{t('msg_encoding_profile')}</th>
 								<th scope="col" className="w-15">{t('msg_ip_addr')}</th>
-								<th scope="col" className="w-5">{t('msg_port')}</th>
+								<th scope="col" className="w_100px">{t('msg_port')}</th>
 								<th scope="col" >{t('msg_network_interface')}</th>
 								<th scope="col" colSpan="2"></th>
 							</tr>

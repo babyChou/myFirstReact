@@ -4,6 +4,9 @@ import { configActions } from '../action/Config.Actions';
 import { rootActions } from '../action/Root.Actions';
 import store from '../store/Store';
 
+import { USER } from '../constant/User.Consts';
+import { deleteCookie } from '../helper/helper';
+
 const rootDOM = document.getElementById('root');
 const errorDOM = document.getElementById('error');
 
@@ -115,6 +118,7 @@ function fetchData(params, method, isStore) {
         }
     })
     .then(json => {
+
         if(isStore !== false && storeFun) {
             if(storeType === 'LOAD') {
                 storeFun(json);    
@@ -124,6 +128,11 @@ function fetchData(params, method, isStore) {
         if(json.hasOwnProperty('result')) {
             if(json.result !== 0) {
                 console.warn(this.url, json);
+                if(json.result % 256 === 102) {
+                    window.name = '';
+                    deleteCookie(btoa(USER));
+                    window.location = '/login';
+                }
             }
         }
         return json;
@@ -225,13 +234,23 @@ const GET_CONFIG = {
     fetchData,
     store: (data) => {
         if(data.result === 0) {
-            store.dispatch(configActions.loadConfig(data.config));
+            store.dispatch(configActions.loadConfig({
+                ...data.config,
+                ...data.streamSetting,
+                mastership : data.mastership
+            }));
         }
     }
 };
 
 const SET_CONFIG = {
     url: '/api/configuration',
+    fetchData
+};
+
+const SET_USER = {
+    url: '/api/setUser',
+    method: 'PATCH',
     fetchData
 };
 
@@ -464,12 +483,73 @@ const UPDATE_CHECK_NETWORK_CONNECTION = {
     fetchData
 };
 
+const DOWNLOAD_CONFIG_BACKUP = {
+    url: '/api/getConfigBackup',
+    method: 'GET',
+    fetchData
+};
+
+const RESTORE_CONFIG_BACKUP = {
+    url: '/api/restoreConfigBackup',
+    method: 'POST',
+    postFile
+};
+
+const GET_USER_LOG = {
+    url: '/api/userLog',
+    method: 'GET',
+    fetchData
+};
+
+const DOWNLOAD_USER_LOG = {
+    url: '/api/downloadLog',
+    method: 'POST',
+    fetchData
+};
+
+const GET_SYSTEM_TIME = {
+    url: '/api/systemTime',
+    method: 'GET',
+    fetchData
+};
+
+const SET_SYSTEM_TIME = {
+    url: '/api/systemTime',
+    method: 'POST',
+    fetchData
+};
+
+const GET_DIRECTORY = {
+    url: '/api/directorys',
+    method: 'GET',
+    fetchData
+};
+
+const CREATE_DIRECTORY = {
+    url: '/api/directorys',
+    method: 'POST',
+    fetchData
+};
+
+const MODIFY_DIRECTORY = {
+    url: '/api/directorys',
+    method: 'PUT',
+    fetchData
+};
+
+const DELETE_DIRECTORY = {
+    url: '/api/directorys',
+    method: 'DELETE',
+    fetchData
+};
+
 
 export {
     LOGIN,
     LOGOUT,
     GET_CONFIG,
     SET_CONFIG,
+    SET_USER,
     SOURCE_THUMBNAIL,
     GET_DEVICE_FACILITIES,
     GET_DEVICE_TASK,
@@ -499,5 +579,15 @@ export {
     LOGOUT_CDN,
     UPLOAD_FW,
     UPDATE_FW,
-    UPDATE_CHECK_NETWORK_CONNECTION
+    UPDATE_CHECK_NETWORK_CONNECTION,
+    DOWNLOAD_CONFIG_BACKUP,
+    RESTORE_CONFIG_BACKUP,
+    GET_USER_LOG,
+    DOWNLOAD_USER_LOG,
+    GET_SYSTEM_TIME,
+    SET_SYSTEM_TIME,
+    GET_DIRECTORY,
+    CREATE_DIRECTORY,
+    MODIFY_DIRECTORY,
+    DELETE_DIRECTORY
 };

@@ -46,6 +46,7 @@
         "deviceName":%s
         "version":"%s",
         "SKU":"%s",
+        "mastership":"%s",
         "keepLogin":%d,
         "sn":"%s"
          ……
@@ -969,6 +970,7 @@ Audio Only
 
 * URL: http://HostName:Port/api/encodeProfile
 * Method: POST
+
 ```
 {
     "profile": {
@@ -1124,6 +1126,7 @@ Audio Only
 ## 9 System
 
 ### 9.1 getSystemTime
+* Descrtion: Get local system time
 * URL: http://HostName:Port/api/systemTime
 * Method: GET
 * Response:

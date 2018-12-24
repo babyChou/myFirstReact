@@ -10,10 +10,12 @@ import PrivateRoute from './PrivateRoute';
 import BroadcastList from './BroadcastList';
 import Configuration from './Configuration';
 import EncodingProfile from './EncodingProfile';
+import FileBrowser from './FileBrowser';
 import Pip from './Pip';
 import Admin from './Admin';
 import Login from './Login';
 import Token from './Token';
+
 
 // const history = createBrowserHistory();
 
@@ -47,7 +49,7 @@ class App extends React.Component {
 						<PrivateRoute path="/administration" component={Admin} authentication={authentication}/>
 						<PrivateRoute path="/encoding_profile" component={EncodingProfile} authentication={authentication}/>
 						<PrivateRoute path="/log_management" component={EncodingProfile} authentication={authentication}/>
-						<PrivateRoute path="/filebrowser" component={EncodingProfile} authentication={authentication}/>
+						<PrivateRoute path="/filebrowser" component={FileBrowser} authentication={authentication}/>
 						<Redirect from="*" to={"/configuration"} />
 					</Switch>
 				</Router>) ;

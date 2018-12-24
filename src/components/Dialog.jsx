@@ -13,6 +13,8 @@ ok: <Function>
 cancel: <Function>
 okLabel: <String> default -> t('msg_ok')
 cancelLabel: <String> default -> t('msg_cancel')
+zIndex: <Number> default -> 1050
+backdropZindex: <Number> default -> 1040
 */
 
 class Dialog extends React.Component {
@@ -55,12 +57,15 @@ class Dialog extends React.Component {
 	}
 
 	render() {
-		const { t } = this.props;
+		const { t, backdropZindex, zIndex } = this.props;
 		const okLabel = this.props.okLabel || t('msg_ok');
 		const cancelLabel = this.props.cancelLabel || t('msg_cancel');
 		const onOk = this.btnAction(this.props.ok);
 		const onCancel = this.btnAction(this.props.cancel);
 		let diaSize = this.props.size;
+		let okProperty = {};
+		let modalStyle = {};
+		let backdropStyle = {};
 
 		if(diaSize === 'lg') {
 			diaSize = 'modal-lg';
@@ -69,36 +74,55 @@ class Dialog extends React.Component {
 			diaSize = 'modal-sm';
 		}
 
+		if(this.props.okDisabled) {
+			okProperty.disabled = this.props.okDisabled;
+		}
+
 
 		if(!this.props.isShow) {
 			return null;
 		}
 
+		if(zIndex) {
+			modalStyle.zIndex = zIndex;
+		}
+
+		if(backdropZindex) {
+			backdropStyle.zIndex = backdropZindex;
+		}
+
+
+
 		return (
 			<React.Fragment>
-				<div className="modal fade show d-block" >
+				<div className="modal fade show d-block" style={modalStyle}>
 					<div className={`modal-dialog modal-dialog-centered ${diaSize ? diaSize : ''}`}>
 						
 						<div className="modal-content" >
 							<div className="modal-header text-white">
 								<h6 className="modal-title">{this.props.title}</h6>
-								<button type="button" className="close" aria-label="Close" onClick={onCancel}><span aria-hidden="true">&times;</span></button>
+								{
+									this.props.type !== 'focusAlert' ? <button type="button" className="close" aria-label="Close" onClick={onCancel}><span aria-hidden="true">&times;</span></button> :
+									null
+								}
+								
 							</div>
 							<div className="modal-body px-4">
 								{ this.props.type !== 'custom' ? this.reminderDOM(this.props.icon) : null }
 								{ this.props.children }
 							</div>
 							<div className="modal-footer">
-								<Btn size="sm" onClick={onOk} className="float-right mt-1">{okLabel}</Btn>
-								{this.props.type !== 'alert' ? <Btn size="sm" onClick={onCancel} className="float-right mt-1">{cancelLabel}</Btn> : null}
+								<Btn onClick={onOk} className="float-right mt-1" {...okProperty}>{okLabel}</Btn>
+								{!this.props.type.match(/alert/i) ? <Btn size="sm" onClick={onCancel} className="float-right mt-1">{cancelLabel}</Btn> : null}
 								
 							</div>
 						</div>
 					</div>
 					
 				</div>
-				<div className="modal-backdrop fade show"></div>
-				</React.Fragment>
+				<div className="modal-backdrop fade show" style={backdropStyle}></div>
+				
+			</React.Fragment>
 		);
 	}
 }

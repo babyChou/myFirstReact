@@ -244,6 +244,8 @@ class BroadcastList extends React.Component {
 
 				this.setState(updateData);
 				
+			}).catch(err => {
+				clearInterval(this.interval);
 			});
 
 		}, updateSec);
@@ -463,7 +465,8 @@ class BroadcastList extends React.Component {
 	            break;
 	        case 11: //https://www.ustream.tv/broadcaster/'+streamInfo.cdnUrl
 	            // http://www.ustream.tv/channel/11753958 (Not sure channelID)
-	            uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.channelID;
+	            // uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.channelID;
+	            uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.videoID;
 	           
 				urls.push(<a href={uri} target="_blank">{uri}</a>);
 	            break;
@@ -477,6 +480,9 @@ class BroadcastList extends React.Component {
 	        case 13:
 				uri = 'https://www.youtube.com/watch?v=' + streamProfile.youtube.videoID;
 				urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            break;
+	        case 15:
+				urls.push(<a href={uri} target="_blank">{streamProfile.facebook.videoID}</a>);
 	            break;
 	        case 51:
 	        	urls.push(

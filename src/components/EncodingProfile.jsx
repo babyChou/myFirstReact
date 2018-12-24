@@ -31,12 +31,15 @@ const videoInfoKeyMap = {
 	outputRatio : 'msg_profile_display_aspect_ratio',
 	frameRate : 'msg_profile_frame_rate',
 	frame : 'msg_profile_key_frame',
+	level : 'msg_profile_level',
+	nullPacket : 'msg_profile_auto_null'
 };
 
 const audioInfoKeyMap = {
 	channel : 'msg_profile_channel',
 	bitrate : 'msg_profile_audio_bitrate',
-	sampleRate : 'msg_profile_audio_sample_rate'
+	sampleRate : 'msg_profile_audio_sample_rate',
+	nullPacket : 'msg_profile_auto_null'
 };
 
 //msg_profile_resolution
@@ -246,8 +249,11 @@ class EncodingProfile extends React.Component {
 				return <p key={key} className="px-2 w_260px">{t(videoInfoKeyMap[key]) + ' : ' + ENCODE_OUTPUT_RATIO[val]}</p>;
 			case 'frameRate':
 				return <p key={key} className="px-2 w_260px">{t(videoInfoKeyMap[key]) + ' : ' + ENCODE_FRAME_RATE[val]}</p>;
-			default:
+			case 'nullPacket':
+			case 'bitrate':
 				return <p key={key} className="px-2 w_260px">{t(videoInfoKeyMap[key]) + ' : ' + val}</p>;
+			default:
+				return null;
 		}
 
 	}
@@ -258,11 +264,12 @@ class EncodingProfile extends React.Component {
 		switch(key) {
 			case 'channel':
 				return <p key={key} className="px-2">{`${t(audioInfoKeyMap[key])} : ${ENCODE_AUDIO_CHANNEL[val]['name']}`}</p>;
+			case 'nullPacket':
 			case 'sampleRate':				
 			case 'bitrate':
 				return <p key={key} className="px-2">{`${t(audioInfoKeyMap[key])} : ${val}`}</p>;
 			default:
-				return <p key={key} className="px-2">{t(audioInfoKeyMap[key]) + ' : ' + val}</p>;
+				return null;
 		}
 	}
 	

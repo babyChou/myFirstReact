@@ -141,14 +141,16 @@ class HeaderPanel extends React.Component {
 	}
 
 	render() {
-		const { t, devices, selectedSource } = this.props;
+		const { t, devices, selectedSource, taskList } = this.props;
 		const { preview } = this.state;
+
 
 		return (
 			<React.Fragment>
 				{
 					devices.map(device => {
-						
+						const isDeviceStreaming = taskList.some(task => task.deviceID === device.id && task.isStart === 1);
+
 						return (
 								<div key={device.id} className="input_panel rounded p-2 d-flex align-items-start d-inline-flex mr-2">
 									<div className="p-2 text-center">
@@ -177,6 +179,10 @@ class HeaderPanel extends React.Component {
 													if(selectedSource[otherDeviceID].filter(selectedType => selectedType.match(type)).length > 0) {
 													isDisabled = true;
 												} */
+											}
+
+											if(isDeviceStreaming) {
+												isDisabled = true;
 											}
 
 											return (<div key={device.id + type} className="p-2">

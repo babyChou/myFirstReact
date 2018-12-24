@@ -23,9 +23,10 @@ const configReducer = (state = initialState, action) => {
 
     switch (action.type) {
         case SET_CONFIG:
+
             return {
                 ...state,
-                config: Object.assign({}, action.config, state.config)
+                config: Object.assign({}, state.config, action.config)
             };
         case LOAD_CONFIG:
             return { 

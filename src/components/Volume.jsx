@@ -246,7 +246,6 @@ export default class Volume extends React.Component {
 				break
 		}
 
-				{/* <div className="volume_control d-inline">*/}
 		return (
 				<div className="volume_control d-flex align-items-center"> 
 					{ btnMinMax === false ? '' : <button className="btn_tuner_volume_minimal align-middle" disabled={disabled} onClick={this.minVolume}></button> }

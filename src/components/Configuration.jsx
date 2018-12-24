@@ -3,7 +3,7 @@ import Header from "./Header";
 import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from "redux";
-import { DEFAULT_STREAM_TYPE, MSG_SUCCESS_SECONDS,  MSG_FAILED_SECONDS} from "../constant/Init.Consts";
+import { DEFAULT_STREAM_TYPE, MSG_SUCCESS_SECONDS, MSG_FAILED_SECONDS} from "../constant/Init.Consts";
 import { configActions } from "../action/Config.Actions";
 import { GET_NETWORK_STATUS, GET_PIP_CONFIG_LIST } from "../helper/Services";
 import { concatTasksStatus, randomID } from "../helper/helper";
@@ -41,6 +41,58 @@ const mapDispatchToProps = dispatch => {
 	};
 };
 
+const MAX_BITRATE = 20000;
+
+
+function filterEncodingProfilesByStreamType(encodeProfiles, streamType) {
+	return encodeProfiles.filter(profile => profile.streamType.includes(streamType) || profile.category === 0);
+}
+
+
+function getCurrEncodingProfiles(encodeProfiles, streamType) {
+	let _encodeProfiles = encodeProfiles.filter(profile => profile.streamType.includes(streamType) || profile.category === 0);
+
+	return function filterByResolution(firstProfileID, operator) {
+
+		const profileInfo = encodeProfiles.find(profile => profile.id === firstProfileID);
+		let width = Infinity;
+		if(profileInfo && profileInfo.width) {
+			width = Number(profileInfo.width);
+		}
+
+		if(operator === 'biggerthan') {
+			_encodeProfiles = _encodeProfiles.filter(profile => profile.width >= width);
+		}else{
+			_encodeProfiles = _encodeProfiles.filter(profile => profile.width <= width);
+		}
+
+		return function filterByBitrate(profileIDs) {
+			if(!!profileIDs && profileIDs.length > 0) {
+				const sumBitrate = profileIDs
+										.map(id => {
+											const profileInfo = encodeProfiles.find(profile => profile.id === id);
+
+												if(profileInfo) {
+													return profileInfo.totalBitrate;
+												}else{
+													return 0;
+												}
+												
+										})
+										.reduce((bitrate, sumVal) => bitrate + sumVal);
+
+				_encodeProfiles = _encodeProfiles.filter(profile => (profile.totalBitrate + sumBitrate) < MAX_BITRATE);
+				
+			}
+
+			return _encodeProfiles;
+		}
+
+	}
+
+}
+
+
 class Configuration extends React.Component {
 	constructor(props) {
 		super(props);
@@ -59,6 +111,7 @@ class Configuration extends React.Component {
 
 		this.addSubTask = this.addSubTask.bind(this);
 		this.deleteSubTask = this.deleteSubTask.bind(this);
+		this.updateTask = this.updateTask.bind(this);
 		this.handleBackdrop = this.handleBackdrop.bind(this);
 		this.handleAlert = this.handleAlert.bind(this);
 		this.renewDevicesTasksDetail = this.renewDevicesTasksDetail.bind(this);
@@ -75,7 +128,7 @@ class Configuration extends React.Component {
 		let pipList = [];
 		let netWorkStatus = [];
 		let devicesConfig = [];
-		let devices, devicesTasksStatus, encodeProfiles;
+		let devices = {}, devicesTasksStatus = {}, encodeProfiles = {};
 
 		checkFacilities()
 			.then(facilities => {
@@ -91,6 +144,7 @@ class Configuration extends React.Component {
 						devicesTasks,
 						data[1]
 					);
+
 					encodeProfiles = data[2];
 					netWorkStatus = data[3]["nic"];
 					pipList = data[4]["config"];
@@ -113,21 +167,33 @@ class Configuration extends React.Component {
 					return Promise.all(reqPromise2).then(data => data);
 				});
 			})
-			.then(data => {
-				let streamProfiles = data[data.length - 1];
+			.then(seqStreamProfiles => {
+				let streamProfiles = seqStreamProfiles[0];
 				let streamInfo = {
 					deviceID: -1,
 					taskKey: -1,
 					taskID: -1,
-					profileID: null,
+					profileID: '',
 					isStart: 0,
 					streamStatus: 0,
 					id: -1,
 					streamType: defaultStreamType,
 					nic: 1
 				};
+				let devicesTasksDetail = [];
 
-				let devicesTasksDetail = devices.map(facility => {
+				if(seqStreamProfiles.length > 0) {
+					streamProfiles = seqStreamProfiles.reduce((profiles, finalProfiles) => {
+						if(finalProfiles.length > profiles.length) {
+							return finalProfiles;
+						}else{
+							return profiles;
+						}
+					});
+				}
+
+
+				devicesTasksDetail = devices.map(facility => {
 					let tasks = [];
 					let config = devicesConfig.find(
 						device => device.id === facility.id
@@ -138,9 +204,7 @@ class Configuration extends React.Component {
 						.filter(device => device.id === facility.id)
 						.forEach(device => {
 							tasks = device.tasks.map((task, i) => {
-								let streamProfile = streamProfiles.find(
-									stream => stream.id === task.streamID
-								);
+								let streamProfile = streamProfiles.find(stream => stream.id === task.streamID);
 
 								return {
 									deviceID: device.id,
@@ -156,10 +220,13 @@ class Configuration extends React.Component {
 
 					if (tasks.length === 0) {
 						streamInfo.taskKey = randomID();
+
 						tasks.push(Object.assign({}, streamInfo, {
 							deviceID : facility.id
 						}));
+
 					}
+
 
 					return {
 						...facility,
@@ -224,7 +291,7 @@ class Configuration extends React.Component {
 	}
 
 	renewDevicesTasksDetail(taskInfo) {
-		const { deviceID, taskID, rowNo, profileID, streamID } = taskInfo;
+		const { deviceID, taskID, taskKey, profileID, streamID } = taskInfo;
 		const { devicesConfig, tasksStatus, streamProfiles } = this.props;
 
 		let devicesTasksDetail = this.state.devicesTasksDetail.map(device => {
@@ -233,12 +300,10 @@ class Configuration extends React.Component {
 			if(device.id === deviceID) {
 
 				let tasks = device.tasks.map((task, i) => {
-								let _rowNo = i+1;
-
 								let taskStatus = tasksStatus.find(taskStatus => taskStatus.deviceID === deviceID && taskStatus.taskID === taskID);
 								let streamProfile = streamProfiles.find(stream => stream.id === streamID);
 
-								if(rowNo === _rowNo) {
+								if(taskKey === task.taskKey) {
 									return {
 										...task,
 										taskID: taskID,
@@ -284,12 +349,13 @@ class Configuration extends React.Component {
 			deviceID: deviceID,
 			taskID: -1,
 			taskKey: randomID(),
-			profileID: null,
+			profileID: '',
 			isStart: 0,
 			streamStatus: 0,
 			id: -1,
 			streamType: defaultStreamType,
-			nic: 1
+			nic: 1,
+			createTime : Date.now()
 		};
 
 		devicesTasksDetail = this.state.devicesTasksDetail.map(device => {
@@ -335,6 +401,33 @@ class Configuration extends React.Component {
 			devicesTasksDetail
 		});
 	}
+	updateTask(deviceID, taskKey, updateTask) {
+		let devicesTasksDetail = this.state.devicesTasksDetail.map(device => {
+			if (device.id !== deviceID) {
+				return device;
+			}
+
+			return {
+				...device,
+				tasks : device.tasks.map(task => {
+					if(task.taskKey !== taskKey) {
+						return task;
+					}
+					
+					return {
+						...task,
+						...updateTask
+					};
+				})
+			};
+
+		});
+
+
+		this.setState({
+			devicesTasksDetail
+		});
+	}
 	handleBackdrop(show) {
 		this.setState({
 			backdropShow: show
@@ -360,76 +453,120 @@ class Configuration extends React.Component {
 		});
 	}
 	render() {
-		const {
-			t,
-			devices,
-			encodeProfiles,
-			devicesConfig,
-			selectedSource
-		} = this.props;
-		const {
-			netWorkStatus,
-			devicesTasksDetail,
-			isDeviceConfigSet,
-			alert
-		} = this.state;
+		const { t, devices, encodeProfiles, devicesConfig, selectedSource } = this.props;
+		const { netWorkStatus, devicesTasksDetail, isDeviceConfigSet, alert } = this.state;
+		let currBitrate = 0;
+		let taskList = [];
+
+		devicesTasksDetail.forEach(device => {
+			taskList = [...taskList, ...(device.tasks.filter(task => task.profileID !== ''))];
+		});
+
+		if(taskList.length > 0) {
+			currBitrate = taskList.map(task => encodeProfiles.find(profile => profile.id === task.profileID)['totalBitrate']).reduce((bitrate, currentBitrate) => bitrate + currentBitrate);
+		}
+
 
 		return (
 			<div className="container_wrapper">
 				{/* { this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null } */}
 				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Alert isOpen={!!alert.msg} className="fixed-top text-center m-5" color={alert.color}>{alert.msg}</Alert>
-				<Header>
-					{isDeviceConfigSet ? (
-						<ConfigurationPanel
-							devices={devices}
-							selectedSource={selectedSource}
-							devicesConfig={devicesConfig}
-						/>
-					) : null}
+				<Header addition={<p className="color-attention">{`${t('msg_total_bitrate')} ( ${t('msg_total_bitrate_current')} / ${t('msg_total_bitrate_max')} ) ${currBitrate} / 20000 Kbps`}</p>}>
+					{isDeviceConfigSet ? (<ConfigurationPanel taskList={taskList} devices={devices} selectedSource={selectedSource} devicesConfig={devicesConfig} />) : null}
 				</Header>
 				<section id="config_panel" className="mx-3">
 					{devicesTasksDetail.map(device => {
 						let totalTaskCount = device.tasks.length;
+						let filterProfiles = undefined;
+						let profileIDs = [];
+						let isDeviceStreaming = taskList.some(task => task.deviceID === device.id && task.isStart === 1);
 
 						return (
-							<ConfigurationModal
-								key={device.id}
-								t={t}
-								id={device.id}
-							>
+							<ConfigurationModal key={device.id} t={t} id={device.id} >
 								{
-									<ConfigurationTabs
-										facility={device}
-										t={t}
-										id={device.id}
-										deviceConfig={device.deviceConfig}
-										pipList={this.state.pipList}
-										updateDeviceConfig={this.props.setDeviceConfig}
-										renewDevicesTasksDetail={this.renewDevicesTasksDetail}
-										selectedSource={selectedSource}
-									/>
+									<ConfigurationTabs facility={device} t={t} id={device.id} deviceConfig={device.deviceConfig} pipList={this.state.pipList} updateDeviceConfig={this.props.setDeviceConfig} renewDevicesTasksDetail={this.renewDevicesTasksDetail} selectedSource={selectedSource}/>
 								}
 								{ device.tasks.map((task, i) => {
+									if(taskList.length === 0) {
+										filterProfiles = filterEncodingProfilesByStreamType(encodeProfiles, task.streamType);
+									}else{
+										
+										//This task not set yet
+										if(task.id === -1) {
+											try {
+												//Check has pioneer task or not
+												const firstTask = taskList.find(item => item.deviceID === task.deviceID);
+
+												profileIDs = taskList.map(item => item.profileID);
+
+												if(!!firstTask) {
+													//Find pioneer task. Mean this task is output 2
+													filterProfiles = getCurrEncodingProfiles(encodeProfiles, task.streamType)(firstTask.profileID, 'lessthan')(profileIDs);
+													
+												}else{
+													//Mean this Device not set task yet
+													filterProfiles = getCurrEncodingProfiles(encodeProfiles, task.streamType)()(profileIDs);
+
+												}
+
+											}catch(err) {
+												alert(`Find task error. ${err}`);
+												console.log(err);
+											}
+
+										}else{
+											try {
+												//Check this task is output 1 or 2
+												const siblingTask = taskList.find(item => item.deviceID === task.deviceID && item.id !== task.id);
+												profileIDs = taskList.filter(item => item.id !== task.id).map(item => item.profileID);
+
+												if(siblingTask) {
+													if(siblingTask.id < task.id) {
+														//Mean this task is output 2
+														filterProfiles = getCurrEncodingProfiles(encodeProfiles, task.streamType)(siblingTask.profileID, 'lessthan')(profileIDs);
+													}else{
+														//Mean this task is output 1
+														filterProfiles = getCurrEncodingProfiles(encodeProfiles, task.streamType)(siblingTask.profileID, 'biggerthan')(profileIDs);
+													}
+
+												}else{
+													//Mean this task is output1 and already set
+													filterProfiles = getCurrEncodingProfiles(encodeProfiles, task.streamType)()(profileIDs);
+												}
+
+											}catch(err) {
+												alert(`Find task error. ${err}`);
+												console.log(err);
+											}
+
+										}
+									}
+
+
+									let _props = {
+										key : task.taskKey,
+										taskKey : task.taskKey,
+										rowNo : i + 1,
+										totalTaskCount : totalTaskCount,
+										nics : netWorkStatus,
+										videoInputs : device.videoInput,
+										selectedSource : selectedSource,
+										updateDeviceConfig : this.props.setDeviceConfig,
+										reverseInputSource : device.deviceConfig.reverseInputSource,
+										streamInfo : task,
+										encodeProfiles : filterProfiles,
+										addSubTask : this.addSubTask,
+										deleteSubTask : this.deleteSubTask,
+										updateTask : this.updateTask,
+										handleBackdrop : this.handleBackdrop,
+										handleAlert : this.handleAlert,
+										renewDevicesTasksDetail : this.renewDevicesTasksDetail,
+										isDeviceStreaming : isDeviceStreaming
+									};
+
 									return (
-										<ConfigurationTasks
-											key={task.taskKey}
-											taskKey={task.taskKey}
-											rowNo={i + 1}
-											totalTaskCount={totalTaskCount}
-											nics={netWorkStatus}
-											videoInputs={device.videoInput}
-											selectedSource={selectedSource}
-											updateDeviceConfig={this.props.setDeviceConfig}
-											reverseInputSource={device.deviceConfig.reverseInputSource}
-											streamInfo={task}
-											encodeProfiles={encodeProfiles}
-											addSubTask={this.addSubTask}
-											deleteSubTask={this.deleteSubTask}
-											handleBackdrop={this.handleBackdrop}
-											handleAlert={this.handleAlert}
-											renewDevicesTasksDetail={this.renewDevicesTasksDetail}
-										/>
+										<ConfigurationTasks {..._props} />
 									);
 								})}
 							</ConfigurationModal>

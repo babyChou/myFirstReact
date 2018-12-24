@@ -23,8 +23,8 @@ if($method === 'GET') {
 	// 	'autoStart' => 0
 	// ];
 
-	// echo $string;
-
+	// echo $string;//51137894
+	
 	echo json_encode($json_data);
 }else if($method === 'POST'){
 	$reqJson = json_decode(file_get_contents('php://input'), true);
@@ -36,6 +36,8 @@ if($method === 'GET') {
 		    foreach($value as $key2 => $value2) {//config , streamSetting
 		    	$json_data[$key][$key2] = $value2;
 		    }
+	    }else{
+	    	$json_data[$key] = $value;
 	    }
 
 	}

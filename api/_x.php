@@ -146,6 +146,8 @@ foreach ($files as $f) {
         $videoInfo['bframeNum'] = (int)$xml->VideoInfo->BFrameNum;
         $videoInfo['frame'] = (int)$xml->VideoInfo->KeyFrame;
         $videoInfo['frameRate'] = (int)$xml->VideoInfo->FrameRate/100;
+        $videoInfo['level'] = (int)$xml->VideoInfo->Level;
+        $videoInfo['nullPacket'] = 'off';
         
         $_profile = (int)$xml->VideoInfo->Profile > 2 ? 1 : (int)$xml->VideoInfo->Profile;
         $encodeMode = (int)$xml->VideoInfo->EncodeMode;
@@ -170,6 +172,7 @@ foreach ($files as $f) {
         $audioInfo['sampleRate'] = (int)$xml->AudioInfo->SampleRate/1000;
         $audioInfo['bitrate'] = (int)$xml->AudioInfo->Bitrate/1000;
         $audioInfo['encodeMode'] = (int)$xml->AudioInfo->EncodeMode;
+        $audioInfo['nullPacket'] = 'off';
 
         $profile['audioInfo'] = $audioInfo;
     }

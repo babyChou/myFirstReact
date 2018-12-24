@@ -470,8 +470,17 @@ export const AUDIO_SAMPLE_MAP_BITRATE = Object.freeze({
       }
 });
 
+export const WEEKDAYS_SHORT = Object.freeze({
+  zh_tw: ["日","一","二","三","四","五","六"],
+  zh_cn: ["日","一","二","三","四","五","六"]
+});
 
-  
+export const MONTHS = Object.freeze({
+  zh_tw: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+  zh_cn: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ]
+});
 
-    
-    
+export const WEEKDAYS_LONG = Object.freeze({
+  zh_tw: ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"],
+  zh_cn: ["星期日","星期一","星期二","星期三","星期四","星期五","星期六" ]
+});

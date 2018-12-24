@@ -5,7 +5,7 @@ import { AUTHENTICATE_OAUTH, LOGOUT_CDN } from '../helper/Services';
 
 const HOSTNAME = 'http://' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 const HOST_URI = `${HOSTNAME}/retrieveToken`;
-const REDIRECT_URI = `https://www.facebook.com/v3.2/dialog/oauth?client_id=1288773337839988&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&scope=public_profile,publish_video&response_type=token&state=${HOST_URI}/cgi-bin/facebookAuth`;
+const REDIRECT_URI = `https://www.facebook.com/v3.2/dialog/oauth?client_id=1288773337839988&redirect_uri=https://www.avermedia.com/oauth/auth_v2.0.php&scope=public_profile,publish_video&response_type=token&state=${HOST_URI}`;
  
 
 class ConfigurationFacebook extends React.Component {

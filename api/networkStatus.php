@@ -54,7 +54,7 @@ if( $method === 'POST' ) {
 			if (preg_match("/(Description)/i", $o)) {
 				// echo substr($o, 0, -1)."\n";
 				$pos = strrpos($o, ":") + 2;
-				$nic["id"] = $nicCount;
+				$nic["id"] = (string)$nicCount;
 				$nic["name"] = substr($o, $pos);
 			}
 

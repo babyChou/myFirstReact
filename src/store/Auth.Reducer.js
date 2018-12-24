@@ -10,8 +10,6 @@ import { getCookie } from '../helper/helper';
 // let user = window.name || JSON.parse(window.localStorage.getItem(btoa(USER)));
 let user = window.name || getCookie(btoa(USER));
 
-console.log(window.name);
-
 const initialState = user ? {
     loggedIn: true,
     session: user

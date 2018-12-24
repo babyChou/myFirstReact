@@ -54,9 +54,9 @@ export default class PipCanvas extends React.Component {
 		let x1 = 2, y1 = 2, w1, h1, txtX1, txtY1;
 		let x2 = 2 , y2 = 2,w2, h2, txtX2, txtY2;
 		let fontSize1 = 20, fontSize2 = 20;
-		let cropW = 0;
-		let cropH = 0;
-		let cropX = 0;
+		// let cropW = 0;
+		// let cropH = 0;
+		// let cropX = 0;
 		let cropY = 0;
 		let margin = 0;
 
@@ -73,9 +73,9 @@ export default class PipCanvas extends React.Component {
 			if(h1 > h2) {
 				margin = (height - h1)/2;
 				y1 = cropY = margin;
-				cropX = x2;
-				cropW = w2;
-				cropH = h1;
+				// cropX = x2;
+				// cropW = w2;
+				// cropH = h1;
 				// y2 = (h1 - h2) + margin;
 				y2 = height/2 - h2/2;
 				
@@ -83,9 +83,9 @@ export default class PipCanvas extends React.Component {
 				margin = (height - h2)/2;
 				// y1 = (h2 - h1) + margin;
 				y1 = height/2 - h1/2;
-				cropX = x1;
-				cropW = w1;
-				cropH = h2;
+				// cropX = x1;
+				// cropW = w1;
+				// cropH = h2;
 				y2 = cropY = margin;
 				
 			}

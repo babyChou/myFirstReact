@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, withRouter } from 'react-router-dom';
 import { translate } from "react-i18next";
 import { SET_CONFIG, LOGOUT } from '../helper/Services';
 import { configActions } from '../action/Config.Actions';
@@ -9,7 +9,7 @@ import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap
 import i18n from "../i18n";
 import { deleteCookie } from '../helper/helper';
 import { USER } from '../constant/User.Consts';
-
+import Dialog from "./Dialog";
 
 const languageEmu = {
 	'en': 'English',
@@ -36,13 +36,36 @@ class Header extends React.Component {
 		this.state = {
 			language: languageEmu[props.config.language],
 			collapse: true,
+			isDialogShow: !!(props.config.mastership === 'remoteController'),
 			dropdownOpen: false,
+			dialogObj : {
+				type : 'focusAlert',
+				icon : 'info',
+				title : props.t('msg_remote_controller'),
+				msg : props.t('msg_remote_control_appointment_info'),
+				okLabel : props.t('msg_remote_control_unlock'),
+				ok : () => {
+					SET_CONFIG.fetchData({
+						mastership : 'web'
+					}, 'POST').then(data => {
+						props.setConfig({
+							mastership : 'web'
+						});
+
+						this.setState({
+							isDialogShow : false
+						});
+						
+					});
+				}
+			},
 			pannelStyle : {}
 		};
 
 		this.changeLang = this.changeLang.bind(this);
 		this.panelCollapse = this.panelCollapse.bind(this);
 		this.toggleDropDown = this.toggleDropDown.bind(this);
+		this.goRemote = this.goRemote.bind(this);
 
 	}
 
@@ -88,6 +111,23 @@ class Header extends React.Component {
 		});
 	}
 
+	goRemote() {
+
+		SET_CONFIG.fetchData({
+			mastership : 'remoteController'
+		}, 'POST').then(data => {
+			if(data.result === 0) {
+				this.setState({
+					isDialogShow: true
+				});
+				
+			}
+		});
+
+
+	
+	}
+
 	render() {
 		const { t, children } = this.props;
 		let dropdownRow = [];
@@ -99,10 +139,15 @@ class Header extends React.Component {
 
 		return (
 			<header>
+				<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>
 				<section id="header_top" className="head_2">
 					<div className="head_1"></div>
 					<div className="logo"></div>
 					<ul id="menu_config">
+						<li className="btn_common">
+							{/* <NavLink exact to="/dialog_info" className="ml-rev-15px"><span>{t('msg_remote_control_control')}</span></NavLink> */}
+							<span className="ml-rev-15px" onClick={this.goRemote}>{t('msg_remote_controller_control')}</span>
+						</li>
 						<li className="btn_menu_language" onClick={this.toggleDropDown}>
 							<Dropdown size="sm" isOpen={this.state.dropdownOpen} toggle={this.toggleDropDown}>
 								<DropdownToggle tag="span" >{this.state.language}</DropdownToggle>
@@ -126,6 +171,7 @@ class Header extends React.Component {
 								</DropdownMenu>
 							</Dropdown>
 						</li>
+						
 						<li className="btn_menu_logout" onClick={this.logout}><span>{t('msg_logout')}</span></li>
 					</ul>
 
@@ -139,6 +185,15 @@ class Header extends React.Component {
 						{/* <NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink> */}
 						<NavLink to="/administration" className="btn_administration" activeClassName="active"><span>{t('msg_administration')}</span></NavLink>
 					</nav>
+					{
+						this.props.addition ? 
+						<div className="header_top_addition">
+							{this.props.addition}
+						</div> : 
+						null
+					}
+
+					
 				</section>
 
 				{
@@ -157,6 +212,7 @@ class Header extends React.Component {
 }
 
 export default compose(
+	withRouter,
 	translate('translation'),
 	connect(mapStateToProps, mapDispatchToProps)
 )(Header);

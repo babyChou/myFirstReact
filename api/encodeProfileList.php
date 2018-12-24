@@ -16,6 +16,7 @@ if($method === 'GET') {
 
 	$result->result = 0;
 	$result->profiles = [];
+	$totalBitrate = 0;
 
 	foreach ($json_data as $obj) {
 		$currProfile = [
@@ -25,14 +26,26 @@ if($method === 'GET') {
 			'container' => $obj['container'],
 			'streamType' => $obj['streamType']
 		];
-		
+
+		if(isset($obj['videoInfo'])) {
+			$currProfile['width'] = $obj['videoInfo']['width'];
+			$totalBitrate += $obj['videoInfo']['bitrate'];
+			$currProfile['totalBitrate'] = $totalBitrate;
+		} 
+		if(isset($obj['audioInfo'])) {
+			$totalBitrate += $obj['audioInfo']['bitrate'];
+			$currProfile['totalBitrate'] = $totalBitrate;
+		}
+
+		$currProfile['totalBitrate'] = $currProfile['totalBitrate']/10;
+
 
 		if(isset($obj['videoType'])) {
 			$currProfile['videoType'] = $obj['videoType'];
 		} 
 		if(isset($obj['audioType'])) {
 			$currProfile['audioType'] = $obj['audioType'];
-		} 
+		}
 
 		array_push($result->profiles, $currProfile);
 

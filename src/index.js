@@ -8,6 +8,8 @@ import 'url-search-params';
 //https://reactjs.org/docs/javascript-environment-requirements.html
 //https://stackoverflow.com/questions/43756211/best-way-to-polyfill-es6-features-in-react-app-that-uses-create-react-app
 
+// npm install classlist-polyfill
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { I18nextProvider } from 'react-i18next';
