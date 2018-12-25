@@ -93,6 +93,9 @@ export class FileBrowser extends React.Component {
 							<li className="list-inline-item">
 								<button type="button" className="btn_edit" onClick={()=> this.setState({isSelectDialogShow : true})}></button>
 							</li>
+							<li className="list-inline-item">
+								{dir}
+							</li>
 						</ul>
 						<div className="table-responsive">
 							<table className="table-configuration w-100">

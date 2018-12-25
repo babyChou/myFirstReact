@@ -69,8 +69,6 @@ const NOT_NECESSARY_FIELD = {
 	51 : ['ipAddr','port']
 }
 
-const MAX_BITRATE = 20000;
-
 function isFieldDisabled(key, streamType, isStart) {
 	if(isStart) {
 		return !!isStart;
@@ -210,7 +208,6 @@ class ConfigurationTasks extends React.Component {
 		(encodeProfiles, t) => {
 			let formatName = '';
 			let formatKey = '';
-			let formatTypes = [];
 			let group = [];
 			let group0 = {
 				name : t('msg_profile_category_name_0'),

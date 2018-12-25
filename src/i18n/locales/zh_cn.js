@@ -684,7 +684,6 @@ export default {
     msg_window_size : ' 子视窗尺寸',
     msg_other : '其他',
     msg_remote_control : '遥控器控制',
-    msg_remote_control : 'Remote Control',
     msg_total_bitrate : '串流编码率总量',
     msg_total_bitrate_current : '目前',
     msg_total_bitrate_max : '最大值',
