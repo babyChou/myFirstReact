@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { compose } from "redux";
 import { translate } from "react-i18next";
-import { GET_ENCODE_PROFILE_LIST, GET_ENCODE_PROFILE, SET_ENCODE_PROFILE } from "../helper/Services";
+import { GET_ENCODE_PROFILE_LIST, GET_ENCODE_PROFILE, SET_ENCODE_PROFILE, GET_DEVICE_TASK } from "../helper/Services";
 import { 
 	ENCODE_VIDEO_CODEC,
 	ENCODE_AUDIO_CODEC,
@@ -48,6 +48,7 @@ const audioInfoKeyMap = {
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
 
 const mapStateToProps = store => ({
+	devicesTasks: store.configReducer.devicesTasks,
 	encodingProfiles: store.profiles.encodeProfiles
 });
 
@@ -83,7 +84,16 @@ class EncodingProfile extends React.Component {
 
 	}
 	componentDidMount() {
-		this.getNewList();
+
+		GET_DEVICE_TASK.fetchData({
+			deviceID: 0,
+            taskID: 0
+		}).then(data => {
+			if(data.result === 0) {
+				this.getNewList();
+			}
+		});
+
 	}
 	getNewList() {
 
@@ -275,9 +285,12 @@ class EncodingProfile extends React.Component {
 	
 	render() {
 		const { t } = this.props;
-		const { encodingProfiles } = this.props;
+		const { encodingProfiles, devicesTasks } = this.props;
 		const { editProfileID } = this.state;
 		const customProfiles = encodingProfiles.filter(profile => profile.id > 1000);
+
+
+		// console.log(devicesTasks);
 
 		return (
 			<div className="container_wrapper">
@@ -308,6 +321,10 @@ class EncodingProfile extends React.Component {
 										{
 											customProfiles.map(profile => {
 												let codecArr = [];
+												const isDeleteDisabled = devicesTasks
+																			.filter(device => device.tasks.find(task => task.profileID === profile.id))
+																			.filter(val => !!val).length > 0;
+
 
 												if(profile.videoType) {
 													codecArr.push(ENCODE_VIDEO_CODEC[profile.videoType]);
@@ -356,7 +373,7 @@ class EncodingProfile extends React.Component {
 														}
 													</td>
 													<td className="align-middle"><button className="btn_edit mx-auto" onClick={e => this.editProfile(e, profile.id) }></button></td>
-													<td className="align-middle"><button className="btn_delete mx-auto" onClick={e => this.deleteProfile(e, profile.id) }></button></td>
+													<td className="align-middle"><button className="btn_delete mx-auto" disabled={isDeleteDisabled} onClick={e => this.deleteProfile(e, profile.id) }></button></td>
 												</tr>);
 											})
 										}

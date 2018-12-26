@@ -101,7 +101,7 @@ export class FileBrowser extends React.Component {
 							<table className="table-configuration w-100">
 								<thead className="thead-blue">
 									<tr className="table-bordered">
-										<th scope="col" className="text-center w_85px"></th>
+										<th scope="col" className="text-center w_85px"><input type="checkbox" name="" id=""/></th>
 										<th scope="col" className="text-center">{t('msg_name')}</th>
 										<th scope="col" className="text-center">{t('msg_video_format')}</th>
 										<th scope="col" className="text-center w_300px">{t('msg_date')}</th>
@@ -149,7 +149,7 @@ export class FileBrowser extends React.Component {
 							</table>
 						</div>
 					</WindowModal>
-					<Dialog type="confirm" ok={this.ok} isShow={isSelectDialogShow} toggle={()=> this.setState({isSelectDialogShow : !isSelectDialogShow})}  title={t('msg_time_setting')}>
+					<Dialog type="confirm" ok={this.ok} isShow={isSelectDialogShow} toggle={()=> this.setState({isSelectDialogShow : !isSelectDialogShow})}  title={t('msg_select_remote_path')}>
 						<FileBrowserTree path={dir} updatePath={this.updatePath}></FileBrowserTree>
 					</Dialog>
 				</div>

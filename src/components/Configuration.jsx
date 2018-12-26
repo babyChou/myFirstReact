@@ -120,7 +120,7 @@ class Configuration extends React.Component {
 		let reqPromise = [
 			checkDevicesTasks(true),
 			checkTasksStatus(true),
-			checkEncodeProfiles(),
+			checkEncodeProfiles(true),
 			GET_NETWORK_STATUS.fetchData(),
 			GET_PIP_CONFIG_LIST.fetchData()
 		];
@@ -158,10 +158,6 @@ class Configuration extends React.Component {
 								checkStreamProfiles(task.streamID, true)
 							);
 						});
-					});
-
-					this.setState({
-						isDeviceConfigSet: true
 					});
 
 					return Promise.all(reqPromise2).then(data => data);
@@ -238,7 +234,8 @@ class Configuration extends React.Component {
 				this.setState({
 					pipList,
 					netWorkStatus,
-					devicesTasksDetail
+					devicesTasksDetail,
+					isDeviceConfigSet: true
 				});
 			});
 	}

@@ -272,7 +272,10 @@ class ConfigurationTasks extends React.Component {
 				}
 			});
 
-			group.push(group0);
+			if(group0.formatTypes.length > 0) {
+				group.push(group0);
+			}
+
 
 			return group
 					.filter(group => !!group)
@@ -572,6 +575,9 @@ class ConfigurationTasks extends React.Component {
 				title : t('msg_stream_delete'),
 				msg : t('msg_stream_delete_confirm'),
 				ok : () => {
+					this.setState({
+						isDialogShow : false
+					});
 
 					this.props.handleBackdrop(true);
 

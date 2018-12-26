@@ -159,6 +159,7 @@ $btn-imgs-h30: (
 @include genBtns(21px, $btn-imgs-h21);
 @include genBtns(66px, ('btn_source_hdmi' : '%panel_hdmi_simple'));
 @include genBtns(46px, ('btn_source_sdi' : '%panel_sdi_simple'));
+@include genBtns(32px, ('btn_reconvert' : '%btn_reconvert'));
 
 .btn_common_sm{width: 70px;}
 .btn_common_md{width: 100px;}

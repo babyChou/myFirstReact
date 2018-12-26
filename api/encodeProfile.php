@@ -51,6 +51,10 @@ if($method === 'GET') {
 		}
 	}
 
+	if(empty($customIDArr)) {
+		$customIDArr[] = 1000;
+	}
+
 	$newID = max($customIDArr) + 1;
 
 	$add_data['id'] = $newID;

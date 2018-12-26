@@ -189,7 +189,7 @@ foreach ($files as $f) {
 
 $str = json_encode($profiles);
 
-$file = fopen("./encodeProfileList.json","w");
-echo fwrite($file, $str);
-fclose($file);
+// $file = fopen("./encodeProfileList.json","w");
+// echo fwrite($file, $str);
+// fclose($file);
 ?>

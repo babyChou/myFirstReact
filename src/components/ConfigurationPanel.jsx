@@ -170,7 +170,7 @@ class HeaderPanel extends React.Component {
 											let inputType = type.slice(0, -1);
 											let btnClass = `btn_source_${inputType} panel_${inputType}_simple mx-auto mt-2`;
 											let otherDeviceID = (device.id % 2) + 1;
-											let isDisabled = false;
+											let isDisabled = true;
 
 											if(selectedSource[device.id].indexOf(type) !== -1) {
 												btnClass += ' active';
@@ -181,8 +181,8 @@ class HeaderPanel extends React.Component {
 												} */
 											}
 
-											if(isDeviceStreaming) {
-												isDisabled = true;
+											if(!isDeviceStreaming) {
+												isDisabled = false;
 											}
 
 											return (<div key={device.id + type} className="p-2">
