@@ -689,6 +689,7 @@ export default {
     msg_total_bitrate_max : '最大值',
     msg_current_path : '目前路径',
     msg_select_remote_path : '选择路径',
+    msg_conflict_network_interface: "此设定与其他网络接口冲突",
     validator_accept: "请输入拥有合法后缀名的字符串",
     validator_checkdb: "输入错误，请再重试一次",
     validator_checkspace: "开头不能为空格",

@@ -16,9 +16,10 @@ if($method === 'GET') {
 
 	$result->result = 0;
 	$result->profiles = [];
-	$totalBitrate = 0;
+	
 
 	foreach ($json_data as $obj) {
+		$totalBitrate = 0;
 		$currProfile = [
 			'id' => $obj['id'],
 			'category' => $obj['category'],
@@ -37,7 +38,7 @@ if($method === 'GET') {
 			$currProfile['totalBitrate'] = $totalBitrate;
 		}
 
-		$currProfile['totalBitrate'] = $currProfile['totalBitrate']/10;
+		// $currProfile['totalBitrate'] = $currProfile['totalBitrate'];
 
 
 		if(isset($obj['videoType'])) {

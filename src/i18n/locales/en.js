@@ -688,6 +688,7 @@ export default {
     msg_total_bitrate_max : 'max',
     msg_current_path : 'Current Path',
     msg_select_remote_path : 'Select Path',
+    msg_conflict_network_interface : 'Conflict with other network interface',
     validator_accept : 'Please enter a value with a valid extension.',
     validator_checkdb : 'Wrong inputs. Please try again.',
     validator_checkspace : 'The name cannot start with a space',

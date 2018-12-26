@@ -461,6 +461,7 @@ class Configuration extends React.Component {
 
 		if(taskList.length > 0) {
 			currBitrate = taskList.map(task => encodeProfiles.find(profile => profile.id === task.profileID)['totalBitrate']).reduce((bitrate, currentBitrate) => bitrate + currentBitrate);
+			currBitrate = (currBitrate/1000).toFixed(2);
 		}
 
 
@@ -469,7 +470,7 @@ class Configuration extends React.Component {
 				{/* { this.state.backdropShow ? ( <div className="modal-backdrop fade show" />) : null } */}
 				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Alert isOpen={!!alert.msg} className="fixed-top text-center m-5" color={alert.color}>{alert.msg}</Alert>
-				<Header addition={<p className="color-attention">{`${t('msg_total_bitrate')} ( ${t('msg_total_bitrate_current')} / ${t('msg_total_bitrate_max')} ) ${currBitrate} / 20000 Kbps`}</p>}>
+				<Header addition={<p className="color-attention">{`${t('msg_total_bitrate')} ( ${t('msg_total_bitrate_current')} / ${t('msg_total_bitrate_max')} ) : ${currBitrate} / 20 Mbps`}</p>}>
 					{isDeviceConfigSet ? (<ConfigurationPanel taskList={taskList} devices={devices} selectedSource={selectedSource} devicesConfig={devicesConfig} />) : null}
 				</Header>
 				<section id="config_panel" className="mx-3">

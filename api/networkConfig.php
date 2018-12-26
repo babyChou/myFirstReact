@@ -61,7 +61,7 @@ if( $method === 'POST' || $method === 'PATCH') {
 
 			if (preg_match("/(DHCP)/i", $o)) {
 				if (preg_match("/(YES)/i", $o)) {
-					$dnsType = 0;
+					$dnsType = 1;
 				}else{
 					$dnsType = 2;
 				}
@@ -71,10 +71,11 @@ if( $method === 'POST' || $method === 'PATCH') {
 			if (preg_match("/(Autoconfiguration)/i", $o)) {
 				if (preg_match("/(YES)/i", $o)) {
 					if($dnsType === 0) {
-						$dnsType = 1;
+						$dnsType = 0;
 					}
 				}
 
+				// $nic["dhcp"] = $dnsTypes[0];
 				$nic["dhcp"] = $dnsTypes[$dnsType];
 			}
 
@@ -83,20 +84,20 @@ if( $method === 'POST' || $method === 'PATCH') {
 				foreach ($matchs as $i => $_ip) {
 					if(preg_match("/(IPv4)/i", $o)) {
 						// echo $_ip;
-						// $nic["ip"] = $_ip;
+						// $nic["ip"] = $_ip;//a003670
 					}
 					if(preg_match("/(DNS Servers)/i", $o) || preg_match("/^\s+((?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3})\$/i", $o)) {
 						// echo $o."\n";
 						// $nic["dns"] = array($_ip);
-						// array_push($nic["dns"], $_ip);
+						// array_push($nic["dns"], $_ip);//a003670
 
 					}
 					if(preg_match("/(Default)/i", $o)) {
-						// $nic["gateway"] = $_ip;
+						// $nic["gateway"] = $_ip;//a003670
 					}
 
 					if(preg_match("/(Subnet)/i", $o)) {
-						// $nic["mask"] = $_ip;
+						// $nic["mask"] = $_ip;//a003670
 					}
 					
 					// echo filter_var($_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);

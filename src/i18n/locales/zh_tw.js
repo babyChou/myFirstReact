@@ -688,6 +688,7 @@ export default {
     msg_total_bitrate_current : '目前',
     msg_total_bitrate_max : '最大值',
     msg_current_path : '目前路徑',
+    msg_conflict_network_interface : '此設定與其他網路設定衝突',
     msg_select_remote_path : '選擇路徑',
     validator_accept : '請輸入有效的後缀字串',
     validator_checkdb : '輸入錯誤，請再重試一次',

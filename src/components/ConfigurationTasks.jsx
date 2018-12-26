@@ -301,7 +301,7 @@ class ConfigurationTasks extends React.Component {
 								.map(type => <option key={type[0]} value={type[0]}>{type[1]}</option>)
 	)
 	nicsDOM = memoize(
-		(nics) => nics.map(nic => <option key={nic.id} value={nic.id}>{nic.name}</option>)
+		(nics) => nics.map(nic => <option key={nic.id} value={nic.name}>{nic.name}</option>)
 	)
 
 	videoInputOptionDOM = memoize(
@@ -433,7 +433,7 @@ class ConfigurationTasks extends React.Component {
 
 			switch(oKey) {
 				case 'nic':
-					streamProfile.nic = Number(this.state.nic.value);
+					streamProfile.nic = this.state.nic.value;
 					break;
 				case 'port':
 					streamProfile[subPropsKey]['port'] = Number(this.state.port.value);
@@ -619,7 +619,7 @@ class ConfigurationTasks extends React.Component {
 			case 'port':
 				return 1234;
 			case 'nic':
-				return nics[0]['id'];
+				return nics[0]['name'];
 			default:
 				return '';
 		}

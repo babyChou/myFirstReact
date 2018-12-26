@@ -8,7 +8,7 @@ import Btn from './Btn';
 import Loader from './Loader';
 import { Alert } from 'reactstrap';
 
-const dhcpValArr = ['static_ip', 'auto_ip_dns','auto_ip'];
+const dhcpValArr = ['static_ip','auto_ip','auto_ip_dns'];
 class AdminNetwork extends React.Component {
 	constructor(props) {
 		super(props);
@@ -103,16 +103,16 @@ class AdminNetwork extends React.Component {
 			dhcp : dhcpValArr[dhcpVal]
 		};
 
-		if(dhcpVal === 1){ //auto_ip_dns
+		if(dhcpVal === 1){ //auto_ip
+			updateData.ip = reset;
+			updateData.mask = reset;
+			updateData.gateway = reset;
+		}else if(dhcpVal === 2) { //auto_ip_dns
 			updateData.ip = reset;
 			updateData.mask = reset;
 			updateData.gateway = reset;
 			updateData.dnsMain = reset;
 			updateData.dnsSub = reset;
-		}else if(dhcpVal === 2) { //auto_ip
-			updateData.ip = reset;
-			updateData.mask = reset;
-			updateData.gateway = reset;
 		}
 
 		this.setState(updateData);
@@ -180,7 +180,7 @@ class AdminNetwork extends React.Component {
 					if(nic.ip === ipArr.join('.')) {
 						isFormInVaild = false;
 						ip.invalid = true;
-						ip.errMsg = 'MSG_ This IP is used by the other port';
+						ip.errMsg = t('msg_conflict_network_interface');//ip conflict
 					}
 				}
 			});
@@ -289,6 +289,7 @@ class AdminNetwork extends React.Component {
 									},3000);
 								}else{
 									this.setState({
+										isDialogShow : false,
 										alertColor : 'danger',
 										alertMsg : <React.Fragment><h4 className="alert-heading">{t('msg_failed')}</h4><p>Error code : {data.result}</p></React.Fragment>
 									}, () => {
@@ -365,7 +366,7 @@ class AdminNetwork extends React.Component {
 				dnsMain,
 				dnsSub
 			}, () => {
-				console.log(this.state);
+				// console.log(this.state);
 			});
 		}
 	}
@@ -416,14 +417,14 @@ class AdminNetwork extends React.Component {
 		}
 	}
 	onFocusInput(e) {
-		const name = e.currentTarget.dataset['name'];
+		/* const name = e.currentTarget.dataset['name'];
 		const elIndex = Number(e.target.dataset['index']);
 		let newArr = [...this.state[name + 'Arr']];
 		newArr[elIndex] = '';
 
 		this.setState({
 			[name + 'Arr'] : newArr
-		});
+		}); */
 	}
 	onChangeInput(e) {
 		const nextInputDOM = this.getNextInput(e.target);
@@ -435,7 +436,7 @@ class AdminNetwork extends React.Component {
 		const maxLength = Number(e.target.maxLength);
 		const valLength = e.target.value.length;
 
-		if(!!value) {
+		if(!!value || value === 0) {
 			if(value > max) {
 				value = Number(max);
 			}
@@ -450,7 +451,6 @@ class AdminNetwork extends React.Component {
 			this.setState({
 				[name + 'Arr'] : newArr
 			}, ()=>{
-				console.log(this.state);
 				if(valLength >= maxLength) {
 					if(nextInputDOM) {
 						nextInputDOM.focus();
@@ -485,7 +485,7 @@ class AdminNetwork extends React.Component {
 		}
 			
 
-		if(currentNic.dhcp === 'auto_ip_dns') {
+		if(currentNic.dhcp === 'auto_ip') {
 			dnsMainCss +=  ' disabled';
 			dnsDubCss +=  ' disabled';
 		}
@@ -578,11 +578,11 @@ class AdminNetwork extends React.Component {
 							<div className="mx-2 d-flex align-items-center"><div className="w-45"></div><small className="text-danger">{gateway.errMsg}</small></div>
 						</div>
 						<div className="form-group form-check">
-							<input className="form-check-input" type="radio" value="1" name="dns_setting" id="auto_set_dns" onChange={this.onChangeCheck} checked={currentNic.dhcp === 'auto_ip_dns'} disabled={currentNic.dhcp === 'static_ip'} ref={this.checkedDOMs[2]}/>
+							<input className="form-check-input" type="radio" value="1" name="dns_setting" id="auto_set_dns" onChange={this.onChangeCheck} checked={currentNic.dhcp === 'auto_ip'} disabled={currentNic.dhcp === 'static_ip'} ref={this.checkedDOMs[2]}/>
 							<label className="form-check-label" htmlFor="auto_set_dns">{t('msg_auto_set_dns')}</label>
 						</div>
 						<div className="form-group form-check">
-							<input className="form-check-input" type="radio" value="2" name="dns_setting" id="manually_set_dns" onChange={this.onChangeCheck} checked={currentNic.dhcp === 'static_ip' || currentNic.dhcp === 'auto_ip'}  ref={this.checkedDOMs[3]}/>
+							<input className="form-check-input" type="radio" value="2" name="dns_setting" id="manually_set_dns" onChange={this.onChangeCheck} checked={currentNic.dhcp === 'static_ip' || currentNic.dhcp === 'auto_ip_dns'}  ref={this.checkedDOMs[3]}/>
 							<label className="form-check-label" htmlFor="manually_set_dns">{t('msg_manually_set_dns')}</label>
 						</div>
 						<div className="form-group ml-3">
@@ -595,7 +595,7 @@ class AdminNetwork extends React.Component {
 											const max = (i === 0 ? 223 : 255);
 											return (
 												<React.Fragment key={i}>
-													<input data-index={i} data-name="dnsMain" type="text" maxLength="3" min={min} max={max} value={val} required={(currentNic.dhcp === 'static_ip' || currentNic.dhcp === 'auto_ip')} onChange={this.onChangeInput}/>
+													<input data-index={i} data-name="dnsMain" type="text" maxLength="3" min={min} max={max} value={val} required={(currentNic.dhcp === 'static_ip' || currentNic.dhcp === 'auto_ip_dns')} onChange={this.onChangeInput}/>
 													{ i < (dnsMainArr.length - 1) ? <span className="mx-1">.</span> : null }
 												</React.Fragment>);
 										})
@@ -612,7 +612,7 @@ class AdminNetwork extends React.Component {
 											const max = (i === 0 ? 223 : 255);
 											return (
 												<React.Fragment key={i}>
-													<input data-index={i} data-name="dnsSub" type="text" maxLength="3" min={min} max={max} value={val} required={(currentNic.dhcp === 'static_ip' || currentNic.dhcp === 'auto_ip')} onChange={this.onChangeInput}/>
+													<input data-index={i} data-name="dnsSub" type="text" maxLength="3" min={min} max={max} value={val} required={(currentNic.dhcp === 'static_ip' || currentNic.dhcp === 'auto_ip_dns')} onChange={this.onChangeInput}/>
 													{ i < (dnsSubArr.length - 1) ? <span className="mx-1">.</span> : null }
 												</React.Fragment>);
 										})

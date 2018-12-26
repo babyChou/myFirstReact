@@ -422,7 +422,7 @@ class BroadcastList extends React.Component {
 	                }else if(streamType === 1){
 	                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{uri}', '').replace('{protocol}', protocols[streamType]));
 	                }else{
-	                	if(streamProfile.nic === data.id) {
+	                	if(streamProfile.nic === data.name) {
 	                		urls.push(tempUrl.replace('{ip}', data.ip).replace('{uri}', '').replace('{protocol}', protocols[streamType]));
 	                	}
 	                }
