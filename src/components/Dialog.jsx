@@ -15,6 +15,7 @@ okLabel: <String> default -> t('msg_ok')
 cancelLabel: <String> default -> t('msg_cancel')
 zIndex: <Number> default -> 1050
 backdropZindex: <Number> default -> 1040
+customFooter: null
 */
 
 class Dialog extends React.Component {
@@ -57,7 +58,7 @@ class Dialog extends React.Component {
 	}
 
 	render() {
-		const { t, backdropZindex, zIndex } = this.props;
+		const { t, backdropZindex, zIndex, customFooter } = this.props;
 		const okLabel = this.props.okLabel || t('msg_ok');
 		const cancelLabel = this.props.cancelLabel || t('msg_cancel');
 		const onOk = this.btnAction(this.props.ok);
@@ -107,13 +108,18 @@ class Dialog extends React.Component {
 								}
 								
 							</div>
-							<div className="modal-body px-4">
+							<div className="modal-body px-4 pb-1">
 								{ this.props.type !== 'custom' ? this.reminderDOM(this.props.icon) : null }
 								{ this.props.children }
 							</div>
-							<div className="modal-footer">
-								<Btn onClick={onOk} className="float-right mt-1" {...okProperty}>{okLabel}</Btn>
-								{!this.props.type.match(/alert/i) ? <Btn size="sm" onClick={onCancel} className="float-right mt-1">{cancelLabel}</Btn> : null}
+							<div className="modal-footer px-4 pt-2 pb-4">
+								{
+									customFooter ? customFooter : 
+									<React.Fragment>
+										<Btn onClick={onOk} className="float-right mt-1" {...okProperty}>{okLabel}</Btn>
+										{!this.props.type.match(/alert/i) ? <Btn size="sm" onClick={onCancel} className="float-right mt-1">{cancelLabel}</Btn> : null}
+									</React.Fragment>
+								}
 								
 							</div>
 						</div>

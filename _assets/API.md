@@ -301,6 +301,7 @@ streamType:
             "description": "%s",
             "privacy": "%s", //"unlisted", "private", "public"
             "tag": "%s,"
+            "videoID": "%s"
         },
 
 - 14: CDNvideo
@@ -1476,9 +1477,9 @@ PATCH (Modify)
 
 ```
 {
-	    "result": %d,
-	    "empty": "%s",
-	    "directory": [{
+	 "result": %d,
+	 "empty": "%s",
+	 "directory": [{
 			"name": "%s",
 			"subdirectory": "%s",
 			"time": %d,
@@ -1538,3 +1539,19 @@ PATCH (Modify)
 | type      | int    | 0 USB, 1 cifs                                            |
 | directory | String | \ 取得根目錄下的列表, \dir1 取得根目錄下的dir1其目錄列表 |
 | name      | String | Created or modification name                             |
+
+
+### getStoreDeviceList
+
+* URL: http://HostName:Port/api/storeDeviceList
+* Method: GET
+
+* Response 
+    
+
+```
+{
+   "result": %d,
+   "storeDevices": ["sd","usb"]
+  }
+```

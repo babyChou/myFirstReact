@@ -542,6 +542,11 @@ const DELETE_DIRECTORY = {
     method: 'DELETE',
     fetchData
 };
+const GET_STORE_DEVICE_LIST = {
+    url: '/api/storeDeviceList',
+    method: 'GET',
+    fetchData
+};
 
 
 export {
@@ -589,5 +594,6 @@ export {
     GET_DIRECTORY,
     CREATE_DIRECTORY,
     MODIFY_DIRECTORY,
-    DELETE_DIRECTORY
+    DELETE_DIRECTORY,
+    GET_STORE_DEVICE_LIST
 };

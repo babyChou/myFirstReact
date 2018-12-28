@@ -69,6 +69,11 @@ if($method === 'GET') {
 	$reqDir = $_GET['directory'];
 
 	echo json_encode(dirToArray($dir.$reqDir));
+
+}else if($method === 'POST') {
+	echo json_encode(['result' => 0]);	
+}else if($method === 'DELETE'){
+	echo json_encode(['result' => 0]);	
 }
 
 
