@@ -17,7 +17,29 @@ import {
 	ENCODE_LEVEL
 } from "../constant/Common.Consts";
 
-const DEVICE_MAX_BITRATE = 102400;
+const DEVICE_MAX_BITRATE = 20000;
+// const DEVICE_MAX_BITRATE = Infinity;
+
+function getMaxBitrate(namePrefix) {
+	const currResulution = document.querySelector(`select[name="${namePrefix}_videoInfo_resolution"]`).value;
+	const currProfile = document.querySelector(`select[name="${namePrefix}_videoInfo_profile"]`).value;
+	const currCodec = document.querySelector(`select[name="${namePrefix}_videoType"]`).value;
+	const currLevel = ENCODE_RESOLUTION_LEVEL[currCodec][currResulution][currProfile];
+	const basicVal = ENCODE_LEVEL[currLevel][currCodec][currProfile] || ENCODE_LEVEL[currLevel][currCodec]['main'];
+	let maxBitrate = basicVal;
+
+	if(currCodec === 'h264') {
+		if(currProfile !== 'baseline' && currProfile !== 'main') {
+			maxBitrate = basicVal*1.25;
+		}
+	}
+
+	maxBitrate = (maxBitrate > DEVICE_MAX_BITRATE ? DEVICE_MAX_BITRATE : maxBitrate);
+
+	// console.log(maxBitrate, currLevel, currCodec, currProfile);
+
+	return maxBitrate;
+}
 
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
@@ -53,40 +75,44 @@ class EncodingProfile extends React.Component {
 			maxFrameRate : maxFrameRate*100
 		};
 
-		this.changeResolution = this.changeResolution.bind(this);
 		this.changeEncodeProfile = this.changeEncodeProfile.bind(this);
 		this.changeBitrate = this.changeBitrate.bind(this);
+		this.changeMiddleWare = this.changeMiddleWare.bind(this);
 
 	}
-	componentDidMount() {
 
-	}
-
-	getMaxBitrate() {}
-	getFrameRate() {}
-
-	changeResolution(e) {
-		const { encodingProfile } = this.props;
-		const currResulution = e.target.value;
-		const currProfile = encodingProfile.videoInfo.profile;
-		const currCodec = encodingProfile.videoType;
-		const currLevel = ENCODE_RESOLUTION_LEVEL[currCodec][currResulution][currProfile];
-		const basicVal = ENCODE_LEVEL[currLevel][currCodec][currProfile] || ENCODE_LEVEL[currLevel][currCodec]['main'];
-		let maxBitrate = basicVal;
-
-		if(currCodec === 'h264') {
-			if(currProfile !== 'baseline' && currProfile !== 'main') {
-				maxBitrate = basicVal*1.25;
-			}
+	getSnapshotBeforeUpdate(prevProps, prevState) {
+		const currVideoType = document.querySelector(`select[name="${prevProps.namePrefix}_videoType"]`).value;
+		if (prevProps.encodingProfile.videoType !== currVideoType) {
+			return true
 		}
 
-		maxBitrate = (maxBitrate > DEVICE_MAX_BITRATE ? DEVICE_MAX_BITRATE : maxBitrate);
+		return null;
+	}
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		const namePrefix = prevProps.namePrefix;
 
+		if(snapshot) {
+			this.setState({
+				maxBitrate: getMaxBitrate(namePrefix)
+			});
+		}
+		return null;
+
+	}
+
+	componentDidMount(prevProps, prevState) {
+
+	}
+
+	
+	getFrameRate() {}
+
+	changeMiddleWare(e) {
 		this.setState({
-			maxBitrate : maxBitrate
+			maxBitrate : getMaxBitrate(this.props.namePrefix)
 		});
-		
-		
+
 		this.props.changeVal(e);
 	}
 	changeEncodeProfile(e) {
@@ -123,8 +149,6 @@ class EncodingProfile extends React.Component {
 		const resolution = `${encodingProfile.videoInfo.width}x${encodingProfile.videoInfo.height}`;
 
 
-		// console.log(encodingProfiles);
-
 		return (
 			<div className="form-group row ">
 				<div className="col encoding_form_divider_right">
@@ -144,7 +168,7 @@ class EncodingProfile extends React.Component {
 						
 						<label className="col-auto encoding_form_title">{t('msg_profile_resolution')}</label>
 						<div className="col">
-							<select name={`${this.props.namePrefix}_videoInfo_resolution`} className="form-control" onChange={this.changeResolution} value={resolution}>
+							<select name={`${this.props.namePrefix}_videoInfo_resolution`} className="form-control" onChange={this.changeMiddleWare} value={resolution}>
 								{
 									Object.entries(RESOLUTION).map(resolution => <option key={resolution[0]} value={resolution[0]}>{resolution[0]}</option>)
 								}
@@ -154,7 +178,7 @@ class EncodingProfile extends React.Component {
 					<div className="form-group row">
 						<label className="col-auto encoding_form_title">{t('msg_profile_h264_profile')}</label>
 						<div className="col">
-							<select name={`${this.props.namePrefix}_videoInfo_profile`} className="form-control" onChange={this.props.changeVal} value={encodingProfile.videoInfo.profile}>
+							<select name={`${this.props.namePrefix}_videoInfo_profile`} className="form-control" onChange={this.changeMiddleWare} value={encodingProfile.videoInfo.profile}>
 								{
 									Object.entries(ENCODE_PROFILE)
 											.filter(encodeProfile => encodeProfile[1]['tags'].includes(currVideoType))

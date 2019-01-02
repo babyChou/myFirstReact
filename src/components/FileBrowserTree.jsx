@@ -35,7 +35,7 @@ export class FileBrowserTree extends React.Component {
 		super(props);
 
         this.state = {
-        	newDirName : 'New Folder',
+        	newDirErr : 'New Folder',
         	selectDir : props.path || '\\',
         	storeageType : props.storeageType,
         	storeageList : [],
@@ -115,6 +115,8 @@ export class FileBrowserTree extends React.Component {
         this.getDirectoryInfo = this.getDirectoryInfo.bind(this);
         this.showList = this.showList.bind(this);
         this.closeList = this.closeList.bind(this);
+        this.changeCreateInput = this.changeCreateInput.bind(this);
+
 	}
 	componentDidMount() {
 		
@@ -495,17 +497,41 @@ export class FileBrowserTree extends React.Component {
 		});
 	}
 	createFolder(closeDia) {
-		const { storeageType, selectDir, directory, newDirName } = this.state;
+		const { t } = this.props;
+		const { storeageType, selectDir, directory, newDirErr } = this.state;
 		const currDirInfo = this.getDirectoryInfo(selectDir);
 		const targetDir = selectDir.replace(/(\\)$/,'');
 		let newDirectory = [];
+		const inputDom = document.getElementById('createDirInput');
+
+		inputDom.classList.remove('is-invalid');
+
+		//my-was-validated, is-invalid
+
+		if(!inputDom.checkValidity()) {
+			let errMsg = t('validator_required');
+			console.log(inputDom.validationMessage);
+			console.log(inputDom.validity);
+
+			if(inputDom.validity.patternMismatch) {
+				errMsg = t('msg_special_characters_folder');
+			}
+
+			this.setState({
+				newDirErr : errMsg
+			},() => {
+				inputDom.classList.add('is-invalid');
+			});
+
+			return false;
+		}
 
 		if(!!currDirInfo.directory) {
 			newDirectory = [...currDirInfo.directory];
 		}
 
 		newDirectory = [...newDirectory, {
-				"name": newDirName,
+				"name": inputDom.value,
 				"subDirectory": false,
 				"time": new Date()
 			}];
@@ -530,6 +556,24 @@ export class FileBrowserTree extends React.Component {
 		});
 	}
 
+	changeCreateInput(e) {
+		const inputDom = e.target;
+		const { t } = this.props;
+
+		if(!inputDom.checkValidity()) {
+			let errMsg = t('validator_required');
+
+			if(inputDom.validity.patternMismatch) {
+				errMsg = t('msg_special_characters_folder');
+			}
+
+			this.setState({
+				newDirErr : errMsg
+			});
+		}
+
+	}
+
 	deleteFolder(e) {
 		const { storeageType, selectDir, directory } = this.state;
 		if(e.key !== 'Delete' || selectDir === '\\') {
@@ -537,7 +581,7 @@ export class FileBrowserTree extends React.Component {
 		}
 
 		//TODO: check folder is empty or not
-		//dir = '\\' can not be delete?
+
 		const { t } = this.props;
 		
 		const targetDir = selectDir.replace(/(\\)$/,'');
@@ -589,10 +633,12 @@ export class FileBrowserTree extends React.Component {
 							if(data.result === 0) {
 								this.setState({ 
 									isDialogShow : false,
+									selectDir : '\\',
 									directory : {
 										directory : this.updateDirectory(directory.directory, { subDirectory : newDirectory.length > 0, directory : newDirectory, open : prevNodeDirInfo.open }, prevDir)
 									}
 								});
+
 							}
 
 						});
@@ -651,7 +697,7 @@ export class FileBrowserTree extends React.Component {
 
     render() {
         const { t, isCreatingFolder, updateParentState } = this.props;
-        const { directory, selectDir, storeageType, storeageList, showMenu, isDialogShow, dialogParams } = this.state;
+        const { directory, selectDir, storeageType, storeageList, showMenu, isDialogShow, dialogParams, newDirErr } = this.state;
 
 
          // is-invalid, msg_special_characters_folder
@@ -659,11 +705,11 @@ export class FileBrowserTree extends React.Component {
             <div className="">
             	{ !isCreatingFolder ? null : 
 					<DialogPortal title={t('msg_add_folder')} ok={this.createFolder} cancel={() => { updateParentState({ isCreatingFolder : false }) }}>
-						<div key='body' className="form-group row my-was-validated">
+						<div key='body' className="form-group row">
 							<label className="w_130px col-auto col-form-label">{t('msg_folder_name')}</label>
 							<div className="col">		
-								<input type="text" className="form-control" required pattern="[^\\^\|^/^:^?^<^>^*^+^*]*"/>
-								<div className="invalid-inline-feedback">{t('validator_required')}</div>
+								<input type="text" className="form-control" required pattern="[^\\^\|^/^:^?^<^>^*^+^*]*" id="createDirInput" onChange={this.changeCreateInput}/>
+								<div className="invalid-inline-feedback">{newDirErr}</div>
 							</div>
 						</div>
 					</DialogPortal>

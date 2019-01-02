@@ -17,7 +17,9 @@ export {
     checkUri,
     checkPortNumber,
     concatTasksStatus,
-    serializeParams
+    serializeParams,
+    formatDuration,
+    formatBytes
 };
 
 function setCookie(cKey, cValue, exDays, cPath) {
@@ -39,6 +41,31 @@ function getCookie(cKey) {
         if (c.indexOf(key) === 0) return c.substring(key.length,c.length);
     }
     return "";
+}
+
+
+
+function formatDuration(sec){
+    var days = Math.floor(sec / 86400);
+    var hours = Math.floor((sec % 86400) / 3600);
+    var minutes = Math.floor(((sec % 86400) % 3600) / 60);
+    var seconds = ((sec % 86400) % 3600) % 60;
+
+    if (hours   < 10) {hours = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+
+    return (days > 0 ? days+':' : '') + hours+':'+minutes+':'+seconds;
+}
+
+
+function formatBytes(bytes,decimals) {
+   if(bytes == 0) return '0 Bytes';
+   var k = 1024,
+       dm = decimals <= 0 ? 0 : decimals || 2,
+       sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+       i = Math.floor(Math.log(bytes) / Math.log(k));
+   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 function deleteCookie(cKey,cPath) {

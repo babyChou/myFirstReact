@@ -2,6 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { compose } from "redux";
 import { translate } from "react-i18next";
+import Moment from 'moment';
 
 import Header from './Header';
 import WindowModal from './WindowModal';
@@ -11,6 +12,7 @@ import FileBrowserTree from "./FileBrowserTree";
 
 import { RECORD_STORE_DEVICE } from "../constant/Common.Consts";
 import { GET_STORE_DEVICE_LIST, GET_DIRECTORY } from "../helper/Services";
+import { formatDuration, formatBytes } from "../helper/helper";
 
 /* const mapDispatchToProps = (dispatch) => {
     return {
@@ -23,6 +25,7 @@ import { GET_STORE_DEVICE_LIST, GET_DIRECTORY } from "../helper/Services";
 const mapStateToProps = ({ state }) => ({
     prop: state.prop
 }); */
+
 
 export class FileBrowser extends React.Component {
 	constructor(props) {
@@ -183,35 +186,36 @@ export class FileBrowser extends React.Component {
 										<tbody>
 											{
 												file.map((item,i) => {
+													const time = Moment(item.time*1000).format('YYYY/MM/DD h:mm:ss A');	
 													
 													return (
 														<tr key={i} className="table-common-odd table-bordered">
 															<td className="align-middle text-center"><input type="checkbox" name="" id=""/></td>
 															<td className="align-middle">
-																<img className="w_130px mr-2" src={item.thumbnail} alt=""/>
+																<img className="w_130px mr-2" src={`http://${item.thumbnail}`} alt=""/>
 																<span>{item.name}</span>
 															</td>
 															<td className="align-middle">
 																{
-																	item.videoCodec ? 
+																	item.videoInfo ? 
 																		<div>
-																			<i className="icon_media d-inline-block mr-2"></i> {item.videoCodec}
+																			<i className="icon_media d-inline-block mr-2"></i> {item.videoInfo}
 																		</div> 
 																	: null
 																}
 																{
-																	item.audioCodec ? 
+																	item.audioInfo ? 
 																		<div>
 																			<i className="icon_sound d-inline-block mr-2"></i>
-																			{item.audioCodec }
+																			{item.audioInfo }
 																		</div>
 																	
 																	: null
 																}
 															</td>
-															<td className="align-middle text-center">{item.time}</td>
-															<td className="align-middle text-center"></td>
-															<td className="align-middle text-center">{item.size}</td>
+															<td className="align-middle text-center">{time}</td>
+															<td className="align-middle text-center">{formatDuration(item.duration)}</td>
+															<td className="align-middle text-center">{formatBytes(item.size*1048576)}</td>
 														</tr>
 													);
 												})

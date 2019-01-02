@@ -6,7 +6,8 @@ $dir = realpath('D:\www\_tmp\\');
 
 
 function dirToArray($dir) { 
-   $hostname = 'http://localhost:9998/_tmp/keyaki/';
+   $hostname = 'http://localhost:9998';
+
 	$result = array(
 		'result' => 0,
 		'directory' => array(),
@@ -34,21 +35,26 @@ function dirToArray($dir) {
 				$result['directory'][] = array(
 					'name' => $value,
 					'subDirectory' => $subDirectory,
-					'time' => date ("m/d/Y H:i A", filemtime($curDir))
+					// 'time' => date ("m/d/Y H:i A", filemtime($curDir))
+					'time' => filemtime($curDir)
 				);
 
 			} else { 
 				$mediaObj = array(
 					'name' => $value,
-					'time' => date ("m/d/Y H:i A", filemtime($curDir)),
-					'size' => filesize($curDir)
+					// 'time' => date ("m/d/Y H:i A", filemtime($curDir)),
+					'time' => filemtime($curDir),
+					'size' => filesize($curDir)/1048576, //mb
+					'duration' => rand(10,10000) //seconds
 				);
 
 				if(preg_match('/(\.png)$|(\.jpeg)$|(\.jpg)$/', $value)) {
 
-					$mediaObj['videoCodec'] = 'MP4';
-					$mediaObj['audioCodec'] = 'AAC';
-					$mediaObj['thumbnail'] = $hostname.$value;
+					$mediaObj['videoInfo'] = 'MP4';
+					$mediaObj['audioInfo'] = 'AAC';
+					// $mediaObj['aaa'] = $dir;
+					// $mediaObj['thumbnail'] = preg_replace('/[\\]/g','/',$dir).$value;
+					$mediaObj['thumbnail'] = str_replace('D:/www','localhost:9998', str_replace('\\', '/',$dir)).$value;
 				}
 
 
