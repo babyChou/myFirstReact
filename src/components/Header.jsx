@@ -42,7 +42,10 @@ class Header extends React.Component {
 				type : 'focusAlert',
 				icon : 'info',
 				title : props.t('msg_remote_controller'),
-				msg : props.t('msg_remote_control_appointment_info'),
+				msg : <ol>
+						<li>{props.t('msg_remote_control_appointment_info')}</li>
+						<li>{props.t('msg_remote_control_reflashing_info')}</li>
+					  </ol>,
 				okLabel : props.t('msg_remote_control_unlock'),
 				ok : () => {
 					SET_CONFIG.fetchData({

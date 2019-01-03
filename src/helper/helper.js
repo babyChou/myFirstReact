@@ -19,7 +19,8 @@ export {
     concatTasksStatus,
     serializeParams,
     formatDuration,
-    formatBytes
+    formatBytes,
+    fireEvent
 };
 
 function setCookie(cKey, cValue, exDays, cPath) {
@@ -43,7 +44,17 @@ function getCookie(cKey) {
     return "";
 }
 
-
+function fireEvent(obj,evt){
+    let fireOnThis = obj;
+    if(document.createEvent ) {
+        let evObj = document.createEvent('MouseEvents');
+        evObj.initEvent( evt, true, false );
+        fireOnThis.dispatchEvent( evObj );
+    } else if( document.createEventObject ) {
+        let evObj = document.createEventObject();
+        fireOnThis.fireEvent( 'on' + evt, evObj );
+    }
+}
 
 function formatDuration(sec){
     var days = Math.floor(sec / 86400);

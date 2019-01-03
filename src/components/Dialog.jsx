@@ -51,7 +51,7 @@ class Dialog extends React.Component {
 		return e => {
 			if(isFunction(action)) {
 				action();
-			}else{
+			}else if(!!this.props.toggle && isFunction(this.props.toggle)){
 				this.props.toggle();
 			}
 		};

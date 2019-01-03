@@ -8,23 +8,7 @@ import DialogPortal from "./DialogPortal";
 import { RECORD_STORE_DEVICE } from "../constant/Common.Consts";
 import { GET_STORE_DEVICE_LIST, GET_DIRECTORY, CREATE_DIRECTORY, MODIFY_DIRECTORY, DELETE_DIRECTORY } from "../helper/Services";
 
-/* const mapDispatchToProps = (dispatch) => {
-    return {
-        action: () => {
-            dispatch(actionAction());
-        },
-    };
-};
 
-const mapStateToProps = ({ state }) => ({
-    prop: state.prop
-}); */
-
-
-// msg_double_file_error : 'The file already exists; delete the file with the same name.',
-// msg_comfirm_delete_folling_folders : '此資料夾內還有其他檔案，將會一併刪除，確認是否將 {{FILE}} 刪除 ?',
-// msg_comfirm_delete_single_folders : '確認是否將 {{FILE}} 刪除 ?',
-// msg_special_characters_folder : '不可使用特殊字元，例如 :  \/|\\:?<>*"+',
 // msg_delete_folder_error_not_empty : '刪除失敗，資料夾非為空',
 // msg_create_folder_error : '建立資料夾失敗',
 // msg_delete_folder_error : '刪除資料夾失敗',
@@ -42,7 +26,7 @@ export class FileBrowserTree extends React.Component {
         	showMenu : false,
         	isDialogShow : false,
         	dialogParams : {
-        		mainMsg : '',
+        		mainMsg : props.t('msg_load_store_device_error'),
         		msg : '',
         		ok : this.checkStoreDeviceList.bind(this),
         		type : 'alert',
@@ -127,6 +111,7 @@ export class FileBrowserTree extends React.Component {
 				if(storeageList.length > 0) {
 					let storeageType = this.state.storeageType;
 					let selectDir = this.state.selectDir;
+
 					if(!storeageList.includes(storeageType)) {
 						storeageType = storeageList[0];
 						selectDir = '\\';
@@ -146,9 +131,21 @@ export class FileBrowserTree extends React.Component {
 						isDialogShow : true,
 						dialogParams : {
 							...this.state.dialogParams,
-							mainMsg : this.props.t('msg_store_device_refresh_tip'),
+							mainMsg : this.props.t('msg_load_store_device_error'),
 							msg : '',
-							ok : () => { }//TODO: go back to 
+							ok : () => {
+								this.setState({
+									isDialogShow : false
+								});
+
+								this.props.updateParentState({
+									isSelectDialogShow : false,
+									storeageType : '',
+									dir : '\\',
+									file : [],
+									storeageList : []
+								})
+							}
 						}
 					});
 				}
@@ -185,7 +182,7 @@ export class FileBrowserTree extends React.Component {
 					});
 					
 				}else{
-					//TODO: go back main page
+					
 					this.setState({
 						isDialogShow : false
 					}, () => {
@@ -246,7 +243,7 @@ export class FileBrowserTree extends React.Component {
 						isDialogShow : true,
 						dialogParams : {
 							...this.state.dialogParams,
-							mainMsg : this.props.t('msg_store_device_refresh_tip'),
+							mainMsg : `Load directory error. result : ${data.result}`,
 							msg : ''
 						}
 					});
@@ -295,7 +292,7 @@ export class FileBrowserTree extends React.Component {
 						isDialogShow : true,
 						dialogParams : {
 							...this.state.dialogParams,
-							mainMsg : this.props.t('msg_store_device_refresh_tip'),
+							mainMsg : `Load directory error. result : ${data.result}`,
 							msg : ''
 						}
 					});
@@ -356,7 +353,7 @@ export class FileBrowserTree extends React.Component {
 						isDialogShow : true,
 						dialogParams : {
 							...this.state.dialogParams,
-							mainMsg : this.props.t('msg_store_device_refresh_tip'),
+							mainMsg : `Load directory error. result : ${data.result}`,
 							msg : ''
 						}
 					});
@@ -684,6 +681,8 @@ export class FileBrowserTree extends React.Component {
 			state.storeageType = e.target.dataset.value;
 			state.selectDir = '\\';
 			isReload = true;
+			this.props.updatePath(state.selectDir);
+			this.props.updateStoreageType(state.storeageType);
 			
 		}
 
@@ -720,18 +719,6 @@ export class FileBrowserTree extends React.Component {
             		<DialogPortal {...dialogParams} ></DialogPortal>            			
             	}
 
-				{/* <div className="input-group mb-3">
-					<div className="input-group-prepend">
-						<span className="input-group-text bg-white">{t('msg_current_path')}</span>
-					</div>
-					<input type="text" className="form-control h_auto bg-white" readOnly aria-label="select Dir" value={selectDir}/>
-					<div className="input-group-append">
-						<span className="input-group-text">
-							<button className="btn_reconvert" type="button" onClick={this.loadDirectory}></button>
-						</span>
-					</div>
-				</div> */}
-
 				<div className="input-group mb-3">
 					<div className="input-group-prepend">
 						<button type="button" className="btn btn-outline-secondary dropdown-toggle" onClick={this.showList}>{RECORD_STORE_DEVICE[storeageType]}</button>
@@ -740,11 +727,11 @@ export class FileBrowserTree extends React.Component {
 						</div>
 					</div>
 					<input type="text" className="form-control h_auto bg-white" readOnly aria-label="select Dir" value={selectDir}/>
-					<div className="input-group-append">
+					{/* <div className="input-group-append">
 						<span className="input-group-text">
 							<button className="btn_reconvert" type="button" onClick={this.loadDirectory}></button>
 						</span>
-					</div>
+					</div> */}
 				</div>
             	
             	<div className="treeZone border p-1" ref={this.treeZone}>
@@ -755,10 +742,6 @@ export class FileBrowserTree extends React.Component {
     }
 }
 
-/* export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(FileBrowserTree); */
 
 export default compose(
 	translate("translation"),

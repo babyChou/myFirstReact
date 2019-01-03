@@ -54,7 +54,7 @@ function dirToArray($dir) {
 					$mediaObj['audioInfo'] = 'AAC';
 					// $mediaObj['aaa'] = $dir;
 					// $mediaObj['thumbnail'] = preg_replace('/[\\]/g','/',$dir).$value;
-					$mediaObj['thumbnail'] = str_replace('D:/www','localhost:9998', str_replace('\\', '/',$dir)).$value;
+					$mediaObj['thumbnail'] = str_replace('D:/www','', str_replace('\\', '/',$dir)).$value;
 				}
 
 

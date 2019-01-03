@@ -9,44 +9,47 @@ import WindowModal from './WindowModal';
 import Dialog from "./Dialog";
 import Btn from './Btn';
 import FileBrowserTree from "./FileBrowserTree";
+import Loader from './Loader';
 
-import { RECORD_STORE_DEVICE } from "../constant/Common.Consts";
-import { GET_STORE_DEVICE_LIST, GET_DIRECTORY } from "../helper/Services";
-import { formatDuration, formatBytes } from "../helper/helper";
+import { GET_STORE_DEVICE_LIST, GET_DIRECTORY, DELETE_DIRECTORY } from "../helper/Services";
+import { randomID, formatDuration, formatBytes, fireEvent } from "../helper/helper";
 
-/* const mapDispatchToProps = (dispatch) => {
-    return {
-        action: () => {
-            dispatch(actionAction());
-        },
-    };
-};
 
-const mapStateToProps = ({ state }) => ({
-    prop: state.prop
-}); */
 
+const HOSTNAME = 'http://' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 
 export class FileBrowser extends React.Component {
 	constructor(props) {
 		super(props);
 
         this.state = {
-        	dir: '\\keyaki\\',
+        	dir: '\\',
         	file : [],
         	storeageType : '',
         	storeageList : [],
+        	isWaiting : false,
         	isSelectDialogShow : false,
-        	isCreatingFolder : false
+        	isDialogShow : false,
+        	isCreatingFolder : false,
+        	isDeleteDisabled : true,
+        	isDownloadDisabled : true,
+        	dialogObj : {}
         }
-		this.path = '\\keyaki\\';
+        this.namePrefix = randomID();
+		this.path = this.state.dir;
+		this.storeageType = this.state.storeageType;
+
         this.updatePath = this.updatePath.bind(this);
+        this.updateStoreageType = this.updateStoreageType.bind(this);
         this.updateState = this.updateState.bind(this);
         this.ok = this.ok.bind(this);
         this.cancel = this.cancel.bind(this);
         this.reflashStorage = this.reflashStorage.bind(this);
         this.newFolder = this.newFolder.bind(this);
         this.customFooter = this.customFooter.bind(this);
+        this.onCheckBox = this.onCheckBox.bind(this);
+        this.deleteFile = this.deleteFile.bind(this);
+        this.downloadFile = this.downloadFile.bind(this);
 	}
 	componentDidMount() {
 		this.reflashStorage();
@@ -71,6 +74,8 @@ export class FileBrowser extends React.Component {
 								dir : '\\',
 								file : data.file
 							});
+
+							this.storeageType = storeageList[0];
 						}
 					});
 					
@@ -87,8 +92,9 @@ export class FileBrowser extends React.Component {
 			}
 		})
 
-
-
+	}
+	updateStoreageType(type) {
+		this.storeageType = type;
 	}
 	updatePath(path) {
 		this.path = path;
@@ -101,7 +107,7 @@ export class FileBrowser extends React.Component {
 	loadFiles() {
 		GET_DIRECTORY.fetchData({
 			'type': this.storeageType,
-			'directory':this.path
+			'directory': this.state.dir
 		}).then(data => {
 			if(data.result === 0) {
 
@@ -112,15 +118,50 @@ export class FileBrowser extends React.Component {
 		});
 	}
 	ok() {
-		this.loadFiles();
+
 		this.setState({
 			dir : this.path,
+			storeageType : this.storeageType,
 			isSelectDialogShow : false
+		}, () => {
+			this.loadFiles();
 		});
 	}
 
 	cancel() {
-		this.setState({isSelectDialogShow : false});
+		const { dir, storeageType } = this.state;
+
+		GET_STORE_DEVICE_LIST.fetchData().then(data => {
+			if(data.result === 0) {
+				const  storeageList = data.storeDevices;
+
+				if(storeageList.length > 0 && storeageList.includes(storeageType)) {
+					this.path = dir;
+					this.storeageType = storeageType;
+				}else if(data.storeDevices.length === 0) {
+					this.setState({
+						storeageType : '',
+						dir : '\\',
+						file : [],
+						storeageList : []
+					});
+
+				}else if(!storeageList.includes(storeageType)) {
+					this.setState({
+						storeageType : storeageList[0],
+						dir : '\\',
+						file : [],
+						storeageList : storeageList
+					}, () => {
+						this.loadFiles();
+					});
+				}
+			}
+		});
+		
+		this.setState({
+			isSelectDialogShow : false
+		});
 	}
 	newFolder() {
 		this.setState({isCreatingFolder : true});
@@ -137,9 +178,99 @@ export class FileBrowser extends React.Component {
 		);
 
 	}
+	onCheckBox(e) {
+		const currDom = e.target;
+		let checkCount = 0;
+		if(!!currDom.id && !!currDom.id.match('itemAll')) {
+			document.querySelectorAll(`input[name="item_${this.namePrefix}"]`).forEach(el => {
+				el.checked = currDom.checked;
+			});
+		}else{
+			const isCheckAll = document.querySelectorAll(`input[name="item_${this.namePrefix}"]:checked`).length === this.state.file.length;
+			document.querySelector(`#itemAll_${this.namePrefix}`).checked = isCheckAll;
+		}
+
+		checkCount = document.querySelectorAll(`input[name="item_${this.namePrefix}"]:checked`).length;
+
+		this.setState({
+			isDeleteDisabled : checkCount === 0,
+			isDownloadDisabled : checkCount === 0
+		});
+
+	}
+	deleteFile(e) {
+		const { t } = this.props;
+		const { dir, storeageType } = this.state;
+		let filesName = [];
+		let i = 0;
+
+		document.querySelectorAll(`input[name="item_${this.namePrefix}"]:checked`).forEach(el => {
+			filesName.push(el.value);
+        });
+
+        this.setState({
+			isDialogShow : true,
+			dialogObj : {
+				title : t('msg_confirm_delete_files'),
+				mainMsg : t('msg_comfirm_delete_folling_files'),
+				icon: 'warning',
+				msg : filesName.map(name => <p key={name} className="d-inline-block mr-2">{name} , </p>),
+				ok : (() => {
+					this.setState({
+						isDialogShow : false,
+						isWaiting : true
+					});
+
+					(function _deleteFile(filePath){
+						
+						DELETE_DIRECTORY.fetchData({
+							'type': storeageType,
+							'directory': filePath
+						}).then(data => {
+							if(data.result === 0) {
+								i++;
+								if(!!filesName[i]) {
+									(_deleteFile.bind(this))(dir + filesName[i]);
+								}else{
+									this.setState({
+										isWaiting : false
+									},() => {
+										document.querySelector(`#itemAll_${this.namePrefix}`).checked = false;
+									});
+									this.loadFiles();
+								}
+							}else{
+								alert(`Delete File ${filePath} error. Result : ${data.result}`);
+							}
+						});
+
+					}).bind(this)(dir + filesName[i]);
+
+					
+				}).bind(this),
+				cancel : (() => { this.setState({ isDialogShow : false }); }).bind(this),
+			}
+        });
+
+	}
+	downloadFile(e) {
+		const { dir, storeageType } = this.state;
+		let download = document.createElement('a');
+
+        document.querySelectorAll(`input[name="item_${this.namePrefix}"]:checked`).forEach(el => {
+        	(fileName => {
+        		download.href = `${HOSTNAME}/${storeageType}/${dir.replace(/[\\]/g,'\/')}${fileName}`;
+        		download.download = fileName;
+        		fireEvent(download, 'click');
+        	})(el.value);
+        });
+        
+        // console.log(HOSTNAME, storeageType,dir);
+		
+	}
     render() {
         const { t } = this.props;
-        const { storeageType, isSelectDialogShow, dir, file, storeageList, isCreatingFolder } = this.state;
+        const { storeageType, isSelectDialogShow, isDialogShow, dir, file, storeageList, isCreatingFolder, isDownloadDisabled, isDeleteDisabled, dialogObj, isWaiting } = this.state;
 
 
         return (
@@ -164,10 +295,10 @@ export class FileBrowser extends React.Component {
 								</ul>
 								<ul className="list-inline">
 									<li className="list-inline-item">
-										<button type="button" className="btn_delete" disabled=""></button>
+										<button type="button" className="btn_delete" disabled={isDeleteDisabled} onClick={this.deleteFile}></button>
 									</li>
 									<li className="list-inline-item mr-4">
-										<button type="button" className="btn_add" disabled="" onClick={()=> this.setState({isCreatingFolder : true})}></button>
+										<button type="button" className="btn_add" disabled={isDownloadDisabled} onClick={this.downloadFile}></button>
 									</li>
 									
 								</ul>
@@ -175,12 +306,12 @@ export class FileBrowser extends React.Component {
 									<table className="table-configuration w-100">
 										<thead className="thead-blue">
 											<tr className="table-bordered">
-												<th scope="col" className="text-center w_85px"><input type="checkbox" name="" id=""/></th>
-												<th scope="col" className="text-center">{t('msg_name')}</th>
-												<th scope="col" className="text-center">{t('msg_video_format')}</th>
+												<th scope="col" className="text-center w_85px"><input type="checkbox" id={`itemAll_${this.namePrefix}`} onChange={this.onCheckBox}/></th>
+												<th scope="col" className="text-center w_500px">{t('msg_file_name')}</th>
+												<th scope="col" className="text-center">{t('msg_file_video_format')}</th>
 												<th scope="col" className="text-center w_300px">{t('msg_date')}</th>
 												<th scope="col" className="text-center ">{t('msg_length')}</th>
-												<th scope="col" className="text-center w_85px">{t('msg_size')}</th>
+												<th scope="col" className="text-center">{t('msg_size')}</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -190,9 +321,9 @@ export class FileBrowser extends React.Component {
 													
 													return (
 														<tr key={i} className="table-common-odd table-bordered">
-															<td className="align-middle text-center"><input type="checkbox" name="" id=""/></td>
+															<td className="align-middle text-center"><input type="checkbox" name={`item_${this.namePrefix}`} value={item.name} onChange={this.onCheckBox}/></td>
 															<td className="align-middle">
-																<img className="w_130px mr-2" src={`http://${item.thumbnail}`} alt=""/>
+																<img className="w_130px mr-2" src={ HOSTNAME + item.thumbnail } alt=""/>
 																<span>{item.name}</span>
 															</td>
 															<td className="align-middle">
@@ -227,20 +358,17 @@ export class FileBrowser extends React.Component {
 						}
 
 					</WindowModal>
+					
 					<Dialog type="confirm" ok={this.ok} isShow={isSelectDialogShow} toggle={()=> this.setState({isSelectDialogShow : !isSelectDialogShow})} title={t('msg_select_remote_path')} customFooter={this.customFooter()}>
-						<FileBrowserTree path={dir} storeageType={storeageType} updatePath={this.updatePath} isCreatingFolder={isCreatingFolder} updateParentState={this.updateState}></FileBrowserTree>
+						<FileBrowserTree path={dir} storeageType={storeageType} updatePath={this.updatePath} updateStoreageType={this.updateStoreageType} isCreatingFolder={isCreatingFolder} updateParentState={this.updateState}></FileBrowserTree>
 					</Dialog>
-					{/* <Dialog type="confirm" isShow={isCreatingFolder} zIndex="1051" backdropZindex="1050"   title={t('msg_time_setting')} msg={t('msg_time_restart')}></Dialog> */}
+					<Dialog type="confirm" isShow={isDialogShow} zIndex="1051" backdropZindex="1050" {...dialogObj} ></Dialog>
+					<Loader isOpen={isWaiting}></Loader>
 				</div>
 			</div>
         );
     }
 }
-
-/* export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(FileBrowser); */
 
 export default compose(
 	translate("translation"),

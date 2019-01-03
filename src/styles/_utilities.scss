@@ -74,6 +74,10 @@
 	width: 300px;
 }
 
+.w_500px{
+	width: 500px;
+}
+
 .w_310px{
 	width: 310px;
 }
@@ -148,4 +152,9 @@
 
 .subTree_open{
 	display: block;
+}
+
+.treeZone {
+	height : 210px;
+	overflow-y: auto;
 }
