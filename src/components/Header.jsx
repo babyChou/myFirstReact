@@ -185,7 +185,7 @@ class Header extends React.Component {
 						<NavLink to="/encoding_profile" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink>
 						<NavLink to="/pip" className="btn_pip" activeClassName="active"><span>{t('msg_pip')}</span></NavLink>
 						{/* <NavLink to="/log_management" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink> */}
-						{/* <NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink> */}
+						<NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink>
 						<NavLink to="/administration" className="btn_administration" activeClassName="active"><span>{t('msg_administration')}</span></NavLink>
 					</nav>
 					{

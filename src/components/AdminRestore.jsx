@@ -129,7 +129,7 @@ class AdminRestore extends React.Component {
 		return (
 			<fieldset className="my-was-validated">
 				<div className="form-group row">								
-					<div className="col-auto w_130px">
+					<div className="col-auto conmmon_title_w">
 						{t('msg_backup_sitting')}
 					</div>
 					<div className="col-auto">
@@ -137,7 +137,7 @@ class AdminRestore extends React.Component {
 					</div>
 				</div>
 				<div className="form-group row">
-					<div className="col-auto w_130px">
+					<div className="col-auto conmmon_title_w">
 						{t('msg_restore_sitting')}
 					</div>
 					<div className="col-md-6">

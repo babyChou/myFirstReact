@@ -377,10 +377,11 @@ export class FileBrowserTree extends React.Component {
 		let dirArr = dir.split('\\');
 		let currDirName = '';
 		let _currData = oldData;
+		const findItem = (item => item.name === currDirName);
 
 		while(dirArr.length > 0) {
 			currDirName = dirArr.shift();
-			_currData = _currData.find(item => item.name === currDirName);
+			_currData = _currData.find(findItem);
 
 			if(dirArr.length > 0) {
 				_currData = _currData.directory;
@@ -398,10 +399,11 @@ export class FileBrowserTree extends React.Component {
 		let dirArr = dir.split('\\');
 		let currDirName = '';
 		let _currData = oldData;
+		const findItem = (item => item.name === currDirName);
 
 		while(dirArr.length > 0) {
 			currDirName = dirArr.shift();
-			_currData = _currData.find(item => item.name === currDirName);
+			_currData = _currData.find(findItem);
 
 			if(dirArr.length > 0) {
 				_currData = _currData.directory;
@@ -495,7 +497,7 @@ export class FileBrowserTree extends React.Component {
 	}
 	createFolder(closeDia) {
 		const { t } = this.props;
-		const { storeageType, selectDir, directory, newDirErr } = this.state;
+		const { storeageType, selectDir, directory } = this.state;
 		const currDirInfo = this.getDirectoryInfo(selectDir);
 		const targetDir = selectDir.replace(/(\\)$/,'');
 		let newDirectory = [];
@@ -507,8 +509,6 @@ export class FileBrowserTree extends React.Component {
 
 		if(!inputDom.checkValidity()) {
 			let errMsg = t('validator_required');
-			console.log(inputDom.validationMessage);
-			console.log(inputDom.validity);
 
 			if(inputDom.validity.patternMismatch) {
 				errMsg = t('msg_special_characters_folder');
@@ -621,7 +621,7 @@ export class FileBrowserTree extends React.Component {
 					title: t('msg_delete_folder'),
 					mainMsg : mainMsg,
 					msg : '',
-					ok : (() => {
+					ok : () => {
 						
 						DELETE_DIRECTORY.fetchData({
 							'type': storeageType,
@@ -640,10 +640,10 @@ export class FileBrowserTree extends React.Component {
 
 						});
 
-					}).bind(this),
-					cancel : (() => {
+					},
+					cancel : () => {
 						this.setState({ isDialogShow : false });
-					}).bind(this)
+					}
 				}
 			});
 

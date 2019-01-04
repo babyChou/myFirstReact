@@ -87,7 +87,7 @@ class EncodingProfileEdit extends React.Component {
 	}
 	
 	changeVal(e) {
-		const val = (e.target.type === 'checkbox' ? e.target.checked : e.target.value);
+		let val = (e.target.type === 'checkbox' ? e.target.checked : e.target.value);
 		const attrName = e.target.name.replace(this.props.namePrefix + '_', '');
 
 		if(attrName === 'refProfile') {

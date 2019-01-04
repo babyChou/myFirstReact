@@ -202,7 +202,7 @@ class EncodingProfile extends React.Component {
 				const keySub = attrNameArr[1];
 				let val = el.value;
 
-				if(!isNaN(val)) {
+				if(key !== 'name' && !isNaN(val)) {
 					val = Number(val);
 				}
 

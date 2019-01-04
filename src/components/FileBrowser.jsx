@@ -171,7 +171,7 @@ export class FileBrowser extends React.Component {
 
 		return (
 			<React.Fragment>
-				<Btn onClick={this.newFolder} className="mt-1" style={{marginRight: 'auto'}}>{t('msg_new_folder')}</Btn>
+				<Btn onClick={this.newFolder} className="mt-1" style={{marginRight: 'auto'}}>{t('msg_add_folder')}</Btn>
 				<Btn onClick={this.ok} className="mt-1">{t('msg_ok')}</Btn>
 				<Btn onClick={this.cancel} className="mt-1">{t('msg_cancel')}</Btn>
 			</React.Fragment>
@@ -215,7 +215,7 @@ export class FileBrowser extends React.Component {
 				mainMsg : t('msg_comfirm_delete_folling_files'),
 				icon: 'warning',
 				msg : filesName.map(name => <p key={name} className="d-inline-block mr-2">{name} , </p>),
-				ok : (() => {
+				ok : () => {
 					this.setState({
 						isDialogShow : false,
 						isWaiting : true
@@ -247,8 +247,8 @@ export class FileBrowser extends React.Component {
 					}).bind(this)(dir + filesName[i]);
 
 					
-				}).bind(this),
-				cancel : (() => { this.setState({ isDialogShow : false }); }).bind(this),
+				},
+				cancel : () => { this.setState({ isDialogShow : false }); },
 			}
         });
 

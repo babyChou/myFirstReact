@@ -103,19 +103,19 @@ class AdminAccount extends React.Component {
 		return (
 			<fieldset ref={this.form} className="my-was-validated">
 				<div className="form-group row">
-					<label htmlFor="input_oldUsername" className="col-md-3 col-form-label">{t('msg_input_username_old')}</label>
+					<label htmlFor="input_oldUsername" className="col-auto conmmon_title_w col-form-label">{t('msg_input_username_old')}</label>
 					<div className="col-md-7">
 						<input type="text" className="form-control" id="input_oldUsername" value={oldUsername} onChange={this.changeVal}/>
 					</div>
 				</div>
 				<div className="form-group row">
-					<label htmlFor="input_username" className="col-md-3 col-form-label">{t('msg_input_username_01')}</label>
+					<label htmlFor="input_username" className="col-auto conmmon_title_w col-form-label">{t('msg_input_username_01')}</label>
 					<div className="col-md-7">
 						<input type="text" className="form-control" id="input_username" value={username} onChange={this.changeVal}/>
 					</div>
 				</div>
 				<div className="form-group row">
-					<label htmlFor="input_cfusername" className="col-md-3 col-form-label">{t('msg_input_username_02')}</label>
+					<label htmlFor="input_cfusername" className="col-auto conmmon_title_w col-form-label">{t('msg_input_username_02')}</label>
 					<div className="col-md-7">
 						<input type="text" className="form-control" id="input_cfusername" value={cfusername} onChange={this.changeVal}/>
 						<div className="invalid-inline-feedback">{t('validator_equalTo')}</div>

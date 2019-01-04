@@ -12,9 +12,10 @@ class AdminSap extends React.Component {
 		super(props);
 
 		this.state = {
-			sap : '',
+			sap : props.config.sap,
 			okDisabled : true,
 			alertMsg : '',
+			errMsgKey : '',
 			alertColor : 'info'
 		};
 
@@ -28,20 +29,31 @@ class AdminSap extends React.Component {
 		
 	}
 	changeVal(e) {
-		const attrName = e.target.name.replace('input_','');
-		console.log(attrName, e.target.value);
-		
+		const inputDom = e.target;
+		const attrName = inputDom.name.replace('input_','');
+		inputDom.classList.remove('is-invalid');
+
 		this.setState({
 			[attrName] : e.target.value
 		},() => {
+			
 
 			if(this.form.current.querySelectorAll('input:invalid').length === 0) {
 				this.setState({
 					okDisabled : false
 				});
 			}else{
+				let errMsgKey = 'validator_required';
+
+				if(inputDom.validity.patternMismatch) {
+					errMsgKey = 'msg_special_characters_folder';
+				}
+
 				this.setState({
+					errMsgKey : errMsgKey,
 					okDisabled : true
+				},() => {
+					inputDom.classList.add('is-invalid');
 				});
 			}
 
@@ -51,12 +63,12 @@ class AdminSap extends React.Component {
 	}
 
 	submitForm() {
-		const { t } = this.props;
+		const { t, setConfig } = this.props;
 		const { sap } = this.state;
 
 		SET_CONFIG.fetchData({
 			config : {
-				sap : this.state.name
+				sap : sap
 			}
 		}, 'POST').then(data => {
 			this.setState({
@@ -68,22 +80,25 @@ class AdminSap extends React.Component {
 					});
 				}, MSG_SUCCESS_SECONDS);
 			});
-			/* setConfig({
-				deviceName : this.state.name
-			}) */
+			setConfig({
+				sap : sap
+			})
 
 		});
 	}
 	
 	render() {
-		const { t } = this.props;
-		const { sap, okDisabled, alertMsg, alertColor } = this.state;
+		const { t, config } = this.props;
+		const { sap, okDisabled, alertMsg, alertColor, errMsgKey } = this.state;
 
 		return (
 			<fieldset ref={this.form}>
 				<div className="d-flex align-items-center">
-					<div className="col-md-2">{t('msg_group_name')}</div>
-					<input type="text" className="form-control" name="input_sap" value={sap} onChange={this.changeVal} required/>
+					<div className="conmmon_title_w col-auto">{t('msg_group_name')}</div>
+					<div className="col">
+						<input type="text" className="form-control" name="input_sap" value={sap} onChange={this.changeVal} maxLength="50" required pattern="[^\\^\|^/^:^?^<^>^*^+^*]*"/>
+						<div className="invalid-inline-feedback">{t(errMsgKey)}</div>
+					</div>
 					<div className="col-md-2">
 						<Btn size="sm" type="submit" onClick={this.submitForm} className="" disabled={okDisabled}>{t("msg_ok")}</Btn>
 					</div>

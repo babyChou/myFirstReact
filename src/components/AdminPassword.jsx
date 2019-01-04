@@ -101,19 +101,19 @@ class AdminPassword extends React.Component {
 		return (
 			<fieldset ref={this.form} className="my-was-validated">
 				<div className="form-group row">
-					<label htmlFor="input_oldPassword" className="col-md-3 col-form-label">{t('msg_input_password_old')}</label>
+					<label htmlFor="input_oldPassword" className="col-auto conmmon_title_w col-form-label">{t('msg_input_password_old')}</label>
 					<div className="col-md-7">
 						<input type="password" className="form-control" id="input_oldPassword" value={oldPassword} onChange={this.changeVal}/>
 					</div>
 				</div>
 				<div className="form-group row">
-					<label htmlFor="input_password" className="col-md-3 col-form-label">{t('msg_input_password_01')}</label>
+					<label htmlFor="input_password" className="col-auto conmmon_title_w col-form-label">{t('msg_input_password_01')}</label>
 					<div className="col-md-7">
 						<input type="password" className="form-control" id="input_password" value={password} onChange={this.changeVal}/>
 					</div>
 				</div>
 				<div className="form-group row">
-					<label htmlFor="input_cfpassword" className="col-md-3 col-form-label">{t('msg_input_password_02')}</label>
+					<label htmlFor="input_cfpassword" className="col-auto conmmon_title_w col-form-label">{t('msg_input_password_02')}</label>
 					<div className="col-md-7">
 						<input type="password" className="form-control" id="input_cfpassword" value={cfpassword} onChange={this.changeVal}/>
 						<div className="invalid-inline-feedback">{t('validator_equalTo')}</div>

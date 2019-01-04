@@ -73,7 +73,7 @@ class AdminBasicInfo extends React.Component {
 		const { dialogObj, isDialogShow, name } = this.state;
 
 		return (
-			<fieldset className="">
+			<React.Fragment>
 				<Dialog isShow={isDialogShow} toggle={this.toogleDia} { ...dialogObj }>
 					<div className="form-group row align-items-center">
 						<label htmlFor="" className="col-auto">{t('msg_device_name')}</label>
@@ -84,17 +84,17 @@ class AdminBasicInfo extends React.Component {
 					</div>
 				</Dialog>
 				<div className="d-flex align-items-center">
-					<div className="w-20">{t('msg_device_name')}</div>
-					<div className="">
+					<div className="conmmon_title_w">{t('msg_device_name')}</div>
+					<div className="w-100">
 						<span className="align-middle">{ config.deviceName }</span>
 						<button className="btn_rename_edit d-inline-block align-middle mx-3" onClick={()=>{this.setState({isDialogShow: !isDialogShow })}}></button>
 					</div>
 				</div>
 				<div className="d-flex align-items-center mt-3">
-					<div className="w-20">{t('msg_firmware_version')}</div>
-					<div className="">{ config.version}</div>
+					<div className="conmmon_title_w">{t('msg_firmware_version')}</div>
+					<div className="w-100">{ config.version}</div>
 				</div>
-			</fieldset>
+			</React.Fragment>
 		);
 	}
 }

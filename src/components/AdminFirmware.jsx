@@ -69,12 +69,12 @@ class AdminFirmware extends React.Component {
 		
 	}
 	updateFW(e) {
-		
+		let countdownTimer;
 		UPDATE_FW.fetchData().then(data => {
 			if(data.result === 0) {
 				let seconds = data.seconds || 60;
 
-				setInterval(() => {
+				countdownTimer = setInterval(() => {
 					this.setState({
 						counterShow : true,
 						counter : seconds
@@ -84,6 +84,7 @@ class AdminFirmware extends React.Component {
 
 					if(seconds <= 0) {
 						window.location.reload();
+						clearInterval(countdownTimer);
 					}
 
 				}, 1000);
@@ -98,12 +99,12 @@ class AdminFirmware extends React.Component {
 		const { fileText, fileErrMsg, backdropShow, counterShow, counter, fileOk } = this.state;
 
 		return (
-			<div className="m-2 d-flex align-items-center ">
+			<div className="mt-3 d-flex align-items-center ">
 				{ counterShow ? <Loader innerText={ counter + 's'} text={t('msg_firmware_updateing')}></Loader> : null }
 				{ backdropShow ? <Loader></Loader> : null }
 				
-				<div className="text-capitalize w-30">{t('msg_firmware_update_file')}</div>
-				<div className="custom-file mx-3">
+				<div className="text-capitalize conmmon_title_w">{t('msg_firmware_update_file')}</div>
+				<div className="custom-file mr-3">
 					<input type="file" className={'custom-file-input ' + (fileErrMsg ? 'is-invalid' : '')} id="firmwareInput" onChange={this.onUploadFile} accept=".bin"/>
 					<label className="custom-file-label" htmlFor="customFile" data-content={t('msg_browse')}>{ fileText }</label>
 					<div className="invalid-feedback">{ fileErrMsg }</div>

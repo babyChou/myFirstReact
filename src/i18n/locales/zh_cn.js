@@ -710,6 +710,7 @@ export default {
     msg_file_video_format : '影片格式',
     msg_length : '长度',
     msg_size : '大小',
+    msg_file_browser : '档案浏览',
     validator_accept: "请输入拥有合法后缀名的字符串",
     validator_checkdb: "输入错误，请再重试一次",
     validator_checkspace: "开头不能为空格",
