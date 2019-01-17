@@ -103,7 +103,7 @@ class Dialog extends React.Component {
 							<div className="modal-header text-white">
 								<h6 className="modal-title">{this.props.title}</h6>
 								{
-									this.props.type !== 'focusAlert' ? <button type="button" className="close" aria-label="Close" onClick={onCancel}><span aria-hidden="true">&times;</span></button> :
+									this.props.type !== 'focusAlert' ? <button type="button" className="close" aria-label="Close" ><span aria-hidden="true" onClick={onCancel}>&times;</span></button> :
 									null
 								}
 								

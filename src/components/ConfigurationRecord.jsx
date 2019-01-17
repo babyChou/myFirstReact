@@ -166,7 +166,11 @@ class ConfigurationRecord extends React.Component {
 
 	}
 	getFirstContaner(profiles, profileID) {
-		return profiles.find(profile => profile.id === profileID).container[0];
+		if(profiles.length > 0) {
+			return profiles.find(profile => profile.id === profileID).container[0];
+		}else{
+			return 'flv';
+		}
 	}
 	onChangeVal(e, key) {
 
@@ -247,7 +251,7 @@ class ConfigurationRecord extends React.Component {
 
 
 		UPDATE_CHECK_NETWORK_CONNECTION.fetchData({
-			recordPath : ip + folderPath,
+			recordPath : ip + '/' +folderPath,
 			username : this.state.username.value,
 			password : this.state.password.value,
 		}).then(data => {
@@ -310,8 +314,12 @@ class ConfigurationRecord extends React.Component {
 							{
 								Object.entries(RECORD_CONTAINER)
 								.filter(item => {
-									const container = encodeProfiles.find(profile => profile.id === profileID).container;
-									return container.includes(item[0]);
+									if(encodeProfiles.length > 0) {
+										const container = encodeProfiles.find(profile => profile.id === profileID).container;
+										return container.includes(item[0]);
+									}else{
+										return [];
+									}
 								})
 								.map(item => <option key={item[0]} value={item[0]}>{item[1]}</option>)
 							}
@@ -358,7 +366,7 @@ class ConfigurationRecord extends React.Component {
 					<div className="mb-2 row align-items-center">
 						<div className="col-2 col-lg-2">{t('msg_backup_password')}</div>
 						<div className="col d-flex">
-							<input className="form-control col-3" type="text" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
+							<input className="form-control col-3" type="password" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
 						</div>
 						
 					</div>

@@ -13,7 +13,7 @@ const ConfigurationModal = (props) => {
 			<div className="modal-body">
 				{ props.children[0] }
 				<div className="table-responsive">
-					<table className="table-configuration">
+					<table className="table-configuration w-100">
 						<thead className="thead-blue">
 							<tr className="table-bordered">
 								<th scope="col" className="w_85px">{t('msg_no')}</th>

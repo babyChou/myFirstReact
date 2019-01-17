@@ -218,6 +218,10 @@ export default class Volume extends React.Component {
 		this.updateUIval(val);
 		this.setState({
 			valueText : val
+		},() => {
+			if(isFunction(this.props.onChange)) {
+				this.props.onChange(val, this.props.name);
+			}
 		});
 
 	}
@@ -226,6 +230,10 @@ export default class Volume extends React.Component {
 		this.updateUIval(val);
 		this.setState({
 			valueText : val
+		}, () => {
+			if(isFunction(this.props.onChange)) {
+				this.props.onChange(val, this.props.name);
+			}
 		});
 	}
 	render() {

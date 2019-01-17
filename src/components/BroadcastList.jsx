@@ -3,7 +3,7 @@ import Header from './Header';
 import { translate } from "react-i18next";
 import { connect } from "react-redux";
 import { compose } from 'redux';
-import { BROCASTLIST_GLOBAL_UPDATE_TIME } from "../constant/Init.Consts";
+import { BROCASTLIST_GLOBAL_UPDATE_TIME, BROCASTLIST_PANNEL_UPDATE_TIME } from "../constant/Init.Consts";
 import { INPUT_SOURCES, STREAM_STATUS, RECORD_STORE_DEVICE, RECORD_CONTAINER } from '../constant/Common.Consts';
 import { checkFacilities, checkDeviceConfig, checkDevicesTasks, checkTasksStatus, checkEncodeProfiles, checkStreamProfiles } from '../helper/preloader';
 import { concatTasksStatus } from '../helper/helper';
@@ -139,6 +139,7 @@ class BroadcastList extends React.Component {
 					encodingProfiles.forEach(profile => {
 						if(task.profileID === profile.id) {
 							task.profileName = profile.name;
+							task.profileTotalBitrate = profile.totalBitrate;
 						}
 					});
 
@@ -414,8 +415,9 @@ class BroadcastList extends React.Component {
 	    const tempUrl = '{protocol}://{@}{ip}:{port}{uri}';
 	    const protocols = ['', 'tcp', 'udp', 'udp', 'rtp', 'rtp', '', '', 'rtsp'];
 
-	    if (streamType < 11) {
-	        netWorkStatus.filter(data => (data.ip !== '0.0.0.0'))
+
+	    if (streamType === 8 || streamType === 1) {
+	        netWorkStatus.filter(data => (data.isConnected !== 0))
 	            .forEach(data => {
 	                if (streamType === 8) {
 	                    urls.push(tempUrl.replace('{ip}', data.ip).replace('{protocol}', protocols[streamType]));
@@ -429,7 +431,7 @@ class BroadcastList extends React.Component {
 	            });
 	    }
 
-	    // console.log(netWorkStatus);
+	    // console.log(netWorkStatus);1,8
 	    switch (streamType) {
 	        case 1: //tcp://ip:port
 	            urls = urls.map(url => {
@@ -439,15 +441,11 @@ class BroadcastList extends React.Component {
 	            break;
 	        case 2: // udp://@ip:port
 	        case 3:
-	            urls = urls.map(url => {
-	                return url.replace('{@}', '@').replace('{port}', streamProfile.udp.port);
-	            });
+	        	urls = [tempUrl.replace('{@}', '@').replace('{port}', streamProfile.udp.port).replace('{ip}', streamProfile.udp.ip).replace('{uri}','').replace('{protocol}', protocols[streamType])];
 	            break;
 	        case 4: // rtp://@ip:port
 	        case 5:
-	            urls = urls.map(url => {
-	                return url.replace('{@}', '@').replace('{port}', streamProfile.rtp.port);
-	            });
+	        	urls = [tempUrl.replace('{@}', '@').replace('{port}', streamProfile.rtp.port).replace('{ip}', streamProfile.rtp.ip).replace('{uri}','').replace('{protocol}', protocols[streamType])];
 	            break;
 	        case 6: //FMS URL : streamInfo.rtmpUrl, Stream
 	            urls = [t('msg_fms_addr') + ' ' + streamProfile.rtmp.rtmpUrl ,t('msg_fms_stream_name') + ' ' + streamProfile.rtmp.rtmpStreamName ];
@@ -616,11 +614,22 @@ class BroadcastList extends React.Component {
 					</tr>;
 		}
 
+		let currBitrate = 0;
+
+		devicesTasks.forEach(device => {
+			device.tasks.forEach(task => {
+				currBitrate += task.profileTotalBitrate;				
+			});
+		});
+
+		currBitrate = (currBitrate/1000).toFixed(2);
+
+
 		return (
 			<div className="container_wrapper">
 				{<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>}
 				<Loader isOpen={this.state.backdropShow}></Loader>
-				<Header>
+				<Header addition={<p className="color-attention">{`${t('msg_total_bitrate_ceiling')} ( ${t('msg_total_bitrate_accumulative')} / ${t('msg_total_bitrate_max')} ) : ${currBitrate} / 20 Mbps`}</p>}>
 					<BroadcastListPanel devices={devices} preview={preview} signals={signals}></BroadcastListPanel>
 
 				</Header>

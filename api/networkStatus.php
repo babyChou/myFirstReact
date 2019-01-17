@@ -51,6 +51,8 @@ if( $method === 'POST' ) {
 		if($enableWrite) {
 			// echo $o."\n";
 
+			$nic["isConnected"] = rand(0,1);
+
 			if (preg_match("/(Description)/i", $o)) {
 				// echo substr($o, 0, -1)."\n";
 				$pos = strrpos($o, ":") + 2;

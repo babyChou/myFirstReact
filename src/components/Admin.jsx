@@ -17,8 +17,7 @@ import AdminRestore from './AdminRestore';
 import AdminSystemTime from './AdminSystemTime';
 import AdminSap from './AdminSap';
 
-
-// import Dialog from "./Dialog";
+const IS_HIDE = false;
 
 //form valid https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Form_validation
 const mapStateToProps = store => ({
@@ -57,18 +56,21 @@ class Admin extends React.Component {
 							<AdminFirmware></AdminFirmware>
 						</WindowModal>
 
-						<WindowModal title={t('msg_backup_restore_sitting')}>
-							<AdminRestore></AdminRestore>
-						</WindowModal>
-
-						{/* <WindowModal title={t('msg_ir_blaster_setting')} ></WindowModal> */}
-						 
 						<WindowModal title={t('msg_modify_account')}>
 							<AdminAccount></AdminAccount>
 						</WindowModal>
 						<WindowModal title={t('msg_modify_password')}>
 							<AdminPassword></AdminPassword>
 						</WindowModal>
+
+						{
+							!IS_HIDE ? null: 
+							<WindowModal title={t('msg_backup_restore_sitting')}>
+								<AdminRestore></AdminRestore>
+							</WindowModal>
+						}
+
+						{/* <WindowModal title={t('msg_ir_blaster_setting')} ></WindowModal> */}
 					</div>
 					<div className="col-6">
 						<WindowModal title={t('msg_network_setting')}>
@@ -80,13 +82,18 @@ class Admin extends React.Component {
 								{t('msg_cms_server_enable')}
 							</div>
 						</WindowModal> */}
-
-						<WindowModal title={t('msg_time_setting')} >
-							<AdminSystemTime language={config.language}></AdminSystemTime>
-						</WindowModal>
-						<WindowModal title={t('msg_sap_group_setting')} >
-							<AdminSap config={config} setConfig={setConfig}></AdminSap>
-						</WindowModal>
+						{
+							!IS_HIDE ? null: 
+							<WindowModal title={t('msg_time_setting')} >
+								<AdminSystemTime language={config.language}></AdminSystemTime>
+							</WindowModal>
+						}
+						{
+							!IS_HIDE ? null: 
+							<WindowModal title={t('msg_sap_group_setting')} >
+								<AdminSap config={config} setConfig={setConfig}></AdminSap>
+							</WindowModal>
+						}
 					</div>
 				</div>
 

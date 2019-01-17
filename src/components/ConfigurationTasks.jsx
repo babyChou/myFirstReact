@@ -301,7 +301,13 @@ class ConfigurationTasks extends React.Component {
 								.map(type => <option key={type[0]} value={type[0]}>{type[1]}</option>)
 	)
 	nicsDOM = memoize(
-		(nics) => nics.map(nic => <option key={nic.id} value={nic.name}>{nic.name}</option>)
+		(nics) => nics.map(nic => {
+			if(nic.isConnected === 1) {
+				return <option key={nic.id} value={nic.name}>{nic.ip}</option>;
+			}else{
+				return <option key={nic.id} value={nic.name}>0.0.0.0</option>;
+			}
+		})
 	)
 
 	videoInputOptionDOM = memoize(

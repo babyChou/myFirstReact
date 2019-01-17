@@ -11,6 +11,8 @@ import { deleteCookie } from '../helper/helper';
 import { USER } from '../constant/User.Consts';
 import Dialog from "./Dialog";
 
+const IS_HIDE = false;
+
 const languageEmu = {
 	'en': 'English',
 	'zh_tw': '繁體中文',
@@ -184,8 +186,14 @@ class Header extends React.Component {
 						<NavLink to="/configuration" className="btn_configuration" activeClassName="active"><span>{t('msg_configuration')}</span></NavLink>
 						<NavLink to="/encoding_profile" className="btn_encoding" activeClassName="active"><span>{t('msg_encoding_profile')}</span></NavLink>
 						<NavLink to="/pip" className="btn_pip" activeClassName="active"><span>{t('msg_pip')}</span></NavLink>
-						{/* <NavLink to="/log_management" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink> */}
-						<NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink>
+						{
+							!IS_HIDE ? null : 
+							<NavLink to="/log_management" className="btn_log" activeClassName="active"><span>{t('msg_log_management')}</span></NavLink>
+						}
+						{
+							!IS_HIDE ? null : 
+							<NavLink to="/filebrowser" className="btn_browser" activeClassName="active"><span>{t('msg_file_browser')}</span></NavLink>
+						}
 						<NavLink to="/administration" className="btn_administration" activeClassName="active"><span>{t('msg_administration')}</span></NavLink>
 					</nav>
 					{
