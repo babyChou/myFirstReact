@@ -95,9 +95,7 @@ switch ($method) {
             exit();
         }
 
-
-
-        $document = $collection->findOneAndReplace(
+        $document = $collection->replaceOne(
             ['id' => $profile['id']],
             $profile,
             ['upsert' => true]

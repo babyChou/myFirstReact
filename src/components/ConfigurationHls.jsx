@@ -207,7 +207,7 @@ class ConfigurationHls extends React.Component {
 				<div className="mb-2 form-row align-items-center">
 					<div className="col-3 col-lg-2">{t('msg_rtmp_password')}</div>
 					<div className="col-3 col-lg-2">
-						<input className="form-control" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
+						<input type="password" className="form-control" value={password.value} onChange={e => this.onChangeVal(e, 'password')} />
 					</div>
 				</div>
 

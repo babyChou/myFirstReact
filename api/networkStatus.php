@@ -11,6 +11,34 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // $ip = getHostByName(getHostName());
 
+/*{
+    "nic": [
+        {
+            "dhcp": "auto_ip",
+            "dns": [],
+            "gateway": "",
+            "id": "00181af1b256",
+            "ip": "169.254.80.141",
+            "mask": "255.255.0.0",
+            "name": "eth0",
+            "nic_mask": 0
+        },
+        {
+            "dhcp": "auto_ip",
+            "dns": [
+                "10.1.1.57",
+                "10.1.1.55"
+            ],
+            "gateway": "10.1.9.254",
+            "id": "00181af1b257",
+            "ip": "10.1.9.99",
+            "mask": "255.255.255.0",
+            "name": "eth1",
+            "nic_mask": 0
+        }
+    ],
+    "result": 0
+}*/
 
 if( $method === 'POST' ) {
 

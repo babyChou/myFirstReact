@@ -13,7 +13,6 @@ class AdminBasicInfo extends React.Component {
 			name : props.config.deviceName,
 			dialogObj : {
 				type : 'confirm',
-				title : props.t('msg_edit_device_name'),
 				okDisabled: true,
 				ok : this.ok.bind(this)
 			},
@@ -74,7 +73,7 @@ class AdminBasicInfo extends React.Component {
 
 		return (
 			<React.Fragment>
-				<Dialog isShow={isDialogShow} toggle={this.toogleDia} { ...dialogObj }>
+				<Dialog title={t('msg_edit_device_name')} isShow={isDialogShow} toggle={this.toogleDia} { ...dialogObj }>
 					<div className="form-group row align-items-center">
 						<label htmlFor="" className="col-auto">{t('msg_device_name')}</label>
 						<div className="col">

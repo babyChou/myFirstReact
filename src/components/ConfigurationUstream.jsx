@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { translate } from "react-i18next";
 import { retrieveFromProp, isFunction } from '../helper/helper';
-import { AUTHENTICATE_CDN, GET_CDN_CHANNEL_LIST, LOGOUT_CDN } from '../helper/Services';
+import { AUTHENTICATE_CDN, GET_CDN_CHANNEL_LIST, LOGOUT_CDN, SET_STREAM_PROFILE } from '../helper/Services';
 
 const USTREAM_LOGO = (
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2133 2133">
@@ -172,27 +172,50 @@ class ConfigurationUstream extends React.Component {
 	}
 
 	logout(e) {
-		const streamType = this.props.streamInfo.streamType;
+		const { taskKey, streamInfo, updateRootStreamProfile } = this.props;
+		const streamType = streamInfo.streamType;
 		const { username, password } = this.state;
+		const key = STREAM_TYPES[streamType];
 
-		LOGOUT_CDN.fetchData({
-			streamType
-		}).then(() => {
-			this.setState({
-				username : {
-					...username,
-					value: ''
-				},
-				password : {
-					...password,
-					value: ''
-				},
+		const toEmptyProfile = {
+			[key] : {
 				channelID : '',
-				channels : [],
-				isLogin : false,
-				isCheckingLogin : false
+				password : '',
+				userID : '',
+				videoID : ''
+			}
+		};
+
+		SET_STREAM_PROFILE.fetchData({
+			streamProfile : {
+				id : streamInfo.id,
+				...toEmptyProfile
+			}
+		}, 'PUT').then(data => {
+
+			LOGOUT_CDN.fetchData({
+				streamType
+			}).then(() => {
+
+				updateRootStreamProfile(taskKey, toEmptyProfile);
+
+				this.setState({
+					username : {
+						...username,
+						value: ''
+					},
+					password : {
+						...password,
+						value: ''
+					},
+					channelID : '',
+					channels : [],
+					isLogin : false,
+					isCheckingLogin : false
+				});
 			});
 		});
+
 	}
 	login(e) {
 		const { streamInfo, t } = this.props;
@@ -209,7 +232,6 @@ class ConfigurationUstream extends React.Component {
 		if(cdnLoginFormDOM.length > 0) {
 			return false;
 		}
-
 
 		this.props.handleBackdrop(true);
 

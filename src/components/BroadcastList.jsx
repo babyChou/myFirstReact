@@ -7,7 +7,7 @@ import { BROCASTLIST_GLOBAL_UPDATE_TIME, BROCASTLIST_PANNEL_UPDATE_TIME } from "
 import { INPUT_SOURCES, STREAM_STATUS, RECORD_STORE_DEVICE, RECORD_CONTAINER } from '../constant/Common.Consts';
 import { checkFacilities, checkDeviceConfig, checkDevicesTasks, checkTasksStatus, checkEncodeProfiles, checkStreamProfiles } from '../helper/preloader';
 import { concatTasksStatus } from '../helper/helper';
-import { DELETE_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, GET_NETWORK_STATUS, GET_PIP_PREVIEW_IMG, GET_INPUT_SIGNAL_STATUS } from '../helper/Services';
+import { DELETE_DEVICE_TASK, START_DEVICE_TASK, STOP_DEVICE_TASK, GET_NETWORK_STATUS, GET_PIP_PREVIEW_IMG, GET_INPUT_SIGNAL_STATUS, GET_DEVICE_CONFIG } from '../helper/Services';
 import { NavLink } from 'react-router-dom';
 import BroadcastListPanel from "./BroadcastListPanel";
 import Dialog from "./Dialog";
@@ -20,8 +20,6 @@ const mapStateToProps = store => (
 		selectedSource: store.rootReducer.selectedSource
 	}
 );
-
-const updateSec = BROCASTLIST_GLOBAL_UPDATE_TIME;
 
 class BroadcastList extends React.Component {
 	constructor(props) {
@@ -60,7 +58,7 @@ class BroadcastList extends React.Component {
 
 		checkFacilities().then(facilitys => {
 
-			return Promise.all(facilitys.map(facility => checkDeviceConfig(facility.id)))
+			return Promise.all(facilitys.map(facility => checkDeviceConfig(facility.id, true)))
 							.then((devicesConfig)=> {
 								
 								devicesConfig.forEach(config => {
@@ -93,11 +91,12 @@ class BroadcastList extends React.Component {
 
 	}
 	componentWillUnmount () {
-		clearInterval(this.interval);
+		clearTimeout(this.interval);
 	}
 	componentDidCatch(error, info) {
-		clearInterval(this.interval);
+		clearTimeout(this.interval);
 	}
+
 	renewList() {
 		let reqPromise = [checkDevicesTasks(true), checkEncodeProfiles(), GET_NETWORK_STATUS.fetchData(), checkTasksStatus(true), GET_INPUT_SIGNAL_STATUS.fetchData()];
 		let reqPromise2 = [];
@@ -168,88 +167,23 @@ class BroadcastList extends React.Component {
 
 		})
 		.then(data => {
+			if(this.interval) {
+				clearTimeout(this.interval);
+			}
+
 			this.setState({
 				devicesTasks : data,
 				btnsStatus,
 				tasksIsChecked,
 				backdropShow : false
 			});
+
+
+			this.interval = setTimeout(() => {
+				this.renewList();
+			}, BROCASTLIST_GLOBAL_UPDATE_TIME);
+
 		});
-
-		if(this.interval) {
-			clearInterval(this.interval);
-		}
-
-		this.interval = setInterval(() => {
-			const { devices, selectedSource } = this.props;
-			let queryP = [];
-
-			queryP.push(checkTasksStatus(true).then(tasksStatus => {
-				return this.state.devicesTasks.map(device => {
-					let tasks = tasksStatus.filter(taskStatus => (device.id === taskStatus.deviceID))
-										.map(taskStatus => {
-											let task = device.tasks.filter(task => (task.id === taskStatus.taskID))[0];
-											return {
-												...task,
-												taskStatus: taskStatus
-											};
-										});
-
-					return {
-						id : device.id,
-						tasks : tasks
-					}
-
-				});
-
-			}));
-
-			queryP.push(GET_INPUT_SIGNAL_STATUS.fetchData());
-
-			devices.forEach(device => {
-				let deviceID = device.id;
-				if(selectedSource[deviceID].length > 0) {
-
-					queryP.push(GET_PIP_PREVIEW_IMG.fetchFile({
-						id : deviceID
-					}).then(url => {
-						return {
-							id : deviceID,
-							url: url
-						};
-					}));
-					
-				}
-			});
-
-
-			Promise.all(queryP).then(data => {
-				let updateData = {
-					preview : {
-						...this.state.preview
-					}
-				};
-				data.forEach((uData, i) => {
-					switch(i) {
-						case 0:
-							updateData.devicesTasks = uData;
-							break;
-						case 1:
-							updateData.signals = uData.signalStatuses;
-							break;
-						default: 
-							updateData.preview[uData.id] = uData.url
-							break;
-					}
-				});
-
-				this.setState(updateData);
-				
-			}).catch(err => {
-				clearInterval(this.interval);
-			});
-
-		}, updateSec);
 
 	}
 	taskOnCheck(e) {
@@ -464,23 +398,31 @@ class BroadcastList extends React.Component {
 	        case 11: //https://www.ustream.tv/broadcaster/'+streamInfo.cdnUrl
 	            // http://www.ustream.tv/channel/11753958 (Not sure channelID)
 	            // uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.channelID;
-	            uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.videoID;
+	            if(streamProfile.ustream.videoID) {
+	            	uri = 'https://www.ustream.tv/channel/' + streamProfile.ustream.videoID;
+					urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            }
 	           
-				urls.push(<a href={uri} target="_blank">{uri}</a>);
 	            break;
 	        case 12: //https://www.twitch.tv/'+streamInfo.cdnUser
 	            //https://dev.twitch.tv/docs/v5/reference/channels/#get-channel
 	            //Get Channel by cancelIdleCallback
 	            //Response -> {... "url": "https://www.twitch.tv/dallas" ..}
-	            uri = 'https://www.twitch.tv/' + streamProfile.twitch.userID;//(or url)
-				urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            if(streamProfile.twitch.videoID) {
+	            	uri = 'https://www.twitch.tv/' + streamProfile.twitch.videoID;//(or url)
+					urls.push(<a href={uri} target="_blank">{uri}</a>);
+	            }
 	            break;
 	        case 13:
-				uri = 'https://www.youtube.com/watch?v=' + streamProfile.youtube.videoID;
-				urls.push(<a href={uri} target="_blank">{uri}</a>);
+	        	if(streamProfile.youtube.videoID) {
+					uri = 'https://www.youtube.com/watch?v=' + streamProfile.youtube.videoID;
+					urls.push(<a href={uri} target="_blank">{uri}</a>);
+	        	}
 	            break;
 	        case 15:
-				urls.push(<a href={uri} target="_blank">{streamProfile.facebook.videoID}</a>);
+	        	if(streamProfile.facebook.videoID) {
+					urls.push(<a href={uri} target="_blank">{streamProfile.facebook.videoID}</a>);
+	        	}
 	            break;
 	        case 51:
 	        	urls.push(
@@ -623,15 +565,16 @@ class BroadcastList extends React.Component {
 		});
 
 		currBitrate = (currBitrate/1000).toFixed(2);
-
-
+		
 		return (
 			<div className="container_wrapper">
 				{<Dialog isShow={this.state.isDialogShow} toggle={()=>{this.setState({isDialogShow: !this.state.isDialogShow })}} { ...this.state.dialogObj }></Dialog>}
 				<Loader isOpen={this.state.backdropShow}></Loader>
 				<Header addition={<p className="color-attention">{`${t('msg_total_bitrate_ceiling')} ( ${t('msg_total_bitrate_accumulative')} / ${t('msg_total_bitrate_max')} ) : ${currBitrate} / 20 Mbps`}</p>}>
-					<BroadcastListPanel devices={devices} preview={preview} signals={signals}></BroadcastListPanel>
-
+					
+					{
+						devices.length > 0 ? <BroadcastListPanel devices={devices} preview={preview} signals={signals} selectedSource={selectedSource}></BroadcastListPanel> : null
+					}
 				</Header>
 				<section id="config_panel" className="mx-3">
 				{

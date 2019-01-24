@@ -134,6 +134,7 @@ class ConfigurationRecord extends React.Component {
 
 
 			passData = {
+				...passData,
 				container : this.state.container,
 				storeDevice : this.state.storeDevice,
 				recordPath : ROOT_FOLDER,
@@ -330,9 +331,9 @@ class ConfigurationRecord extends React.Component {
 					<div className="col-2 col-lg-2">{t('msg_file_duration')}</div>
 					<div className="col row align-items-center">
 						<div className="col-3 d-flex mr-4 align-items-center">
-							<input className={`form-control w-35 ${( hour.invalid ? 'is-invalid' : '')}`} type="number" value={hour.value} onChange={e => this.onChangeVal(e, 'hour')} />
+							<input className={`form-control w-35 ${( hour.invalid ? 'is-invalid' : '')}`} type="number" min="0" value={hour.value} onChange={e => this.onChangeVal(e, 'hour')} />
 							<span className={'px-2 ' + ( hour.invalid ? 'text-danger' : '')}>{t('msg_hour')}</span>
-							<input className={`form-control w-35 ${( min.invalid ? 'is-invalid' : '')}`} type="number" value={min.value} onChange={e => this.onChangeVal(e, 'min')} />
+							<input className={`form-control w-35 ${( min.invalid ? 'is-invalid' : '')}`} type="number" min="0" value={min.value} onChange={e => this.onChangeVal(e, 'min')} />
 							<span className={'px-2 ' + ( hour.invalid ? 'text-danger' : '')}>{t('msg_minutes')}</span>
 						</div>
 						<span className={( hour.invalid ? 'text-danger' : 'text-secondary')}>( {MIN_RECORD_DURATION +' '+ t('msg_minutes')} ~ 2 {t('msg_hour')} )</span>

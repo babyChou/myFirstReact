@@ -103,17 +103,23 @@ class AdminNetwork extends React.Component {
 			dhcp : dhcpValArr[dhcpVal]
 		};
 
-		if(dhcpVal === 1){ //auto_ip
+		if(dhcpVal === 1){ //auto_ip  [Auto obtain DNS server address]
 			updateData.ip = reset;
 			updateData.mask = reset;
 			updateData.gateway = reset;
-		}else if(dhcpVal === 2) { //auto_ip_dns
+			updateData.dnsMainArr = ['','','',''];
+			updateData.dnsSubArr = ['','','',''];
+		}else if(dhcpVal === 2) { //auto_ip_dns [Obtain an IP address automatically]
 			updateData.ip = reset;
 			updateData.mask = reset;
 			updateData.gateway = reset;
 			updateData.dnsMain = reset;
 			updateData.dnsSub = reset;
+			updateData.ipArr = ['','','',''];
+			updateData.maskArr = ['','','',''];
+			updateData.gatewayArr = ['','','',''];
 		}
+
 
 		this.setState(updateData);
 
@@ -371,7 +377,6 @@ class AdminNetwork extends React.Component {
 		}
 	}
 	onChangeNicID(e) {
-		const { ipArr, maskArr, gatewayArr, dnsMainArr, dnsSubArr } = this.state; 
 		const currentNic = this.state.netWorkStatus.find(nic => nic.id === e.target.value);
 		let ip,mask,gateway,dnsMain,dnsSub;
 
@@ -380,16 +385,13 @@ class AdminNetwork extends React.Component {
 			errMsg : ''
 		};
 
-
-
-
 		this.setState({
 			currentNic,
-			ipArr : Object.assign(ipArr, currentNic.ip.split('.')),
-			maskArr : Object.assign(maskArr, currentNic.mask.split('.')),
-			gatewayArr : Object.assign(gatewayArr, currentNic.gateway.split('.')),
-			dnsMainArr : Object.assign(dnsMainArr, (currentNic.dns[0] || '...').split('.')),
-			dnsSubArr : Object.assign(dnsSubArr, (currentNic.dns[1] || '...').split('.')),
+			ipArr : Object.assign([], currentNic.ip.split('.')),
+			maskArr : Object.assign([], currentNic.mask.split('.')),
+			gatewayArr : Object.assign([], currentNic.gateway.split('.')),
+			dnsMainArr : Object.assign([], (currentNic.dns[0] || '...').split('.')),
+			dnsSubArr : Object.assign([], (currentNic.dns[1] || '...').split('.')),
 			ip,
 			mask,
 			gateway,

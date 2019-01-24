@@ -72,16 +72,18 @@ class Pip extends React.Component {
 			}
 		});
 		
-
-
-
 	}
 	cloneProfile(e, id) {
 		const newPip = JSON.parse(JSON.stringify(this.state.pipList.find(pipConfig => pipConfig.id === id)));
+		const { pipList } = this.state;
 
 		newPip.custom = true;
 		newPip.name += '-copy';
 		delete newPip.id;
+
+		if(pipList.filter(pip => pip.name === newPip.name).length > 0) {
+			newPip.name += '-copy';
+		}
 
 		SET_PIP_CONFIG.fetchData({
 			config : newPip
@@ -90,7 +92,7 @@ class Pip extends React.Component {
 				newPip.id = data.id;
 				
 				this.setState({
-					pipList : [...this.state.pipList, newPip]
+					pipList : [...pipList, newPip]
 				});
 			}
 		});
@@ -240,7 +242,7 @@ class Pip extends React.Component {
 															<label className="form-check-label" htmlFor={pipConfig.id}>{t('msg_profile_keep_aspect_ratio')}</label>
 														</div>
 														{ pipConfig.custom ? <button className="btn_delete float-right mr-2" onClick={e => this.deleteProfile(e, pipConfig.id) }></button> : null}
-														{ pipConfig.duplicable ? <button className="btn_add float-right mx-2" onClick={e => this.cloneProfile(e, pipConfig.id)} disabled={pipList.length >= 9}></button> : null}
+														{ pipConfig.duplicable ? <button className="btn_add float-right mx-2" onClick={e => this.cloneProfile(e, pipConfig.id)} disabled={pipList.length >= 6}></button> : null}
 														
 													</td>
 												</tr>

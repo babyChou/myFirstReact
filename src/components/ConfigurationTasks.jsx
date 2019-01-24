@@ -66,7 +66,7 @@ const NOT_NECESSARY_FIELD = {
 	21 : [],
 	22 : [],
 	23 : [],
-	51 : ['ipAddr','port']
+	51 : ['ipAddr','port','nic']
 }
 
 function isFieldDisabled(key, streamType, isStart) {
@@ -113,8 +113,6 @@ class ConfigurationTasks extends React.Component {
 		const subPropsKey = STREAM_TYPE_MAP_STREAM_PARAMS[streamType];
 		const restData = streamInfo[subPropsKey] || {};
 		const encodingProfileID = retrieveFromProp('profileID', streamInfo);
-
-		
 
 		this.state = {
 			videoSelected : ['',''],
@@ -429,7 +427,6 @@ class ConfigurationTasks extends React.Component {
 			return false;
 		}
 
-		this.props.handleBackdrop(true);
 		
 		//setup values
 		OPTION_FIELD.forEach(oKey => {
@@ -453,9 +450,21 @@ class ConfigurationTasks extends React.Component {
 			}
 
 		});
+
 		
 		//setup sub values
 		delete data.invalidForm;
+		streamProfile.enableCms = !!data.enableCms;
+
+		if(data.hasOwnProperty('enableCms')) {
+			streamProfile.cms = {};
+			if(data.enableCms) {
+				streamProfile.cms = Object.assign({}, data.cms);
+			}
+		}
+
+		delete data.enableCms;
+		delete data.cms;
 
 
 		streamProfile[subPropsKey] = Object.assign(streamProfile[subPropsKey], {...data});
@@ -464,6 +473,7 @@ class ConfigurationTasks extends React.Component {
 			streamProfile.id = streamID;
 		}
 
+		this.props.handleBackdrop(true);
 		
 		//set stream profile 
 		SET_STREAM_PROFILE.fetchData({
@@ -620,7 +630,7 @@ class ConfigurationTasks extends React.Component {
 	}
 
 	getDefaultVal(key, streamType) {
-		const { nics, firstStreamInfo } = this.props;
+		const { nics } = this.props;
 		switch(key) {
 			case 'port':
 				return 1234;
@@ -779,20 +789,23 @@ class ConfigurationTasks extends React.Component {
 
 		const subDOM = (streamType) => {
 			// console.log(streamType, typeof streamType);
-			const { firstStreamInfo, handleBackdrop, handleAlert, encodeProfiles } = this.props;
+			const { handleBackdrop, handleAlert, encodeProfiles, updateRootStreamProfile, taskKey, isCmsConnected } = this.props;
 			const { isStreamingCheck, encodingProfile } = this.state;
 			const _streamType = Number(streamType);
 
 			const params = {
 				handleStartStreming: this.handleStartStreming,
 				isStreamingCheck: isStreamingCheck,
+				taskKey: taskKey,
 				streamInfo: {
 					...streamInfo,
 					profileID: Number(encodingProfile.value),
 					streamType : _streamType
 				},
 				handleBackdrop: handleBackdrop,
-				handleAlert: handleAlert
+				updateRootStreamProfile: updateRootStreamProfile,
+				handleAlert: handleAlert,
+				isCmsConnected : isCmsConnected
 			};
 			switch(_streamType) {
 				case 1:

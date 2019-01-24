@@ -5,9 +5,16 @@
     {
         font-size: $form-feedback-font-size;
 
-        display: none;
+        @if $state != 'tip' {
+            display: none;
+            width: 100%;
+        } @else {
+            width: auto;
+        }
 
-        width: 100%;
+        // display: none;
+
+        
         margin-top: $form-feedback-margin-top;
 
         color: $color;
@@ -78,7 +85,26 @@
                 }
 
             }
+        }
 
+        @if $state == 'tip' {
+
+            .my-was-validated &:invalid, &.is-invalid
+            {
+                border-color: $form-feedback-invalid-color;
+                &:focus
+                {
+                    color: $form-feedback-invalid-color;
+                    box-shadow: 0 0 0 $input-focus-width rgba($form-feedback-invalid-color, .25);
+                }
+
+                ~ .#{$state}-feedback,
+                ~ .#{$state}-inline-feedback,
+                ~ .#{$state}-tooltip
+                {
+                    color: $form-feedback-invalid-color;
+                }
+            }
         }
     }
 
@@ -93,7 +119,7 @@
                  ~ .#{$state}-inline-feedback,
                  ~ .#{$state}-tooltip
                 {
-                    display: block;
+                    color: $color;
                 }
 
                 ~ .valid-feedback,
@@ -136,6 +162,20 @@
             }
 
         }
+
+        @if $state == 'tip' {
+
+            .my-was-validated &:invalid, &.is-invalid
+            {
+                ~ .form-check-label
+                {
+                    color: $form-feedback-invalid-color;
+                }
+            }
+        }
+
+
+
     }
 
     .custom-control-input

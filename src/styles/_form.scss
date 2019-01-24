@@ -3,6 +3,7 @@
 
 @include my-form-validation-state("invalid", $form-feedback-invalid-color);
 @include my-form-validation-state("valid", $secondary);
+@include my-form-validation-state("tip", $secondary);
 
 
 .form-control{

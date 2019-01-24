@@ -34,6 +34,7 @@ const mapDispatchToProps = (dispatch) => {
 class Header extends React.Component {
 	constructor(props) {
 		super(props);
+		const { t, setConfig } = props;
 
 		this.state = {
 			language: languageEmu[props.config.language],
@@ -43,17 +44,17 @@ class Header extends React.Component {
 			dialogObj : {
 				type : 'focusAlert',
 				icon : 'info',
-				title : props.t('msg_remote_controller'),
+				title : t('msg_remote_controller'),
 				msg : <ol>
-						<li>{props.t('msg_remote_control_appointment_info')}</li>
-						<li>{props.t('msg_remote_control_reflashing_info')}</li>
+						<li>{t('msg_remote_control_appointment_info')}</li>
+						<li>{t('msg_remote_control_reflashing_info')}</li>
 					  </ol>,
-				okLabel : props.t('msg_remote_control_unlock'),
+				okLabel : t('msg_remote_control_unlock'),
 				ok : () => {
 					SET_CONFIG.fetchData({
 						mastership : 'web'
 					}, 'POST').then(data => {
-						props.setConfig({
+						setConfig({
 							mastership : 'web'
 						});
 
@@ -102,6 +103,7 @@ class Header extends React.Component {
 
 	}
 	toggleDropDown(e) {
+
 		this.setState({
 			dropdownOpen : !this.state.dropdownOpen
 		});
@@ -117,13 +119,25 @@ class Header extends React.Component {
 	}
 
 	goRemote() {
-
+		const { dialogObj } = this.state;
+		const { t, setConfig } = this.props;
+		
 		SET_CONFIG.fetchData({
 			mastership : 'remoteController'
 		}, 'POST').then(data => {
 			if(data.result === 0) {
 				this.setState({
-					isDialogShow: true
+					isDialogShow: true,
+					dialogObj : {
+						...dialogObj,
+						title : t('msg_remote_controller'),
+						msg : <ol>
+								<li>{t('msg_remote_control_appointment_info')}</li>
+								<li>{t('msg_remote_control_reflashing_info')}</li>
+							  </ol>,
+						okLabel : t('msg_remote_control_unlock'),
+						
+					}
 				});
 				
 			}

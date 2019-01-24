@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { compose } from "redux";
 import { DEFAULT_STREAM_TYPE, MSG_SUCCESS_SECONDS, MSG_FAILED_SECONDS} from "../constant/Init.Consts";
 import { configActions } from "../action/Config.Actions";
-import { GET_NETWORK_STATUS, GET_PIP_CONFIG_LIST } from "../helper/Services";
+import { GET_NETWORK_STATUS, GET_PIP_CONFIG_LIST, GET_CMS_SERVER_STATUS } from "../helper/Services";
 import { concatTasksStatus, randomID } from "../helper/helper";
 import {
 	checkFacilities,
@@ -101,6 +101,7 @@ class Configuration extends React.Component {
 			netWorkStatus: [],
 			pipList: [],
 			devicesTasksDetail: [],
+			isCmsConnected : false,
 			isDeviceConfigSet: false,
 			backdropShow: false,
 			alert : {
@@ -115,6 +116,7 @@ class Configuration extends React.Component {
 		this.handleBackdrop = this.handleBackdrop.bind(this);
 		this.handleAlert = this.handleAlert.bind(this);
 		this.renewDevicesTasksDetail = this.renewDevicesTasksDetail.bind(this);
+		this.updateRootStreamProfile = this.updateRootStreamProfile.bind(this);
 	}
 	componentDidMount() {
 		let reqPromise = [
@@ -122,12 +124,14 @@ class Configuration extends React.Component {
 			checkTasksStatus(true),
 			checkEncodeProfiles(true),
 			GET_NETWORK_STATUS.fetchData(),
-			GET_PIP_CONFIG_LIST.fetchData()
+			GET_PIP_CONFIG_LIST.fetchData(),
+			GET_CMS_SERVER_STATUS.fetchData()
 		];
 		let reqPromise2 = [];
 		let pipList = [];
 		let netWorkStatus = [];
 		let devicesConfig = [];
+		let isCmsConnected = false;
 		let devices = {}, devicesTasksStatus = {}, encodeProfiles = {};
 
 		checkFacilities()
@@ -148,9 +152,11 @@ class Configuration extends React.Component {
 					encodeProfiles = data[2];
 					netWorkStatus = data[3]["nic"];
 					pipList = data[4]["config"];
+					isCmsConnected = !!data[5].instInfo.streamConnect;
 
 					devicesConfig[1] = data.pop();
 					devicesConfig[0] = data.pop();
+
 
 					devicesTasks.forEach(device => {
 						device.tasks.forEach(task => {
@@ -232,6 +238,7 @@ class Configuration extends React.Component {
 				});
 
 				this.setState({
+					isCmsConnected,
 					pipList,
 					netWorkStatus,
 					devicesTasksDetail,
@@ -339,6 +346,29 @@ class Configuration extends React.Component {
 
 	}
 
+	updateRootStreamProfile(taskKey, streamProfile) {
+		const { devicesTasksDetail } = this.state;
+
+		this.setState({
+			devicesTasksDetail : devicesTasksDetail.map(device => {
+				let tasks = device.tasks.map(task => {
+					if(taskKey === task.taskKey) {
+						return {
+							...task,
+							...streamProfile
+						};
+					}else{
+						return task;
+					}
+				});
+
+				return {
+					...device,
+					tasks
+				};
+			})
+		});
+	}
 
 	addSubTask(deviceID) {
 		let devicesTasksDetail = [];
@@ -451,7 +481,7 @@ class Configuration extends React.Component {
 	}
 	render() {
 		const { t, devices, encodeProfiles, devicesConfig, selectedSource } = this.props;
-		const { netWorkStatus, devicesTasksDetail, isDeviceConfigSet, alert } = this.state;
+		const { netWorkStatus, devicesTasksDetail, isDeviceConfigSet, alert, isCmsConnected } = this.state;
 		let currBitrate = 0;
 		let taskList = [];
 
@@ -560,7 +590,9 @@ class Configuration extends React.Component {
 										handleBackdrop : this.handleBackdrop,
 										handleAlert : this.handleAlert,
 										renewDevicesTasksDetail : this.renewDevicesTasksDetail,
-										isDeviceStreaming : isDeviceStreaming
+										updateRootStreamProfile : this.updateRootStreamProfile,
+										isDeviceStreaming : isDeviceStreaming,
+										isCmsConnected : isCmsConnected
 									};
 
 									return (

@@ -1,16 +1,72 @@
 import * as React from 'react';
 import { translate } from "react-i18next";
+import { BROCASTLIST_PANNEL_UPDATE_TIME } from "../constant/Init.Consts";
 import { INPUT_DEVICE_NAME, INPUT_SOURCES } from '../constant/Common.Consts';
-
+import { GET_PIP_PREVIEW_IMG } from '../helper/Services';
 
 class BroadcastListPanel extends React.Component {
+	constructor(props) {
+		super(props);
 
-	componentDidMount() {}
+		this.state = {
+			preview: {
+				1 : props.preview['1'],
+				2 : props.preview['2']
+			}
+		};
+		
+		this.interval = {};
+		this.renewPreview = this.renewPreview.bind(this);
+	}
+
+	componentDidMount() {
+		const { devices } = this.props;
+
+		devices.forEach(device => {
+			this.renewPreview(device.id);
+		});
+	}
 	componentDidUpdate(prevProps, prevState) {}
-	componentWillUnmount () {}
+	componentWillUnmount () {
+		const { devices } = this.props;
+
+		devices.forEach(device => {
+			clearTimeout(this.interval[device.id]);
+		});
+	}
+
+	renewPreview(deviceID){
+		const { selectedSource } = this.props;
+
+		if(this.interval[deviceID]) {
+			clearTimeout(this.interval[deviceID]);
+		}
+
+		if(selectedSource[deviceID].length > 0) {	
+				
+			GET_PIP_PREVIEW_IMG.fetchFile({
+				id : deviceID
+			}).then(url=> {
+
+				this.setState({
+					preview : {
+						...this.state.preview,
+						[deviceID] : url
+					}
+				});
+			});
+		}
+
+
+		this.interval[deviceID] = setTimeout(() => {
+			this.renewPreview(deviceID);
+		}, BROCASTLIST_PANNEL_UPDATE_TIME);
+
+	}
 
 	render() {
-		const { t, devices, preview, signals } = this.props;
+		const { preview } = this.state;
+		const { t, devices, signals } = this.props;
 
 		return (
 			<React.Fragment>
@@ -31,7 +87,7 @@ class BroadcastListPanel extends React.Component {
 									</div>
 									{
 										signals.map((signal,i) => {
-											if(signal.deviceID === device.id) {											
+											if(signal.deviceID === device.id) {						
 												return (
 													<div key={signal.sourceType} className={'p-2 ' + (signal.quality > 60 ? 'text-success' : 'text-danger')}>
 														<h6 >{INPUT_SOURCES[signal.sourceType]}</h6>

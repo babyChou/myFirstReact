@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { translate } from "react-i18next";
 import { randomID, retrieveFromProp } from '../helper/helper';
+import ConfigurationCms from './ConfigurationCms';
 
 const STREAM_TYPE_MAP_STREAM_PARAMS = {
 	1 : 'tcp',
@@ -15,6 +16,8 @@ class ConfigurationTcp extends React.Component {
 		super(props);
 		const streamType = Number(props.streamInfo.streamType);
 		const objProps = props.streamInfo[STREAM_TYPE_MAP_STREAM_PARAMS[streamType]] || {};
+		const cmsProps = props.streamInfo.cms || {};
+		const cmsDesc = retrieveFromProp('description', cmsProps);
 
 		this.state = {
 			setPid: retrieveFromProp('setPid', objProps) || false,
@@ -49,7 +52,25 @@ class ConfigurationTcp extends React.Component {
 				errMsg: ''
 			},
 			sap: retrieveFromProp('sap', objProps) || true,
-			errMsg : ''
+			errMsg : '',
+			enableCms: {
+				value: !!props.streamInfo.enableCms
+			},
+			playBackUrl : {
+				value: retrieveFromProp('playBackUrl', cmsProps) || '',
+				invalid: false,
+				errMsg: ''
+			},
+			title : {
+				value: retrieveFromProp('title', cmsProps) || '',
+				invalid: false,
+				errMsg: '',
+			},
+			description : {
+				value: cmsDesc,
+				invalid: false,
+				textLength: cmsDesc.length,
+			}
 		};
 
 		this.adjustPidID = randomID();
@@ -57,6 +78,7 @@ class ConfigurationTcp extends React.Component {
 
 		this.multicastDOM = this.multicastDOM.bind(this);
 		this.onChangeVal = this.onChangeVal.bind(this);
+		this.updateParentValue = this.updateParentValue.bind(this);
 
 	}
 	componentDidMount() {
@@ -143,6 +165,22 @@ class ConfigurationTcp extends React.Component {
 				passData.sap = this.state.sap;
 			}
 
+			if(Number(streamInfo.streamType) === 3) {
+				passData.enableCms = !!this.state.enableCms.value;
+
+				if(passData.enableCms) {
+					passData.cms = {};
+					document.querySelector(`#tsForm_${deviceID} .cms_stream_config`)
+								.querySelectorAll('input:valid, textarea:valid').forEach(el => {
+									const keyName = el.name.split('_')[1];
+									if(keyName !== 'enableCms') {
+										passData.cms[keyName] = el.value;
+									}
+								});
+				}
+
+			}
+
 			this.setState(updateState);
 			this.props.handleStartStreming(passData);
 		}
@@ -189,10 +227,21 @@ class ConfigurationTcp extends React.Component {
 			</React.Fragment>
 		);
 	}
+	updateParentValue(updateObj) {
+		this.setState(updateObj);
+	}
 
 	render() {
-		const { t, streamInfo } = this.props;
-		const { setPid, videoPid, audioPid, pmtPid, pcrPid, errMsg } = this.state;
+		const { t, streamInfo, isCmsConnected } = this.props;
+		const { setPid, videoPid, audioPid, pmtPid, pcrPid, errMsg, playBackUrl, title, description, enableCms } = this.state;
+		const cmsParam = { 
+			playBackUrl,
+			title,
+			description,
+			enableCms,
+			streamType : Number(streamInfo.streamType),
+			updateParentValue : this.updateParentValue
+		};
 
 		return (
 			<fieldset id={`tsForm_${streamInfo.deviceID}`} className="container-fluid" disabled={streamInfo.isStart}>
@@ -241,6 +290,10 @@ class ConfigurationTcp extends React.Component {
 						</div>
 					</React.Fragment>
 					: null
+				}
+
+				{
+					(Number(streamInfo.streamType) === 3 && isCmsConnected) ? <ConfigurationCms {...cmsParam}></ConfigurationCms> : null
 				}
 			</fieldset>
 		);

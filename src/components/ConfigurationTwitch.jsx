@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { translate } from "react-i18next";
 import { randomID, retrieveFromProp } from '../helper/helper';
-import { AUTHENTICATE_OAUTH, LOGOUT_CDN } from '../helper/Services';
+import { AUTHENTICATE_OAUTH, LOGOUT_CDN, SET_STREAM_PROFILE } from '../helper/Services';
 
 const HOSTNAME = 'http://' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
 const HOST_URI = `${HOSTNAME}/retrieveToken`;
@@ -77,15 +77,33 @@ class ConfigurationTwitch extends React.Component {
 	}
 
 	logout(e) {
-		
-		LOGOUT_CDN.fetchData({
-			streamType : 12
-		}).then(() => {
-			this.setState({
-				userID : null,
-				loginErrMsg : ''
+		const { taskKey, streamInfo, updateRootStreamProfile } = this.props;
+		const toEmptyProfile = {
+			twitch : {
+				channelID: '',
+				userID: '',
+				videoID: ''
+			}
+		};
+
+		SET_STREAM_PROFILE.fetchData({
+			streamProfile : {
+				id : streamInfo.id,
+				...toEmptyProfile
+			}
+		}, 'PUT').then(data => {
+
+			LOGOUT_CDN.fetchData({
+				streamType : 12
+			}).then(() => {
+				updateRootStreamProfile(taskKey, toEmptyProfile);
+				this.setState({
+					userID : null,
+					loginErrMsg : ''
+				});
 			});
 		});
+		
 	}
 	login(e) {
 		this.popup = window.open(REDIRECT_URI,'' , 'height=550px, width=980px');

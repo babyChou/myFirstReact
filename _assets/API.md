@@ -355,6 +355,7 @@ streamType:
       "id":%d,
       "name":"%s ",
       "streamType":%d,
+      "enableCms": %b,
       "uri":"%s ",
       "nic":"%s ",
       "youtube" : {....},
@@ -368,9 +369,15 @@ streamType:
       "hls" : {...},
       "rtsp" : {...},
       "record" : {...},
-      "cms" : {...},
+      "cms" : {
+          "title" : %s,
+          "description" : %s
+          "playBackUrl" : %s
+      },
    }
 }
+```
+
 ```
 
 

@@ -20,7 +20,8 @@ export {
     serializeParams,
     formatDuration,
     formatBytes,
-    fireEvent
+    fireEvent,
+    isHtmlInputTypeSupported
 };
 
 function setCookie(cKey, cValue, exDays, cPath) {
@@ -259,4 +260,12 @@ function concatTasksStatus(_devicesTasks, _tasksStatu) {
         };
 
     });
+}
+
+function isHtmlInputTypeSupported(type) {
+    let input = document.createElement('input');
+    let value = 'a';
+    input.setAttribute('type', type);
+    input.setAttribute('value', value);
+    return (input.value !== value);
 }

@@ -10,7 +10,7 @@ import { deleteCookie } from '../helper/helper';
 const rootDOM = document.getElementById('root');
 const errorDOM = document.getElementById('error');
 
-let hostname = './';
+let hostname = '.';
 let SESSION = '';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -143,7 +143,8 @@ function fetchData(params, method, isStore) {
             url: this.url, body: errInfo.text || err.stack, type: errInfo.type
         }));
 
-        rootDOM.removeChild(rootDOM.firstChild);
+        // rootDOM.removeChild(rootDOM.firstChild);
+        rootDOM.style.display = 'none';
         errorDOM.classList.remove('d-none');
 
         throw err;
@@ -542,11 +543,37 @@ const DELETE_DIRECTORY = {
     method: 'DELETE',
     fetchData
 };
+
 const GET_STORE_DEVICE_LIST = {
     url: '/api/storeDeviceList',
     method: 'GET',
     fetchData
 };
+
+const SET_REBOOT_SCHEDULE = {
+    url: '/api/rebootSchedule',
+    method: 'POST',
+    fetchData
+};
+
+const GET_REBOOT_SCHEDULE = {
+    url: '/api/rebootSchedule',
+    method: 'GET',
+    fetchData
+};
+
+const GET_CMS_SERVER_STATUS = {
+    url: '/api/getCMSRegStatus',
+    method: 'GET',
+    fetchData
+};
+
+const SET_CMS_SERVER = {
+    url: '/api/connectToCMS',
+    method: 'POST',
+    fetchData
+};
+
 
 
 export {
@@ -595,5 +622,9 @@ export {
     CREATE_DIRECTORY,
     MODIFY_DIRECTORY,
     DELETE_DIRECTORY,
-    GET_STORE_DEVICE_LIST
+    GET_STORE_DEVICE_LIST,
+    SET_REBOOT_SCHEDULE,
+    GET_REBOOT_SCHEDULE,
+    GET_CMS_SERVER_STATUS,
+    SET_CMS_SERVER
 };

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { translate } from "react-i18next";
 import { randomID, retrieveFromProp } from '../helper/helper';
-import { AUTHENTICATE_OAUTH, LOGOUT_CDN } from '../helper/Services';
+import { AUTHENTICATE_OAUTH, LOGOUT_CDN, SET_STREAM_PROFILE } from '../helper/Services';
 import Tag from './Tag';
 
 const HOSTNAME = 'http://' + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
@@ -143,15 +143,37 @@ class ConfigurationYoutube extends React.Component {
 	}
 
 	logout(e) {
-		
-		LOGOUT_CDN.fetchData({
-			streamType : 13
-		}).then(() => {
-			this.setState({
-				userID : null,
-				loginErrMsg : ''
+		const { taskKey, streamInfo, updateRootStreamProfile } = this.props;
+		const toEmptyProfile = {
+			youtube : {
+				userID : '',
+				channelID: '',
+				description: '',
+				privacy: '',
+				tag: '',
+				title: '',
+				videoID: '',
+			}
+		};
+
+		SET_STREAM_PROFILE.fetchData({
+			streamProfile : {
+				id : streamInfo.id,
+				...toEmptyProfile
+			}
+		}, 'PUT').then(data => {
+
+			LOGOUT_CDN.fetchData({
+				streamType : 13
+			}).then(() => {
+				updateRootStreamProfile(taskKey, toEmptyProfile);
+				this.setState({
+					userID : null,
+					loginErrMsg : ''
+				});
 			});
 		});
+
 	}
 	login(e) {
 		this.popup = window.open(REDIRECT_URI,'' , 'height=550px, width=980px');
